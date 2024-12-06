@@ -23,6 +23,13 @@ html {
   font-style: normal;
   color: var(--p-stone-200);
 }
+.p-dialog {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--p-stone-200);
+  font-size: 24px;
+}
 
 h1,
 h2,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from "primevue";
+import { Button, Dialog } from "primevue";
 import { abilities } from "../data/ability";
 import { ages } from "../data/age";
 import { personalities } from "../data/personality";
@@ -15,10 +15,33 @@ import {
   materialProperties,
   materials,
 } from "../data/crafting";
+import { skills } from "../data/skills";
+import { ref } from "vue";
+
+const isSkillsDialogOpen = ref<boolean>(false);
+
+function openSkillsDialog() {
+  isSkillsDialogOpen.value = true;
+}
 </script>
 
 <template>
   <div class="rules">
+    <Dialog
+      modal
+      v-model:visible="isSkillsDialogOpen"
+      header="Skills"
+      :style="{}"
+    >
+      <div class="skill-examples">
+        <div class="skill-example" v-for="skill in skills">
+          <h4 class="text-contrast">{{ skill.name }}:</h4>
+          <p v-for="desc in skill.description">
+            {{ desc }}
+          </p>
+        </div>
+      </div>
+    </Dialog>
     <h1>Impact Rules</h1>
     <div class="contents">
       <div class="section">
@@ -295,7 +318,7 @@ import {
           <b class="text-contrast">Blood Magic:</b> Transfer wounds between
           willing characters.
         </p>
-        <Button variant="text">View More</Button>
+        <Button variant="text" @click="openSkillsDialog">View More</Button>
       </div>
     </div>
     <div class="page">
@@ -1408,6 +1431,21 @@ import {
 </template>
 
 <style lang="css" scoped>
+.skill-examples {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 40px;
+  max-height: 1500px;
+  width: 820px;
+
+  .skill-example {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 380px;
+  }
+}
 .rules {
   display: flex;
   flex-direction: column;
