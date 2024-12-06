@@ -8,6 +8,9 @@
 html {
   scroll-behavior: smooth;
 }
+body {
+  background-color: #1c1b22;
+}
 #app {
   display: flex;
   justify-content: center;
