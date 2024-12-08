@@ -27,6 +27,18 @@ function openSkillsDialog() {
 
 <template>
   <div class="rules">
+    <Button
+      as="a"
+      icon="pi pi-chevron-up"
+      href="#"
+      style="
+        position: fixed;
+        top: 20px;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+      "
+    />
     <Dialog
       modal
       v-model:visible="isSkillsDialogOpen"
