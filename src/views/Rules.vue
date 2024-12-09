@@ -41,9 +41,10 @@ function openSkillsDialog() {
   <div class="rules">
     <Button
       class="back-button"
-      as="a"
+      :as="scroll > 100 ? 'a' : 'router-link'"
       :icon="`pi pi-chevron-${scroll > 100 ? 'up' : 'left'}`"
-      :href="scroll > 100 ? '#' : '/'"
+      :href="scroll > 100 ? '#' : undefined"
+      :to="scroll <= 100 ? '/' : undefined"
     />
     <Dialog
       modal
