@@ -16,9 +16,21 @@ import {
   materials,
 } from "../data/crafting";
 import { skills } from "../data/skills";
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 const isSkillsDialogOpen = ref<boolean>(false);
+const scroll = ref<number>(0);
+
+function updateScroll() {
+  scroll.value = document.scrollingElement?.scrollTop ?? 0;
+}
+
+onMounted(() => {
+  window.addEventListener("scroll", updateScroll);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("scroll", updateScroll);
+});
 
 function openSkillsDialog() {
   isSkillsDialogOpen.value = true;
@@ -28,16 +40,10 @@ function openSkillsDialog() {
 <template>
   <div class="rules">
     <Button
+      class="back-button"
       as="a"
-      icon="pi pi-chevron-up"
-      href="#"
-      style="
-        position: fixed;
-        top: 20px;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-      "
+      :icon="`pi pi-chevron-${scroll > 100 ? 'up' : 'left'}`"
+      :href="scroll > 100 ? '#' : '/'"
     />
     <Dialog
       modal
@@ -1443,6 +1449,15 @@ function openSkillsDialog() {
 </template>
 
 <style lang="css" scoped>
+.back-button {
+  position: fixed;
+  top: 20px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  transition: 0.3s;
+}
+
 .skill-examples {
   display: flex;
   flex-direction: column;

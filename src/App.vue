@@ -42,6 +42,7 @@ h5,
 h6 {
   margin: 0;
   font-weight: bold;
+  scroll-margin-top: 200px;
 }
 h1 {
   font-size: 62px;
