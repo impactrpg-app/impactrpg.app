@@ -18,7 +18,6 @@ body {
   margin: 0px;
   padding: 0px;
   min-height: calc(100vh - 20px);
-  min-width: 820px;
 
   /** FONTS */
   font-family: "Roboto", sans-serif;

@@ -1473,6 +1473,7 @@ function openSkillsDialog() {
     width: 380px;
   }
 }
+
 .rules {
   display: flex;
   flex-direction: column;
@@ -1481,6 +1482,12 @@ function openSkillsDialog() {
   margin-top: 200px;
   margin-bottom: 200px;
 
+  h1 {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
   .contents {
     display: flex;
     flex-direction: row;
@@ -1488,6 +1495,12 @@ function openSkillsDialog() {
     width: 100%;
     margin-bottom: 50px;
     align-items: flex-start;
+    justify-content: center;
+
+    @media (max-width: 820px) {
+      align-items: center;
+      flex-direction: column;
+    }
 
     .section {
       display: flex;
@@ -1495,6 +1508,10 @@ function openSkillsDialog() {
       align-items: center;
       flex-basis: 25%;
       gap: 20px;
+
+      @media (max-width: 820px) {
+        min-width: 175px;
+      }
 
       .heading {
         color: var(--p-emerald-200);
@@ -1511,12 +1528,21 @@ function openSkillsDialog() {
     gap: 40px;
     width: 820px;
 
+    @media (max-width: 820px) {
+      width: 400px;
+      flex-wrap: wrap;
+    }
+
     .column {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
       gap: 20px;
       min-width: 400px;
+
+      @media (max-width: 820px) {
+        height: auto !important;
+      }
 
       .block {
         display: flex;
