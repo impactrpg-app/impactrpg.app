@@ -46,12 +46,7 @@ function openSkillsDialog() {
       :href="scroll > 100 ? '#' : undefined"
       :to="scroll <= 100 ? '/' : undefined"
     />
-    <Dialog
-      modal
-      v-model:visible="isSkillsDialogOpen"
-      header="Skills"
-      :style="{}"
-    >
+    <Dialog modal v-model:visible="isSkillsDialogOpen" header="Skills">
       <div class="skill-examples">
         <div class="skill-example" v-for="skill in skills">
           <h4 class="text-contrast">{{ skill.name }}:</h4>
