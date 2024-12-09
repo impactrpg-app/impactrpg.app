@@ -8,7 +8,6 @@ import Monsters from "./views/Monsters.vue";
 import World from "./views/World.vue";
 import JoinRoom from "./views/JoinRoom.vue";
 import CreateRoom from "./views/CreateRoom.vue";
-import Donate from "./views/Donate.vue";
 
 export default createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,11 +46,6 @@ export default createRouter({
       path: "/world",
       name: "World",
       component: World,
-    },
-    {
-      path: "/donate",
-      name: "Donate",
-      component: Donate,
     },
     {
       path: "/create-room",

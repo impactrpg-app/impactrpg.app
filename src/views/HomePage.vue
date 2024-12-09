@@ -36,7 +36,13 @@ import PackageJson from "../../package.json";
     />
     <Button as="router-link" label="Monsters" icon="pi pi-eye" to="/monsters" />
     <Button as="router-link" label="World" icon="pi pi-globe" to="/world" />
-    <Button as="router-link" label="Donate" icon="pi pi-dollar" to="/donate" />
+    <Button
+      as="a"
+      label="Donate"
+      icon="pi pi-dollar"
+      href="https://github.com/sponsors/zeeshan595"
+      target="_blank"
+    />
     <Divider />
     <Button
       as="router-link"
