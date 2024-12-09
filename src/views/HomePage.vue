@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { Button } from "primevue";
+import PackageJson from "../../package.json";
 </script>
 
 <template>
   <div class="homepage">
     <h1>impact</h1>
+    <div class="version">{{ PackageJson.version }}</div>
     <p>By Zeeshan Abid</p>
     <Divider />
     <p>A Free Tabletop Role Playing game.</p>
@@ -57,6 +59,14 @@ import { Button } from "primevue";
   flex-direction: column;
   text-align: center;
   gap: 10px;
+  .version {
+    display: block;
+    position: relative;
+    height: 0;
+    top: -40px;
+    left: 125px;
+    color: var(--p-lime-200);
+  }
 
   a {
     text-decoration: none;
