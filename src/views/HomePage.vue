@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { Button } from "primevue";
 import PackageJson from "../../package.json";
+import { Button, Divider } from "primevue";
 </script>
 
 <template>
@@ -8,7 +8,7 @@ import PackageJson from "../../package.json";
     <h1>impact</h1>
     <div class="version">{{ PackageJson.version }}</div>
     <p>By Zeeshan Abid</p>
-    <Divider />
+    <div class="spacer"></div>
     <p>A Free Tabletop Role Playing game.</p>
     <Button
       as="router-link"
@@ -60,11 +60,15 @@ import PackageJson from "../../package.json";
 </template>
 
 <style lang="css" scoped>
+.spacer {
+  height: 50px;
+}
 .homepage {
   display: flex;
   flex-direction: column;
   text-align: center;
   gap: 10px;
+
   .version {
     display: block;
     position: relative;

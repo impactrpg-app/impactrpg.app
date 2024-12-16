@@ -1,6 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { Toast, ConfirmDialog } from "primevue";
+</script>
 
 <template>
+  <ConfirmDialog></ConfirmDialog>
+  <Toast />
   <RouterView />
 </template>
 
@@ -18,21 +22,17 @@ body {
   margin: 0px;
   padding: 0px;
   min-height: calc(100vh - 20px);
+}
 
-  /** FONTS */
+#app,
+span,
+div {
   font-family: "Roboto", sans-serif;
   font-weight: 500;
   font-style: normal;
-  color: var(--p-stone-200);
-}
-.p-dialog {
-  font-family: "Roboto", sans-serif;
-  font-weight: 500;
-  font-style: normal;
-  color: var(--p-stone-200);
-  font-size: 24px;
 }
 
+/** HEADINGS */
 h1,
 h2,
 h3,
@@ -40,8 +40,12 @@ h4,
 h5,
 h6 {
   margin: 0;
+  padding: 0;
   font-weight: bold;
   scroll-margin-top: 200px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
 }
 h1 {
   font-size: 62px;
@@ -65,31 +69,31 @@ h5 {
 h6 {
   font-size: 18px;
 }
+
+/** TEXT */
+p,
+li,
+span,
+a,
+i,
 b,
-i {
+em {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+
+  font-size: 24px;
+  font-weight: normal;
+  text-decoration: none;
   margin: 0;
   padding: 0;
-  font-size: 24px;
 }
-p {
-  font-size: 24px;
-  margin: 0;
-  font-weight: normal;
+b {
+  font-weight: bold;
 }
-ul {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  list-style: disc;
-  padding-left: 0;
-  margin: 0;
-}
-li {
-  font-size: 24px;
-  font-weight: normal;
-}
-a {
-  text-decoration: none;
+i,
+em {
+  font-style: italic;
 }
 .text-contrast {
   color: var(--p-lime-200);

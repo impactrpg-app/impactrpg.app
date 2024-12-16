@@ -1445,6 +1445,25 @@ function openSkillsDialog() {
 </template>
 
 <style lang="css" scoped>
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: disc;
+  padding-left: 0;
+  margin: 0;
+}
+li {
+  font-size: 24px;
+  font-weight: normal;
+}
+.p-dialog {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--p-stone-200);
+  font-size: 24px;
+}
 .back-button {
   position: fixed;
   top: 20px;
