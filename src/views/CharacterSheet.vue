@@ -285,19 +285,19 @@ function finishEditingSkill() {
     </div>
     <div class="row">
       <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.mana" :min="0" :max="20" />
+        <Knob v-model="selectedCharacter.resources.mana" :min="0" :max="20" value-color="var(--p-blue-200)" />
         <span>Mana</span>
       </div>
       <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.endurance" :min="0" :max="20" />
+        <Knob v-model="selectedCharacter.resources.endurance" :min="0" :max="20" value-color="var(--p-amber-200)" />
         <span>Endurance</span>
       </div>
       <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.corruption" :min="0" :max="10" />
+        <Knob v-model="selectedCharacter.resources.corruption" :min="0" :max="10" value-color="var(--p-fuchsia-200)" />
         <span>Corruption</span>
       </div>
       <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.wounds" :min="0" :max="10" />
+        <Knob v-model="selectedCharacter.resources.wounds" :min="0" :max="10" value-color="var(--p-red-300)" />
         <span>Wounds</span>
       </div>
     </div>
