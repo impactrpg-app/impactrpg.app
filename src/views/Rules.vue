@@ -1438,10 +1438,60 @@ function openSkillsDialog() {
             Curses impose negative effects on enemies, such as Hold Person,
             Slow, Fear, or Polymorph.
           </p>
-          <p>The target must make a defense roll.</p>
           <p>
-            If the roll fails to exceed the mana spent, the curse takes effect
-            for a single round.
+            Each type of curse has a minimum requirement for the mana that should be spent. If the mana spent is lower
+            than this amount then the curse will simply fail immediately
+          </p>
+          <p>
+            The minimum mana requirement for each curse is set by the DM. Below is the recomended advice for minimum
+            mana requirements.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <td>Mana R.</td>
+                <td>Effect</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Effecting movement</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Effecting abilities or stats</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Effecting actions or endurance</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Target skips a turn</td>
+              </tr>
+            </tbody>
+          </table>
+          <h4>APPLY A CURSE</h4>
+          <p>
+            When you apply the curse on a target. Allocate the appropriate mana and then the target makes a defense roll
+            against the mana allocated.
+          </p>
+          <p>
+            If the roll is lower than the mana spent, the curse takes effect on the target for rounds equal to the mana
+            spent divided by the mana required for the curse to activate.
+          </p>
+          <p>
+            <i>
+              If the defender rolls 6 successes, while the mana spent is 8 to polymorph the target (skip their turn).
+              This will result in the curse lasting 2 round.
+            </i>
+          </p>
+          <p>
+            <i>
+              If the defender rolls 5 successes, while the mana spent is 3. This will result in the curse failing to
+              apply to the target.
+            </i>
           </p>
         </div>
       </div>
