@@ -39,13 +39,9 @@ function openSkillsDialog() {
 
 <template>
   <div class="rules">
-    <Button
-      class="back-button"
-      :as="scroll > 100 ? 'a' : 'router-link'"
-      :icon="`pi pi-chevron-${scroll > 100 ? 'up' : 'left'}`"
-      :href="scroll > 100 ? '#' : undefined"
-      :to="scroll <= 100 ? '/' : undefined"
-    />
+    <Button class="back-button" :as="scroll > 100 ? 'a' : 'router-link'"
+      :icon="`pi pi-chevron-${scroll > 100 ? 'up' : 'left'}`" :href="scroll > 100 ? '#' : undefined"
+      :to="scroll <= 100 ? '/' : undefined" />
     <Dialog modal v-model:visible="isSkillsDialogOpen" header="Skills">
       <div class="skill-examples">
         <div class="skill-example" v-for="skill in skills">
@@ -466,8 +462,7 @@ function openSkillsDialog() {
           </p>
           <p>
             Player:
-            <i
-              >"I have 2 Strength and +1D6 from my Athletics skill. I'll roll
+            <i>"I have 2 Strength and +1D6 from my Athletics skill. I'll roll
               3D6."
             </i>
           </p>
@@ -1045,8 +1040,7 @@ function openSkillsDialog() {
         <div class="block">
           <h2 id="actions">ACTIONS</h2>
           <p>
-            At the start of your turn, you gain one action. Unused actions do
-            not carry over to subsequent turns.
+            At the start of your turn, you gain one action. You can spend your action to do any of the following:
           </p>
           <ul>
             <li>Attack</li>
@@ -1055,6 +1049,16 @@ function openSkillsDialog() {
             <li>Casting Spell</li>
             <li>Or any other activity that comes to your imagination.</li>
           </ul>
+          <p>
+            Most actions you perform will lower your endurance. This is how long you can last before your body gives up
+            and
+            you collapse to the ground.
+          </p>
+          <p>
+            The DM may allow you to perform certain acts without spending your action. This can be such as drinking a
+            potion
+            or communicating with other characters.
+          </p>
         </div>
         <div class="block">
           <h3>DELAYING YOUR TURN</h3>
@@ -1104,13 +1108,14 @@ function openSkillsDialog() {
             Movement is assumed to be part of any attack unless otherwise
             restricted.
           </p>
+          <p>Any character can choose to target any other character that is in combat.</p>
           <h4>BLOCKING MELEE ATTACKS</h4>
           <p>
             If a melee attacker targets a ranged character, any ally of the
             defender may choose to block the attack.
           </p>
           <p>The blocking ally becomes the new target.</p>
-          <p>Ranged and magic attacks cannot be blocked by allies.</p>
+          <p>Ranged and magic attacks cannot be blocked by allies in this way.</p>
         </div>
       </div>
     </div>
@@ -1453,10 +1458,12 @@ ul {
   padding-left: 0;
   margin: 0;
 }
+
 li {
   font-size: 24px;
   font-weight: normal;
 }
+
 .p-dialog {
   font-family: "Roboto", sans-serif;
   font-weight: 500;
@@ -1464,6 +1471,7 @@ li {
   color: var(--p-stone-200);
   font-size: 24px;
 }
+
 .back-button {
   position: fixed;
   top: 20px;
@@ -1531,6 +1539,7 @@ li {
       .heading {
         color: var(--p-emerald-200);
       }
+
       h6 {
         color: var(--p-lime-200);
       }
