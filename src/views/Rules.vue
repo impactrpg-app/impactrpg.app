@@ -875,7 +875,7 @@ function openSkillsDialog() {
         <div class="block">
           <h3>RESTING ACTIONS</h3>
           <p>
-            While you are inside of a town or safe location you may do 2 free
+            While you are inside of a town or safe location you may do one free
             rest actions and no more.
           </p>
           <template v-for="action in restActions">

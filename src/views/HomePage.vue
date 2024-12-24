@@ -43,19 +43,6 @@ import { Button, Divider } from "primevue";
       href="https://github.com/sponsors/zeeshan595"
       target="_blank"
     />
-    <Divider />
-    <Button
-      as="router-link"
-      label="Create a Room"
-      icon="pi pi-user-plus"
-      to="/create-room"
-    />
-    <Button
-      as="router-link"
-      label="Join a Room"
-      icon="pi pi-sign-in"
-      to="/join-room"
-    />
   </div>
 </template>
 

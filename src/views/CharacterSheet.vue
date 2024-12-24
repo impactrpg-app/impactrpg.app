@@ -19,6 +19,9 @@ import {
   Textarea,
   useConfirm
 } from "primevue";
+import { Skill, skills } from "../data/skills";
+import { loadFromFile, saveToFile } from '../service/io';
+import DiceRollerComponent from "../components/DiceRollerComponent.vue";
 
 const toast = useToast();
 const confirm = useConfirm()
@@ -32,18 +35,37 @@ const menuItems: MenuItem[] = [
     },
   },
   {
-    label: "upload",
+    label: "load",
     icon: "pi pi-upload",
-    command: () => { },
+    command: async () => {
+      const character = await loadFromFile();
+      if (character) {
+        selectedCharacter.value = { ...JSON.parse(character) }
+        toast.add({
+          severity: "info",
+          summary: "Character Uploaded",
+          detail: "Character sheet has been updated with the file you provided",
+          life: 3000,
+        });
+      } else {
+        toast.add({
+          severity: "error",
+          summary: "Character Upload Failed",
+          detail: "Failed to update character sheet",
+          life: 3000,
+        });
+      }
+    },
   },
   {
-    label: "download",
+    label: "save",
     icon: "pi pi-download",
     command: () => {
+      saveToFile(selectedCharacter.value.info.name ?? 'character', JSON.stringify(selectedCharacter.value));
       toast.add({
         severity: "info",
         summary: "Download Started",
-        detail: "Your browser should start downloading the character sheet",
+        detail: "Your browser should start downloading the character",
         life: 3000,
       });
     },
@@ -51,15 +73,32 @@ const menuItems: MenuItem[] = [
   {
     label: "roll dice",
     icon: "pi pi-sparkles",
-    command: () => { },
+    command: () => {
+      isDiceRollerOpen.value = true;
+    },
   },
   {
     label: "Notes",
     icon: "pi pi-book",
-    command: () => { },
+    command: () => {
+      showNotesEditor.value = true;
+    },
   },
 ];
 const selectedCharacter = ref<Character>({ ...NewCharacter });
+
+// dice roller
+const isDiceRollerOpen = ref<boolean>(false);
+
+//image
+async function updateCharacterImage() {
+  const data = await loadFromFile();
+  if (data === null) return;
+  selectedCharacter.value.info.image = `data:image/png;base64,${btoa(data)}`
+}
+
+// notes
+const showNotesEditor = ref<boolean>(false);
 
 // gear
 const editingGear = ref<CharacterGearItem>({ ...NewGearItem });
@@ -192,19 +231,28 @@ function finishEditingSkill() {
     };
   }
 }
+function skillSelectedFromDropdown(skill: Skill) {
+  editingSkill.value = {
+    name: skill.name,
+    description: skill.description.join('\n')
+  }
+}
 </script>
 
 <template>
+  <DiceRollerComponent v-model:is-open="isDiceRollerOpen" />
   <Dialog modal v-model:visible="showGearEditor" header="Gear" :style="{ width: '650px' }">
     <div class="dialog-content">
       <FloatLabel class="field">
         <InputText id="gear-name" v-model="editingGear.name" />
         <label for="gear-name">Gear Name</label>
       </FloatLabel>
-      <label class="field-label">
-        Goods Type
-      </label>
-      <Select v-model="editingGear.type" :options="Object.values(GoodsType)" />
+      <div class="field no-margin">
+        <label class="field-label">
+          Goods Type
+        </label>
+        <Select v-model="editingGear.type" :options="Object.values(GoodsType)" />
+      </div>
       <FloatLabel class="field">
         <InputNumber id="gear-attack" v-model="editingGear.attack" />
         <label for="gear-attack">Attack</label>
@@ -227,6 +275,12 @@ function finishEditingSkill() {
   </Dialog>
   <Dialog modal v-model:visible="showSkillEditor" header="Skill" :style="{ width: '650px' }">
     <div class="dialog-content">
+      <div class="field no-margin">
+        <label class="field-label">
+          Predefined Skills
+        </label>
+        <Select :options="skills" option-label="name" @value-change="skillSelectedFromDropdown" />
+      </div>
       <FloatLabel class="field">
         <InputText id="skill-name" v-model="editingSkill.name" />
         <label for="skill-name">Skill Name</label>
@@ -243,31 +297,52 @@ function finishEditingSkill() {
       </div>
     </div>
   </Dialog>
-  <div class="character-sheet">
-    <Menubar :model="menuItems" />
-    <div class="row">
-      <FloatLabel class="field">
-        <InputText id="character-name" v-model="selectedCharacter.info.name" />
-        <label for="character-name">Character Name</label>
-      </FloatLabel>
-      <FloatLabel class="field">
-        <InputText id="player-name" v-model="selectedCharacter.info.playerName" />
-        <label for="player-name">Player Name</label>
-      </FloatLabel>
+  <Dialog modal v-model:visible="showNotesEditor" header="Notes" :style="{ width: '650px' }">
+    <div class="dialog-content">
+      <Textarea v-model="selectedCharacter.notes" style="resize: vertical; min-height: 500px;" />
     </div>
+  </Dialog>
+  <div class="character-sheet">
+    <Menubar :model="menuItems" style="min-width: 100%; justify-content: center;" />
     <div class="row">
-      <FloatLabel class="field" style="width: 100px;">
-        <InputText id="age" v-model="selectedCharacter.info.age" />
-        <label for="age">Age</label>
-      </FloatLabel>
-      <FloatLabel class="field" style="width: 160px;">
-        <InputText id="personality" v-model="selectedCharacter.info.personality" />
-        <label for="personality">Personality</label>
-      </FloatLabel>
-      <FloatLabel class="field">
-        <InputText id="injury" v-model="selectedCharacter.resources.injury" />
-        <label for="injury">Injury</label>
-      </FloatLabel>
+      <div class="column" style="width:270px; flex-shrink: 1;flex-grow: 0; flex-basis: 270px;">
+        <div :style="{
+          width: '270px',
+          height: '270px',
+          borderRadius: '10px',
+          background: `url('${selectedCharacter.info.image}')`,
+          backgroundColor: 'var(--p-stone-700)',
+          backgroundSize: 'auto 100%',
+          boxShadow: '0 0 5px 1px var(--p-stone-950)',
+          cursor: 'pointer',
+          display: 'flex',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          textAlign: 'center',
+        }" @click="updateCharacterImage">
+          <i class="pi pi-image" v-if="selectedCharacter.info.image === ''"></i>
+        </div>
+      </div>
+      <div class="column" style="flex-grow: 1; flex-shrink: 0; flex-basis: calc(100% - 300); align-items: flex-start;">
+        <FloatLabel class="field" style="width:100%">
+          <InputText id="character-name" v-model="selectedCharacter.info.name" />
+          <label for="character-name">Character Name</label>
+        </FloatLabel>
+        <div class="row">
+          <FloatLabel class="field" style="width: 50px">
+            <InputText id="character-name" v-model="selectedCharacter.info.age" />
+            <label for="character-name">Age</label>
+          </FloatLabel>
+          <FloatLabel class="field" style="width: 50px">
+            <InputText id="character-name" v-model="selectedCharacter.info.personality" />
+            <label for="character-name">Personality</label>
+          </FloatLabel>
+        </div>
+        <FloatLabel class="field" style="width:100%">
+          <InputText id="character-name" v-model="selectedCharacter.resources.injury" />
+          <label for="character-name">Injury</label>
+        </FloatLabel>
+      </div>
     </div>
     <div class="row">
       <div class="knob-field">
@@ -313,7 +388,7 @@ function finishEditingSkill() {
                 <Button icon="pi pi-trash" variant="text" @click="deleteExistingGearItem(index)" />
               </div>
             </div>
-            <h3 style="width: calc(100% - 60px);">{{ gear.name }}</h3>
+            <h3 style="width: calc(100% - 60px); min-height: 100px;">{{ gear.name }}</h3>
           </template>
           <template #content>
             <div class="gear-content">
@@ -352,10 +427,10 @@ function finishEditingSkill() {
                 <Button icon="pi pi-trash" variant="text" @click="deleteExistingSkill(index)" />
               </div>
             </div>
-            <h3 style="width: calc(100% - 60px);">{{ skill.name }}</h3>
+            <h3 style="width: calc(100% - 60px); min-height: 100px;">{{ skill.name }}</h3>
           </template>
           <template #content>
-            <p style="margin-top:50px;">{{ skill.description }}</p>
+            <p>{{ skill.description }}</p>
           </template>
         </Card>
         <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px;" @click="createSkill" />
@@ -407,7 +482,7 @@ function finishEditingSkill() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 40px;
   width: 655px;
 
   .row {
@@ -423,7 +498,7 @@ function finishEditingSkill() {
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      gap: 10px;
+      gap: 20px;
       flex-grow: 1;
       flex-basis: calc(50% - 30px);
 

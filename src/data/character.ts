@@ -1,8 +1,8 @@
 import { GoodsType } from "./goods";
 
 export type CharacterInfo = {
+  image: string;
   name: string;
-  playerName: string;
   age: string;
   personality: string;
 };
@@ -57,10 +57,10 @@ export type Character = {
 
 export const NewCharacter: Character = {
   info: {
+    image: "",
     name: "",
     age: "",
     personality: "",
-    playerName: "",
   },
   abilities: {
     strength: 3,
