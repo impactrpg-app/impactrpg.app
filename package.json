@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dice-roller/rpg-dice-roller": "^5.5.0",
     "@primevue/themes": "^4.2.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",

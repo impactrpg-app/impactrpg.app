@@ -329,11 +329,11 @@ function skillSelectedFromDropdown(skill: Skill) {
           <label for="character-name">Character Name</label>
         </FloatLabel>
         <div class="row">
-          <FloatLabel class="field" style="width: 50px">
+          <FloatLabel class="field" style="width: 10px">
             <InputText id="character-name" v-model="selectedCharacter.info.age" />
             <label for="character-name">Age</label>
           </FloatLabel>
-          <FloatLabel class="field" style="width: 50px">
+          <FloatLabel class="field" style="width: 120px">
             <InputText id="character-name" v-model="selectedCharacter.info.personality" />
             <label for="character-name">Personality</label>
           </FloatLabel>

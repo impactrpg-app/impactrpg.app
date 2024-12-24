@@ -6,8 +6,6 @@ import Rules from "./views/Rules.vue";
 import Adventures from "./views/Adventures.vue";
 import Monsters from "./views/Monsters.vue";
 import World from "./views/World.vue";
-import JoinRoom from "./views/JoinRoom.vue";
-import CreateRoom from "./views/CreateRoom.vue";
 
 export default createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,16 +44,6 @@ export default createRouter({
       path: "/world",
       name: "World",
       component: World,
-    },
-    {
-      path: "/create-room",
-      name: "Create Room",
-      component: CreateRoom,
-    },
-    {
-      path: "/join-room",
-      name: "Join Room",
-      component: JoinRoom,
     },
   ],
 });

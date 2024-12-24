@@ -1,9 +1,10 @@
-import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import { PrimeVue } from "@primevue/core";
 import Material from "@primevue/themes/material";
 import "primeicons/primeicons.css";
+
+import { createApp } from "vue";
+import { PrimeVue } from "@primevue/core";
 import {
   ConfirmationService,
   DialogService,
