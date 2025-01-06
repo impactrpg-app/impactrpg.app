@@ -61,7 +61,7 @@ onBeforeUnmount(() => {
     <div class="contents">
       <div class="section" v-for="monsterType in Object.values(MonsterType)">
         <a :href="`#${monsterType}`">
-          <h6 class="heading">{{ monsterType }}</h6>
+          <h6 class="heading">{{ monsterType }}s</h6>
         </a>
         <a :href="`#${animal.name}`" v-for="animal in sortedMonsters.get(monsterType)">
           <h6>{{ animal.name }}</h6>
@@ -69,7 +69,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <template v-for="monsterType in Object.values(MonsterType)">
-      <h1 :id="monsterType">{{ monsterType }}</h1>
+      <h1 :id="monsterType">{{ monsterType }}s</h1>
       <div class="page">
         <div class="column" style="flex-direction: row; flex-wrap: wrap;">
           <div class="block" v-for="monster in sortedMonsters.get(monsterType)">

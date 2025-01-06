@@ -1,8 +1,8 @@
 export enum MonsterType {
-  Animal = "Animals",
-  Normal = "Normal Monsters",
-  Magic = "Magic Monsters",
-  Rare = "Rare Monsters",
+  Animal = "Animal",
+  Normal = "Normal Monster",
+  Magic = "Magic Monster",
+  Rare = "Rare Monster",
 }
 
 export type MonsterAction = {
