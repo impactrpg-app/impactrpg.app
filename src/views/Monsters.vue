@@ -83,8 +83,11 @@ onBeforeUnmount(() => {
               <b class="text-contrast">Intelligence</b> {{ monster.abilities.intelligence }}
             </p>
             <p>
+              <b class="text-contrast">Armor</b> {{ monster.armor }},
+              <b class="text-contrast">Wounds</b> {{ monster.wounds }}
+            </p>
+            <p>
               <b class="text-contrast">Actions per Turn</b> {{ monster.actionsPerTurn }}
-              <b class="text-contrast">Wounds</b> {{ monster.wounds }},
             </p>
             <h3>ACTIONS</h3>
             <ul>
@@ -139,22 +142,6 @@ li {
   transition: 0.3s;
 }
 
-.skill-examples {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  gap: 40px;
-  max-height: 1500px;
-  width: 820px;
-
-  .skill-example {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 380px;
-  }
-}
-
 .rules {
   display: flex;
   flex-direction: column;
@@ -177,6 +164,10 @@ li {
     margin-bottom: 50px;
     align-items: flex-start;
     justify-content: center;
+
+    h6 {
+      text-align: center;
+    }
 
     @media (max-width: 820px) {
       align-items: center;

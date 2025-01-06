@@ -25,6 +25,7 @@ export type Monster = {
     agility: number;
     intelligence: number;
   };
+  armor: number;
   wounds: number;
   actionsPerTurn: number;
   actions: MonsterAction[];
@@ -42,6 +43,7 @@ export const monsters: Monster[] = [
       agility: 4,
       intelligence: 2,
     },
+    armor: 0,
     wounds: 1,
     actionsPerTurn: 1,
     actions: [
@@ -71,6 +73,7 @@ export const monsters: Monster[] = [
       agility: 3,
       intelligence: 1,
     },
+    armor: 1,
     wounds: 1,
     actionsPerTurn: 1,
     actions: [
@@ -96,6 +99,7 @@ export const monsters: Monster[] = [
       agility: 2,
       intelligence: 1,
     },
+    armor: 2,
     wounds: 8,
     actionsPerTurn: 1,
     actions: [
@@ -133,6 +137,7 @@ export const monsters: Monster[] = [
       agility: 5,
       intelligence: 2,
     },
+    armor: 1,
     wounds: 5,
     actionsPerTurn: 2,
     actions: [
@@ -172,13 +177,14 @@ export const monsters: Monster[] = [
       agility: 4,
       intelligence: 6,
     },
+    armor: 0,
     wounds: 6,
     actionsPerTurn: 2,
     actions: [
       {
         name: "Mana Burst",
         description:
-          "Everyone in combat (including arcane wraith) takes 1 damage",
+          "Everyone in combat (including arcane wraith) takes 1 wound.",
         rolls: [1],
       },
       {
@@ -203,7 +209,7 @@ export const monsters: Monster[] = [
       {
         name: "Phase Shift",
         description:
-          "Whenever attacked, roll 1D6 on success the target's attack passes through the wraith doing no damage.",
+          "Whenever attacked, roll 1D6 on success the target's attack passes through the wraith doing no wounds.",
       },
     ],
   },
@@ -217,6 +223,7 @@ export const monsters: Monster[] = [
       agility: 6,
       intelligence: 4,
     },
+    armor: 3,
     wounds: 7,
     actionsPerTurn: 3,
     actions: [
@@ -250,6 +257,7 @@ export const monsters: Monster[] = [
       agility: 4,
       intelligence: 5,
     },
+    armor: 2,
     wounds: 12,
     actionsPerTurn: 2,
     actions: [
@@ -299,6 +307,7 @@ export const monsters: Monster[] = [
       agility: 2,
       intelligence: 2,
     },
+    armor: 5,
     wounds: 18,
     actionsPerTurn: 1,
     actions: [
@@ -329,6 +338,279 @@ export const monsters: Monster[] = [
         name: "Molten Core",
         description:
           "When reduced to 7 wounds or fewer, strength increases by 3",
+      },
+    ],
+  },
+  {
+    name: "Crystal Moth",
+    description:
+      "A shimmering moth with crystal-like wings that reflect light.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 1,
+      agility: 4,
+      intelligence: 2,
+    },
+    armor: 1,
+    wounds: 1,
+    actionsPerTurn: 1,
+    actions: [
+      {
+        name: "Wing Slash",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3, 4],
+      },
+      {
+        name: "Crystal Dust",
+        description:
+          "All targets in combat have a penalty to their attack rolls for 2 turns.",
+        rolls: [5, 6],
+      },
+    ],
+  },
+  {
+    name: "Stoneback Tortoise",
+    description: "A large tortoise with a stone-covered shell.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 2,
+      agility: 1,
+      intelligence: 1,
+    },
+    armor: 4,
+    wounds: 3,
+    actionsPerTurn: 1,
+    actions: [
+      {
+        name: "Bite",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3, 4],
+      },
+      {
+        name: "Shell Defense",
+        description: "Increase armor by 2 for 1 turn.",
+        rolls: [5, 6],
+      },
+    ],
+  },
+  {
+    name: "Galehawk",
+    description: "A large bird with silver feathers and sharp talons.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 2,
+      agility: 5,
+      intelligence: 1,
+    },
+    armor: 0,
+    wounds: 2,
+    actionsPerTurn: 1,
+    actions: [
+      {
+        name: "Talon Slash",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3, 4],
+      },
+      {
+        name: "Wind Gust",
+        description:
+          "Pushes enemies back preventing them from doing a melee attack for 1 turn.",
+        rolls: [5, 6],
+      },
+    ],
+  },
+  {
+    name: "Thunder-fang Squirrel",
+    description: "A small squirrel crackling with static electricity.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 1,
+      agility: 5,
+      intelligence: 2,
+    },
+    armor: 0,
+    wounds: 1,
+    actionsPerTurn: 2,
+    actions: [
+      {
+        name: "Bite",
+        description: "Attack a target using strength",
+        rolls: [1, 2],
+      },
+      {
+        name: "Scratch",
+        description: "Attack a target using strength + 1",
+        rolls: [3, 4],
+      },
+      {
+        name: "Shock",
+        description: "Apply shock ailment to a target",
+        rolls: [5, 6],
+      },
+    ],
+  },
+  {
+    name: "Embertail Lynx",
+    description: "A lynx with glowing red fur and fiery paws.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 2,
+      agility: 4,
+      intelligence: 2,
+    },
+    armor: 1,
+    wounds: 2,
+    actionsPerTurn: 2,
+    actions: [
+      {
+        name: "Claw Swipe",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3],
+      },
+      {
+        name: "Flame Leap",
+        description:
+          "Jumps to attack a ranged enemy using strength + 2. The attack cannot be blocked by another character.",
+        rolls: [4, 5, 6],
+      },
+    ],
+  },
+  {
+    name: "Boulder Toad",
+    description: "A large, camouflaged toad with rocky skin.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 3,
+      agility: 2,
+      intelligence: 1,
+    },
+    armor: 2,
+    wounds: 4,
+    actionsPerTurn: 1,
+    actions: [
+      {
+        name: "Tongue Lash",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3, 4, 5, 6],
+      },
+    ],
+    specials: [
+      {
+        name: "Stone Skin",
+        description: "When wounded the toad takes -1 wound.",
+      },
+    ],
+  },
+  {
+    name: "Glowtail Gecko",
+    description: "A small, glowing lizard with a shimmering tail.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 1,
+      agility: 4,
+      intelligence: 1,
+    },
+    armor: 0,
+    wounds: 1,
+    actionsPerTurn: 2,
+    actions: [
+      {
+        name: "Tail Whip",
+        description: "Attack a target using strength",
+        rolls: [1, 2],
+      },
+      {
+        name: "Glow",
+        description:
+          "Everyone in combat has a penalty to their attack rolls for 1 turn.",
+        rolls: [3, 4],
+      },
+      {
+        name: "Dash",
+        description: "Gain +1 agility for 1 turn",
+        rolls: [5, 6],
+      },
+    ],
+  },
+  {
+    name: "Ashclaw Raccoon",
+    description: "A raccoon with blackened fur and glowing red eyes.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 2,
+      agility: 5,
+      intelligence: 3,
+    },
+    armor: 1,
+    wounds: 2,
+    actionsPerTurn: 2,
+    actions: [
+      {
+        name: "Claw Swipe",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3],
+      },
+      {
+        name: "Snatch",
+        description: "Steal a small item from a target",
+        rolls: [4, 5, 6],
+      },
+    ],
+  },
+  {
+    name: "Brambleback Boar",
+    description: "A large boar covered in thorny brambles.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 4,
+      agility: 3,
+      intelligence: 1,
+    },
+    armor: 1,
+    wounds: 3,
+    actionsPerTurn: 1,
+    actions: [
+      {
+        name: "Tusk Charge",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3],
+      },
+      {
+        name: "Bramble Swipe",
+        description:
+          "Characters roll easy strength check. On failure they take 1 wound.",
+        rolls: [4, 5, 6],
+      },
+    ],
+  },
+  {
+    name: "Riverfin Otter",
+    description: "A sleek otter with scales on its back.",
+    type: MonsterType.Animal,
+    abilities: {
+      strength: 2,
+      agility: 4,
+      intelligence: 2,
+    },
+    armor: 2,
+    wounds: 1,
+    actionsPerTurn: 2,
+    actions: [
+      {
+        name: "Claw",
+        description: "Attack using strength",
+        rolls: [1, 2],
+      },
+      {
+        name: "Bite",
+        description: "Attack using strength + 2",
+        rolls: [3, 4],
+      },
+      {
+        name: "Dive",
+        description:
+          "Dive underwater, cannot be attacked next turn. If on land, re-roll the action",
+        rolls: [5, 6],
       },
     ],
   },
