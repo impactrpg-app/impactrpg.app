@@ -219,7 +219,7 @@ li {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 40px;
       min-width: 400px;
 
       @media (max-width: 820px) {
@@ -231,7 +231,7 @@ li {
         flex-direction: column;
         flex-wrap: wrap;
         gap: 20px;
-        max-width: 400px;
+        max-width: 390px;
       }
     }
   }
