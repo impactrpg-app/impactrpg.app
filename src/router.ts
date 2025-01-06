@@ -3,7 +3,6 @@ import Homepage from "./views/HomePage.vue";
 import GettingStarted from "./views/GettingStarted.vue";
 import CharacterSheet from "./views/CharacterSheet.vue";
 import Rules from "./views/Rules.vue";
-import Adventures from "./views/Adventures.vue";
 import Monsters from "./views/Monsters.vue";
 import World from "./views/World.vue";
 
@@ -29,11 +28,6 @@ export default createRouter({
       path: "/rules",
       name: "Rules",
       component: Rules,
-    },
-    {
-      path: "/adventures",
-      name: "Adventures",
-      component: Adventures,
     },
     {
       path: "/monsters",

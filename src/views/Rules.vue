@@ -52,7 +52,7 @@ function openSkillsDialog() {
         </div>
       </div>
     </Dialog>
-    <h1>Impact Rules</h1>
+    <h1>Rulebook</h1>
     <div class="contents">
       <div class="section">
         <a href="#create-character">
@@ -178,6 +178,9 @@ function openSkillsDialog() {
         </a>
         <a href="#poison">
           <h6>Poison</h6>
+        </a>
+        <a href="#ailments">
+          <h6>Ailments</h6>
         </a>
       </div>
       <div class="section">
@@ -543,7 +546,9 @@ function openSkillsDialog() {
         <div class="block">
           <h2 id="wounds">WOUNDS</h2>
           <p>Wounds replace traditional health, adding urgency to survival.</p>
-          <p>Characters can sustain 3 + Strength wounds before perishing.</p>
+          <p>Characters can sustain 5 wounds before perishing. You may find skills or gear that can increase the amount
+            of
+            wounds your character can take.</p>
           <p>
             If a character takes 3 wounds from a single source, they also suffer
             an injury.
@@ -1165,19 +1170,6 @@ function openSkillsDialog() {
           </p>
         </div>
         <div class="block">
-          <h2 id="poison">POISON</h2>
-          <p>
-            Poisoned characters take 1 additional wound from any source of
-            damage.
-          </p>
-          <p>
-            Poison cannot be cured by resting. You must consume an antidote to
-            remove its effects.
-          </p>
-        </div>
-      </div>
-      <div class="column">
-        <div class="block">
           <h2 id="advantage">ADVANTAGE</h2>
           <p>
             Characters in advantageous positions (such as higher ground or
@@ -1198,6 +1190,8 @@ function openSkillsDialog() {
             defense roll. This may only be done once per roll.
           </p>
         </div>
+      </div>
+      <div class="column">
         <div class="block">
           <h2 id="difficult-terrain">DIFFICULT TERRAIN</h2>
           <p>
@@ -1222,6 +1216,40 @@ function openSkillsDialog() {
               If goblin totems are present, a successful check reveals their
               connection to goblins.
             </i>
+          </p>
+        </div>
+        <div class="block">
+          <h2 id="ailments">AILMENTS</h2>
+          <p>
+            Throughout combat the character may be inflicted with ailments, which reduce an ability for specific number
+            of turns.
+          </p>
+          <p>
+            If an ailment is applied for 1 turn then all of the characters including the character that applied the
+            ailment must finish 1 turn for the ailment to be removed.
+          </p>
+          <p>
+            <i>
+              <i>
+                If a character gives me -1 strength for 1 turn then it will be removed at the end of their next turn.
+              </i>
+            </i>
+          </p>
+          <h3></h3>
+          <p>
+            There are four main types of ailments
+          </p>
+          <p>
+            <b class="text-contrast">Shock</b> Have a penalty to attack rolls
+          </p>
+          <p>
+            <b class="text-contrast">Poisoned</b> When wounded take an additional wound
+          </p>
+          <p>
+            <b class="text-contrast">Chill</b> Have a penalty to defense rolls
+          </p>
+          <p>
+            <b class="text-contrast">Burning</b> At the end of your turn take a wound
           </p>
         </div>
       </div>
@@ -1279,25 +1307,20 @@ function openSkillsDialog() {
           </p>
           <p>The defender rolls a defense check to resist the spell.</p>
           <p>If successful, unblocked wounds apply to the target.</p>
-          <h5>ELEMENTAL EFFECTS</h5>
+          <h5 id="elemental-effects">ELEMENTAL EFFECTS</h5>
           <p>
-            Attack spells should apply an elemental effect based on the spell's
-            nature:
+            As long as you inflict a wound on the target you will also apply an ailment to the target depending on the
+            element of your choice.
+          </p>
+          <p>
+            All of these ailments are for 1 turn. You may reduce your damage and spend mana to
+            increase the duration instead.
           </p>
           <ul>
-            <li>
-              <b class="text-contrast">Air</b> The target has a penalty to
-              attack rolls for 1 round.
-            </li>
-            <li><b class="text-contrast">Earth</b> The target is poisoned.</li>
-            <li>
-              <b class="text-contrast">Fire</b> The target takes an additional
-              wound.
-            </li>
-            <li>
-              <b class="text-contrast">Water</b> The target's Agility is reduced
-              by 1.
-            </li>
+            <li><b class="text-contrast">Air</b> applies shock ailment.</li>
+            <li><b class="text-contrast">Earth</b> applies poison ailment.</li>
+            <li><b class="text-contrast">Fire</b> applies burning ailment.</li>
+            <li><b class="text-contrast">Water</b> applies chill ailment.</li>
           </ul>
         </div>
         <div class="block">

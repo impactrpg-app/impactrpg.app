@@ -10,39 +10,12 @@ import { Button, Divider } from "primevue";
     <p>By Zeeshan Abid</p>
     <div class="spacer"></div>
     <p>A Free Tabletop Role Playing game.</p>
-    <Button
-      as="router-link"
-      label="Getting Started"
-      icon="pi pi-info"
-      to="/getting-started"
-    />
-    <Button
-      as="router-link"
-      label="Character Sheet"
-      icon="pi pi-user"
-      to="/character-sheet"
-    />
-    <Button
-      as="router-link"
-      label="How to Play"
-      icon="pi pi-align-justify"
-      to="/rules"
-    />
-    <Button
-      as="router-link"
-      label="Adventures"
-      icon="pi pi-map"
-      to="/adventures"
-    />
+    <Button as="router-link" label="Getting Started" icon="pi pi-info" to="/getting-started" />
+    <Button as="router-link" label="Character Sheet" icon="pi pi-user" to="/character-sheet" />
+    <Button as="router-link" label="Rulebook" icon="pi pi-align-justify" to="/rules" />
     <Button as="router-link" label="Monsters" icon="pi pi-eye" to="/monsters" />
     <Button as="router-link" label="World" icon="pi pi-globe" to="/world" />
-    <Button
-      as="a"
-      label="Donate"
-      icon="pi pi-dollar"
-      href="https://github.com/sponsors/zeeshan595"
-      target="_blank"
-    />
+    <Button as="a" label="Donate" icon="pi pi-dollar" href="https://github.com/sponsors/zeeshan595" target="_blank" />
   </div>
 </template>
 
@@ -50,6 +23,7 @@ import { Button, Divider } from "primevue";
 .spacer {
   height: 50px;
 }
+
 .homepage {
   display: flex;
   flex-direction: column;
