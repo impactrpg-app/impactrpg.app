@@ -176,9 +176,6 @@ function openSkillsDialog() {
         <a href="#ambush">
           <h6>Ambush</h6>
         </a>
-        <a href="#poison">
-          <h6>Poison</h6>
-        </a>
         <a href="#ailments">
           <h6>Ailments</h6>
         </a>
