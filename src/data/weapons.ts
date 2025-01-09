@@ -31,7 +31,7 @@ export const weapons: Weapon[] = [
     size: GoodsType.Small,
     keywords: [
       [
-        "versatile",
+        "Versatile",
         "When wielding this weapon with both hands, you gain a free success on every attack roll.",
       ],
     ],
@@ -44,17 +44,11 @@ export const weapons: Weapon[] = [
     size: GoodsType.Large,
   },
   {
-    name: "Long Distance Weapons",
+    name: "Shields",
     description:
-      "Long distance weapons offer a tactical advantage by allowing you to strike from afar. These include spears, staffs, and whips.",
-    attack: 1,
+      "A shield can be used in place of a weapon for added protection, and can also serve as a weapon in close combat.",
+    armor: 1,
     size: GoodsType.Small,
-    keywords: [
-      [
-        "Distance",
-        "While holding in both hands, you gain a bonus to defense rolls.",
-      ],
-    ],
   },
   {
     name: "Ranged Weapons",
@@ -96,10 +90,16 @@ export const weapons: Weapon[] = [
     ],
   },
   {
-    name: "Shields",
+    name: "Long Distance Weapons",
     description:
-      "A shield can be used in place of a weapon for added protection, and can also serve as a weapon in close combat.",
-    armor: 1,
+      "Long distance weapons offer a tactical advantage by allowing you to strike from afar. These include spears, staffs, and whips.",
+    attack: 1,
     size: GoodsType.Small,
+    keywords: [
+      [
+        "Distance",
+        "While holding in both hands, you gain a bonus to defense rolls.",
+      ],
+    ],
   },
 ];

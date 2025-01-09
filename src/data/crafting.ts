@@ -38,17 +38,17 @@ export const materialProperties: MaterialProperty[] = [
   },
   {
     name: "Tough",
-    description: "Increase the value of 1 die by 1.",
+    description: "After rolling, Increase the value of 1 die by 1.",
   },
   {
-    name: "Spike",
+    name: "Balanced",
     description: "After rolling, re-roll 1 die.",
   },
   {
     name: "Shinny",
     description:
-      "Halve your dice roll count (rounded up), but double your successes.",
-  },
+      "When using the equipment you get 1 extra success to any roll you make.",
+  }, 
 ];
 
 export type CraftingTarget = {
