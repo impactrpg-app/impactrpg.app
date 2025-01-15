@@ -8,6 +8,6 @@
   </p>
   <p>
     Increase the target value required for utility spells by 1 when setting a target with
-    the difficulty level.
+    the difficulty level table on ability checks section.
   </p>
 </template>
