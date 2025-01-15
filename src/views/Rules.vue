@@ -57,6 +57,7 @@ import UtilitySpellComponent from "../components/rules/casting-spells/spell-reso
 import BlessingsComponent from "../components/rules/casting-spells/spell-resolution/BlessingsComponent.vue";
 import CursesComponent from "../components/rules/casting-spells/spell-resolution/CursesComponent.vue";
 import ApplyCurseComponent from "../components/rules/casting-spells/spell-resolution/ApplyCurseComponent.vue";
+import ModifiersComponent from "../components/rules/fighting-monsters/ModifiersComponent.vue";
 
 const isSkillsDialogOpen = ref<boolean>(false);
 function openSkillsDialog() {
@@ -239,7 +240,12 @@ const data: RulesContent[] = [
       {
         title: "Ailments",
         content: AilmentComponent,
+        rows: 2
       },
+      {
+        title: 'Modifiers',
+        content: ModifiersComponent
+      }
     ],
   },
   {
