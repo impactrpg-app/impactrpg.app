@@ -137,7 +137,7 @@ export const monsters: Monster[] = [
       agility: 5,
       intelligence: 2,
     },
-    armor: 1,
+    armor: 2,
     wounds: 5,
     actionsPerTurn: 2,
     actions: [
@@ -611,6 +611,43 @@ export const monsters: Monster[] = [
         description:
           "Dive underwater, cannot be attacked next turn. If on land, re-roll the action",
         rolls: [5, 6],
+      },
+    ],
+  },
+  {
+    name: "Ironfang Wolf",
+    description: "A large wolf with metallic fangs and a shadowy mane.",
+    type: MonsterType.Normal,
+    abilities: {
+      strength: 4,
+      agility: 5,
+      intelligence: 2,
+    },
+    armor: 1,
+    wounds: 4,
+    actionsPerTurn: 2,
+    actions: [
+      {
+        name: "Bite",
+        description: "Attack a target using strength",
+        rolls: [1, 2, 3],
+      },
+      {
+        name: "Shadow Pounce",
+        description:
+          "Attack a target using strength. If the target is wounded they are chilled.",
+        rolls: [4, 5],
+      },
+      {
+        name: "Howl",
+        description: "Gives all wolf allies +1 strength.",
+        rolls: [6],
+      },
+    ],
+    specials: [
+      {
+        name: "Pack Leader",
+        description: "At the start of combat call 1d6 wolf to join the battle.",
       },
     ],
   },
