@@ -4,7 +4,14 @@ import { ref } from "vue";
 import { MenuItem } from "primevue/menuitem";
 import { useToast } from "primevue/usetoast";
 import { GoodsType } from "../data/goods";
-import { Character, CharacterGearItem, CharacterSkill, NewCharacter, NewGearItem, NewSkill } from "../data/character";
+import {
+  Character,
+  CharacterGearItem,
+  CharacterSkill,
+  NewCharacter,
+  NewGearItem,
+  NewSkill,
+} from "../data/character";
 import {
   Menubar,
   Divider,
@@ -17,14 +24,15 @@ import {
   Dialog,
   Select,
   Textarea,
-  useConfirm
+  useConfirm,
+  ProgressBar,
 } from "primevue";
 import { Skill, skills } from "../data/skills";
-import { loadFromFile, saveToFile } from '../service/io';
+import { loadFromFile, saveToFile } from "../service/io";
 import DiceRollerComponent from "../components/DiceRollerComponent.vue";
 
 const toast = useToast();
-const confirm = useConfirm()
+const confirm = useConfirm();
 
 const menuItems: MenuItem[] = [
   {
@@ -40,7 +48,7 @@ const menuItems: MenuItem[] = [
     command: async () => {
       const character = await loadFromFile();
       if (character) {
-        selectedCharacter.value = { ...JSON.parse(character) }
+        selectedCharacter.value = { ...JSON.parse(character) };
         toast.add({
           severity: "info",
           summary: "Character Uploaded",
@@ -61,7 +69,10 @@ const menuItems: MenuItem[] = [
     label: "save",
     icon: "pi pi-download",
     command: () => {
-      saveToFile(selectedCharacter.value.info.name ?? 'character', JSON.stringify(selectedCharacter.value));
+      saveToFile(
+        selectedCharacter.value.info.name ?? "character",
+        JSON.stringify(selectedCharacter.value)
+      );
       toast.add({
         severity: "info",
         summary: "Download Started",
@@ -94,7 +105,7 @@ const isDiceRollerOpen = ref<boolean>(false);
 async function updateCharacterImage() {
   const data = await loadFromFile();
   if (data === null) return;
-  selectedCharacter.value.info.image = `data:image/png;base64,${btoa(data)}`
+  selectedCharacter.value.info.image = `data:image/png;base64,${btoa(data)}`;
 }
 
 // notes
@@ -106,14 +117,14 @@ const showGearEditor = ref<boolean>(false);
 const existingGearIndex = ref<number>(-1);
 function createNewGearItem() {
   editingGear.value = {
-    ...NewGearItem
+    ...NewGearItem,
   };
   existingGearIndex.value = -1;
   showGearEditor.value = true;
 }
 function editExistingGearItem(item: CharacterGearItem, index: number) {
   editingGear.value = {
-    ...item
+    ...item,
   };
   existingGearIndex.value = index;
   showGearEditor.value = true;
@@ -121,8 +132,8 @@ function editExistingGearItem(item: CharacterGearItem, index: number) {
 function deleteExistingGearItem(index: number) {
   confirm.require({
     message: `Do you want to remove ${selectedCharacter.value.gear[index].name} from your gear?`,
-    header: 'Remove Gear',
-    icon: 'pi pi-info-circle',
+    header: "Remove Gear",
+    icon: "pi pi-info-circle",
     rejectProps: {
       label: "Cancel",
       severity: "secondary",
@@ -130,44 +141,39 @@ function deleteExistingGearItem(index: number) {
     },
     acceptProps: {
       label: "Delete",
-      severity: 'danger',
+      severity: "danger",
     },
     accept: () => {
       selectedCharacter.value = {
         ...selectedCharacter.value,
         gear: [
           ...selectedCharacter.value.gear.slice(0, index),
-          ...selectedCharacter.value.gear.slice(index + 1, selectedCharacter.value.gear.length)
-        ]
+          ...selectedCharacter.value.gear.slice(
+            index + 1,
+            selectedCharacter.value.gear.length
+          ),
+        ],
       };
-    }
-  })
-
+    },
+  });
 }
 function finishEditingGearItem() {
   showGearEditor.value = false;
-  if (editingGear.value.attack === 0)
-    editingGear.value.attack = undefined;
-  if (editingGear.value.armor === 0)
-    editingGear.value.armor = undefined;
+  if (editingGear.value.attack === 0) editingGear.value.attack = undefined;
+  if (editingGear.value.armor === 0) editingGear.value.armor = undefined;
 
   if (existingGearIndex.value === -1) {
     selectedCharacter.value = {
       ...selectedCharacter.value,
-      gear: [
-        ...selectedCharacter.value.gear,
-        { ...editingGear.value }
-      ]
-    }
+      gear: [...selectedCharacter.value.gear, { ...editingGear.value }],
+    };
   } else {
     const existingGear = [...selectedCharacter.value.gear];
     existingGear[existingGearIndex.value] = { ...editingGear.value };
     selectedCharacter.value = {
       ...selectedCharacter.value,
-      gear: [
-        ...existingGear
-      ]
-    }
+      gear: [...existingGear],
+    };
   }
 }
 
@@ -182,7 +188,7 @@ function createSkill() {
 }
 function editExistingSkill(skill: CharacterSkill, index: number) {
   editingSkill.value = {
-    ...skill
+    ...skill,
   };
   existingSkillIndex.value = index;
   showSkillEditor.value = true;
@@ -190,52 +196,52 @@ function editExistingSkill(skill: CharacterSkill, index: number) {
 function deleteExistingSkill(index: number) {
   confirm.require({
     message: `Do you want to remove ${selectedCharacter.value.skills[index].name} from your skills?`,
-    header: 'Remove Skill',
-    icon: 'pi pi-info-circle',
+    header: "Remove Skill",
+    icon: "pi pi-info-circle",
     rejectProps: {
-      label: 'Cancel',
-      severity: 'secondary',
+      label: "Cancel",
+      severity: "secondary",
       outlined: true,
     },
     acceptProps: {
-      label: 'Delete',
-      severity: 'danger'
+      label: "Delete",
+      severity: "danger",
     },
     accept: () => {
       selectedCharacter.value = {
         ...selectedCharacter.value,
         skills: [
           ...selectedCharacter.value.skills.slice(0, index),
-          ...selectedCharacter.value.skills.slice(index + 1, selectedCharacter.value.skills.length)
-        ]
+          ...selectedCharacter.value.skills.slice(
+            index + 1,
+            selectedCharacter.value.skills.length
+          ),
+        ],
       };
-    }
-  })
+    },
+  });
 }
 function finishEditingSkill() {
   showSkillEditor.value = false;
   if (existingSkillIndex.value === -1) {
     selectedCharacter.value = {
       ...selectedCharacter.value,
-      skills: [
-        ...selectedCharacter.value.skills,
-        { ...editingSkill.value }
-      ]
+      skills: [...selectedCharacter.value.skills, { ...editingSkill.value }],
     };
   } else {
     const existingSkils = selectedCharacter.value.skills;
     existingSkils[existingSkillIndex.value] = { ...editingSkill.value };
     selectedCharacter.value = {
       ...selectedCharacter.value,
-      skills: existingSkils
+      skills: existingSkils,
     };
   }
 }
 function skillSelectedFromDropdown(skill: Skill) {
   editingSkill.value = {
     name: skill.name,
-    description: skill.description.join('\n')
-  }
+    description: skill.description.join("\n"),
+  };
 }
 </script>
 
@@ -248,9 +254,7 @@ function skillSelectedFromDropdown(skill: Skill) {
         <label for="gear-name">Gear Name</label>
       </FloatLabel>
       <div class="field no-margin">
-        <label class="field-label">
-          Goods Type
-        </label>
+        <label class="field-label"> Goods Type </label>
         <Select v-model="editingGear.type" :options="Object.values(GoodsType)" />
       </div>
       <FloatLabel class="field">
@@ -262,13 +266,11 @@ function skillSelectedFromDropdown(skill: Skill) {
         <label for="gear-armor">Armor</label>
       </FloatLabel>
       <div class="field no-margin">
-        <label class="field-label">
-          Description
-        </label>
-        <Textarea style="height: 100px; resize: vertical;" v-model="editingGear.description" />
+        <label class="field-label"> Description </label>
+        <Textarea style="height: 100px; resize: vertical" v-model="editingGear.description" />
       </div>
       <div class="dialog-buttons">
-        <Button variant="text" label="Cancel" @click="() => showGearEditor = false" />
+        <Button variant="text" label="Cancel" @click="() => (showGearEditor = false)" />
         <Button :label="existingGearIndex !== -1 ? 'Save' : 'Create'" @click="finishEditingGearItem()" />
       </div>
     </div>
@@ -276,9 +278,7 @@ function skillSelectedFromDropdown(skill: Skill) {
   <Dialog modal v-model:visible="showSkillEditor" header="Skill" :style="{ width: '650px' }">
     <div class="dialog-content">
       <div class="field no-margin">
-        <label class="field-label">
-          Predefined Skills
-        </label>
+        <label class="field-label"> Predefined Skills </label>
         <Select :options="skills" option-label="name" @value-change="skillSelectedFromDropdown" />
       </div>
       <FloatLabel class="field">
@@ -286,26 +286,24 @@ function skillSelectedFromDropdown(skill: Skill) {
         <label for="skill-name">Skill Name</label>
       </FloatLabel>
       <div class="field no-margin">
-        <label class="field-label">
-          Description
-        </label>
-        <Textarea style="height: 300px; resize: vertical;" v-model="editingSkill.description" />
+        <label class="field-label"> Description </label>
+        <Textarea style="height: 300px; resize: vertical" v-model="editingSkill.description" />
       </div>
       <div class="dialog-buttons">
-        <Button variant="text" label="Cancel" @click="() => showSkillEditor = false" />
+        <Button variant="text" label="Cancel" @click="() => (showSkillEditor = false)" />
         <Button :label="existingGearIndex !== -1 ? 'Save' : 'Create'" @click="finishEditingSkill()" />
       </div>
     </div>
   </Dialog>
   <Dialog modal v-model:visible="showNotesEditor" header="Notes" :style="{ width: '650px' }">
     <div class="dialog-content">
-      <Textarea v-model="selectedCharacter.notes" style="resize: vertical; min-height: 500px;" />
+      <Textarea v-model="selectedCharacter.notes" style="resize: vertical; min-height: 500px" />
     </div>
   </Dialog>
   <div class="character-sheet">
-    <Menubar :model="menuItems" style="min-width: 100%; justify-content: center;" />
+    <Menubar :model="menuItems" style="min-width: 100%; justify-content: center" />
     <div class="row">
-      <div class="column" style="width:270px; flex-shrink: 1;flex-grow: 0; flex-basis: 270px;">
+      <div class="column" style="width: 270px; flex-shrink: 1; flex-grow: 0; flex-basis: 270px">
         <div :style="{
           width: '270px',
           height: '270px',
@@ -323,8 +321,13 @@ function skillSelectedFromDropdown(skill: Skill) {
           <i class="pi pi-image" v-if="selectedCharacter.info.image === ''"></i>
         </div>
       </div>
-      <div class="column" style="flex-grow: 1; flex-shrink: 0; flex-basis: calc(100% - 300); align-items: flex-start;">
-        <FloatLabel class="field" style="width:100%">
+      <div class="column" style="
+          flex-grow: 1;
+          flex-shrink: 0;
+          flex-basis: calc(100% - 300);
+          align-items: flex-start;
+        ">
+        <FloatLabel class="field" style="width: 100%">
           <InputText id="character-name" v-model="selectedCharacter.info.name" />
           <label for="character-name">Character Name</label>
         </FloatLabel>
@@ -338,7 +341,7 @@ function skillSelectedFromDropdown(skill: Skill) {
             <label for="character-name">Personality</label>
           </FloatLabel>
         </div>
-        <FloatLabel class="field" style="width:100%">
+        <FloatLabel class="field" style="width: 100%">
           <InputText id="character-name" v-model="selectedCharacter.resources.injury" />
           <label for="character-name">Injury</label>
         </FloatLabel>
@@ -376,7 +379,16 @@ function skillSelectedFromDropdown(skill: Skill) {
         <span>Wounds</span>
       </div>
     </div>
-    <Divider />
+    <div class="row">
+      <div class="column">
+        <h4>PROGRESSION</h4>
+        <div class="row">
+          <Button variant="text" @click="selectedCharacter.progression--">-</Button>
+          <ProgressBar class="progression" :value="Math.round((selectedCharacter.progression / 6) * 100)"></ProgressBar>
+          <Button variant="text" @click="selectedCharacter.progression++">+</Button>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="column">
         <h4>GEAR</h4>
@@ -388,19 +400,18 @@ function skillSelectedFromDropdown(skill: Skill) {
                 <Button icon="pi pi-trash" variant="text" @click="deleteExistingGearItem(index)" />
               </div>
             </div>
-            <h3 style="width: calc(100% - 60px); min-height: 100px;">{{ gear.name }}</h3>
+            <h3 style="width: calc(100% - 60px); min-height: 100px">{{ gear.name }}</h3>
           </template>
           <template #content>
             <div class="gear-content">
               <div>
-                <h6 style="color: var(--p-lime-200);">Type: {{ gear.type }}</h6>
+                <h6 style="color: var(--p-lime-200)">Type: {{ gear.type }}</h6>
               </div>
               <div v-if="gear.attack">
                 <h6 style="color: var(--p-lime-200)">
                   Attack: {{ gear.attack }}
-                  <span v-if="gear.isAutomaton"
-                    v-tooltip.bottom="'Do not add your strength when attacking with this weapon'"
-                    style="cursor: default;">*</span>
+                  <span v-if="gear.isAutomaton" v-tooltip.bottom="'Do not add your strength when attacking with this weapon'
+                    " style="cursor: default">*</span>
                 </h6>
               </div>
               <div v-if="gear.armor">
@@ -414,7 +425,7 @@ function skillSelectedFromDropdown(skill: Skill) {
             </div>
           </template>
         </Card>
-        <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px;" @click="createNewGearItem" />
+        <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px" @click="createNewGearItem" />
       </div>
       <Divider layout="vertical" />
       <div class="column">
@@ -427,19 +438,23 @@ function skillSelectedFromDropdown(skill: Skill) {
                 <Button icon="pi pi-trash" variant="text" @click="deleteExistingSkill(index)" />
               </div>
             </div>
-            <h3 style="width: calc(100% - 60px); min-height: 100px;">{{ skill.name }}</h3>
+            <h3 style="width: calc(100% - 60px); min-height: 100px">{{ skill.name }}</h3>
           </template>
           <template #content>
             <p>{{ skill.description }}</p>
           </template>
         </Card>
-        <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px;" @click="createSkill" />
+        <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px" @click="createSkill" />
       </div>
     </div>
   </div>
 </template>
 
 <style lang="css" scoped>
+.progression {
+  flex-grow: 1;
+}
+
 .dialog-content {
   display: flex;
   flex-direction: column;
@@ -489,6 +504,7 @@ function skillSelectedFromDropdown(skill: Skill) {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
     gap: 10px;
     width: 100%;
@@ -547,8 +563,9 @@ function skillSelectedFromDropdown(skill: Skill) {
 }
 </style>
 <style lang="css">
-#pv_id_1_list {
+.p-menubar-root-list {
   width: max-content;
+  flex-direction: row;
 }
 
 .p-menubar-item-label {

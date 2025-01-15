@@ -53,6 +53,7 @@ export type Character = {
   skills: CharacterSkill[];
   gear: CharacterGearItem[];
   notes: string;
+  progression: number;
 };
 
 export const NewCharacter: Character = {
@@ -77,4 +78,5 @@ export const NewCharacter: Character = {
   skills: [],
   gear: [],
   notes: "",
+  progression: 0,
 };
