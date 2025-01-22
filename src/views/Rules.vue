@@ -305,6 +305,9 @@ const data: RulesContent[] = [
 </template>
 
 <style lang="css">
+p {
+  color: var(--p-stone-200);
+}
 .p-dialog {
   font-family: "Roboto", sans-serif;
   font-weight: 500;
