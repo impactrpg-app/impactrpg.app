@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Router from "../router";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { MenuItem } from "primevue/menuitem";
 import { useToast } from "primevue/usetoast";
 import { GoodsType } from "../data/goods";
@@ -29,7 +29,11 @@ import {
 } from "primevue";
 import { Skill, skills } from "../data/skills";
 import { loadFromFile, saveToFile } from "../service/io";
+import { Age, ages } from "../data/age";
+import AutoCompleteDropdown from '../components/AutoCompleteDropdownComponent.vue';
 import DiceRollerComponent from "../components/DiceRollerComponent.vue";
+import { personalities } from "../data/personality";
+import { injuryEffects } from "../data/injury";
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -108,6 +112,8 @@ async function updateCharacterImage() {
   selectedCharacter.value.info.image = `data:image/png;base64,${btoa(data)}`;
 }
 
+const ageOptions = ref<Age[]>(ages);
+
 // notes
 const showNotesEditor = ref<boolean>(false);
 
@@ -175,6 +181,12 @@ function finishEditingGearItem() {
       gear: [...existingGear],
     };
   }
+}
+
+// progression
+const progressionPercent = computed(() => Math.round((selectedCharacter.value.progression / 6) * 100.0))
+function updateCharacterProgression(newVal: number) {
+  selectedCharacter.value.progression = Math.min(Math.max(newVal, 0), 6);
 }
 
 // skills
@@ -249,7 +261,7 @@ function skillSelectedFromDropdown(skill: Skill) {
   <DiceRollerComponent v-model:is-open="isDiceRollerOpen" />
   <Dialog modal v-model:visible="showGearEditor" header="Gear" :style="{ width: '650px' }">
     <div class="dialog-content">
-      <FloatLabel class="field">
+      <FloatLabel variant="on" class="field">
         <InputText id="gear-name" v-model="editingGear.name" />
         <label for="gear-name">Gear Name</label>
       </FloatLabel>
@@ -328,22 +340,37 @@ function skillSelectedFromDropdown(skill: Skill) {
           align-items: flex-start;
         ">
         <FloatLabel class="field" style="width: 100%">
-          <InputText id="character-name" v-model="selectedCharacter.info.name" />
+          <InputText id="character-name" v-model="selectedCharacter.info.name"  />
           <label for="character-name">Character Name</label>
         </FloatLabel>
         <div class="row">
           <FloatLabel class="field" style="width: 10px">
-            <InputText id="character-name" v-model="selectedCharacter.info.age" />
-            <label for="character-name">Age</label>
+            <AutoCompleteDropdown
+              id="character-age"
+              v-model="selectedCharacter.info.age"
+              :suggestions="ageOptions"
+              option-label="name"
+            />
+            <label for="character-age">Age</label>
           </FloatLabel>
           <FloatLabel class="field" style="width: 120px">
-            <InputText id="character-name" v-model="selectedCharacter.info.personality" />
-            <label for="character-name">Personality</label>
+            <AutoCompleteDropdown
+              id="character-personality"
+              v-model="selectedCharacter.info.personality"
+              :suggestions="personalities"
+              option-label="name"
+            />
+            <label for="character-personality">Personality</label>
           </FloatLabel>
         </div>
         <FloatLabel class="field" style="width: 100%">
-          <InputText id="character-name" v-model="selectedCharacter.resources.injury" />
-          <label for="character-name">Injury</label>
+          <AutoCompleteDropdown
+            id="character-injury"
+            v-model="selectedCharacter.resources.injury"
+            :suggestions="injuryEffects"
+            option-label="name"
+          />
+          <label for="character-injury">Injury</label>
         </FloatLabel>
       </div>
     </div>
@@ -383,9 +410,9 @@ function skillSelectedFromDropdown(skill: Skill) {
       <div class="column">
         <h4>PROGRESSION</h4>
         <div class="row">
-          <Button variant="text" @click="selectedCharacter.progression--">-</Button>
-          <ProgressBar class="progression" :value="Math.round((selectedCharacter.progression / 6) * 100)"></ProgressBar>
-          <Button variant="text" @click="selectedCharacter.progression++">+</Button>
+          <Button variant="text" @click="updateCharacterProgression(selectedCharacter.progression - 1)">-</Button>
+          <ProgressBar class="progression" :value="progressionPercent"></ProgressBar>
+          <Button variant="text" @click="updateCharacterProgression(selectedCharacter.progression + 1)">+</Button>
         </div>
       </div>
     </div>
