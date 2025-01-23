@@ -3,7 +3,7 @@ import Router from "../router";
 import { computed, ref } from "vue";
 import { MenuItem } from "primevue/menuitem";
 import { useToast } from "primevue/usetoast";
-import { GoodsType } from "../data/goods";
+import { goods, GoodsType } from "../data/goods";
 import {
   Character,
   CharacterGearItem,
@@ -34,10 +34,15 @@ import AutoCompleteDropdown from '../components/AutoCompleteDropdownComponent.vu
 import DiceRollerComponent from "../components/DiceRollerComponent.vue";
 import { personalities } from "../data/personality";
 import { injuryEffects } from "../data/injury";
+import { weapons } from "../data/weapons";
+import { armors } from "../data/armor";
 
 const toast = useToast();
 const confirm = useConfirm();
 
+function getRandomNumber(max: number) {
+  return Math.floor(Math.random() * max);
+}
 const menuItems: MenuItem[] = [
   {
     label: "back",
@@ -99,6 +104,74 @@ const menuItems: MenuItem[] = [
       showNotesEditor.value = true;
     },
   },
+  {
+    label: 'Randomize',
+    icon: 'pi pi-refresh',
+    command: () => {
+      selectedCharacter.value.info.age = ages[getRandomNumber(ages.length)].name;
+      selectedCharacter.value.info.personality = personalities[getRandomNumber(personalities.length)].name;
+      const stats = [0, 0, 0];
+      const availablePoints = 6;
+      for (let i = 0; i < availablePoints; i++) {
+        let randomStat = getRandomNumber(stats.length);
+        while(stats[randomStat] + 1 > 3) {
+          randomStat = getRandomNumber(stats.length);
+        }
+        stats[randomStat]++;
+      }
+      const [strength, agility, intelligence] = stats;
+      selectedCharacter.value.abilities.strength = strength;
+      selectedCharacter.value.abilities.agility = agility;
+      selectedCharacter.value.abilities.intelligence = intelligence;
+      selectedCharacter.value.resources.endurance = agility + 10;
+
+      const skill = skills[getRandomNumber(skills.length)];
+      selectedCharacter.value.skills = [
+        { name: skill.name, description: skill.description.join('\n\n') }
+      ];
+      
+      selectedCharacter.value.gear = [];
+      let totalGearAmount = 0;
+      while(totalGearAmount < 4) {
+        switch(getRandomNumber(3)) {
+          case 0: // weapon
+            const weapon = weapons[getRandomNumber(weapons.length)];
+            if (weapon.size === GoodsType.Large)
+              totalGearAmount += 2;
+            else
+              totalGearAmount++;
+            selectedCharacter.value.gear.push({
+              ...weapon,
+              type: weapon.size
+            });
+            break;
+          case 1: // armor
+            const armor = armors[getRandomNumber(armors.length)];
+            if (armor.size === GoodsType.Large)
+              totalGearAmount += 2;
+            else
+              totalGearAmount++;
+            selectedCharacter.value.gear.push({
+              ...armor,
+              type: armor.size
+            });
+            break;
+          case 2: // goods
+            const good = goods[getRandomNumber(goods.length)];
+            if (good.size === GoodsType.Large)
+              totalGearAmount += 2;
+            else
+              totalGearAmount++;
+            selectedCharacter.value.gear.push({
+              ...good,
+              type: good.size,
+              description: good.description.join('\n\n'),
+            });
+            break;
+        }
+      }
+    }
+  }
 ];
 const selectedCharacter = ref<Character>({ ...NewCharacter });
 
@@ -409,7 +482,7 @@ function skillSelectedFromDropdown(skill: Skill) {
     <div class="row">
       <div class="column">
         <h4>PROGRESSION</h4>
-        <div class="row">
+        <div class="row" style="align-items: center;">
           <Button variant="text" @click="updateCharacterProgression(selectedCharacter.progression - 1)">-</Button>
           <ProgressBar class="progression" :value="progressionPercent"></ProgressBar>
           <Button variant="text" @click="updateCharacterProgression(selectedCharacter.progression + 1)">+</Button>
@@ -454,7 +527,6 @@ function skillSelectedFromDropdown(skill: Skill) {
         </Card>
         <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px" @click="createNewGearItem" />
       </div>
-      <Divider layout="vertical" />
       <div class="column">
         <h4>SKILLS</h4>
         <Card v-for="(skill, index) in selectedCharacter.skills" class="card">
@@ -531,7 +603,7 @@ function skillSelectedFromDropdown(skill: Skill) {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: start;
     justify-content: space-between;
     gap: 10px;
     width: 100%;
