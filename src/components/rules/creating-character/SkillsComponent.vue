@@ -1,6 +1,6 @@
 <template>
   <p>
-    At character creation, you may select 2 different skills. Skills provide unique
+    At character creation, you may select 1 different skills. Skills provide unique
     abilities or advantages, allowing you to customize your character's strengths and
     playstyle.
   </p>

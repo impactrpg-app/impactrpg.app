@@ -18,6 +18,7 @@ import { weapons } from "../../../data/weapons";
     concealed.
   </p>
   <p>At character creation, you may choose 2 large goods worth of items.</p>
+  <p>Your character can carry 3 large goods worth of items.</p>
   <p>Two small goods can be counted as one large good.</p>
 
   <h3>WEAPONS</h3>
