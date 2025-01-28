@@ -58,10 +58,16 @@ import BlessingsComponent from "../components/rules/casting-spells/spell-resolut
 import CursesComponent from "../components/rules/casting-spells/spell-resolution/CursesComponent.vue";
 import ApplyCurseComponent from "../components/rules/casting-spells/spell-resolution/ApplyCurseComponent.vue";
 import ModifiersComponent from "../components/rules/fighting-monsters/ModifiersComponent.vue";
+import InsanityComponent from "../components/rules/playing-the-game/InsanityComponent.vue";
+import { travelEvents } from "../data/travel";
 
 const isSkillsDialogOpen = ref<boolean>(false);
+const isTravelingEventsDialogOpen = ref<boolean>(false);
 function openSkillsDialog() {
   isSkillsDialogOpen.value = true;
+}
+function openTravelingEventsDialog() {
+  isTravelingEventsDialogOpen.value = true;
 }
 
 const data: RulesContent[] = [
@@ -144,10 +150,15 @@ const data: RulesContent[] = [
       {
         title: "Healing",
         content: HealingComponent,
+        rows: 2,
       },
       {
         title: "Death",
         content: DeathComponent,
+      },
+      {
+        title: "Bonus & Penalty",
+        content: BonusComponent,
       },
       {
         title: "Injury",
@@ -159,8 +170,8 @@ const data: RulesContent[] = [
         content: CorruptionComponent,
       },
       {
-        title: "Bonus & Penalty",
-        content: BonusComponent,
+        title: "Insanity",
+        content: InsanityComponent
       },
       {
         title: "Resurrection",
@@ -169,6 +180,9 @@ const data: RulesContent[] = [
       {
         title: "Traveling",
         content: TravelingComponent,
+        props: {
+          openTravelingEventsDialog,
+        }
       },
       {
         title: "Resting",
@@ -292,12 +306,35 @@ const data: RulesContent[] = [
 
 <template>
   <Dialog modal v-model:visible="isSkillsDialogOpen" header="Skills">
-    <div class="skill-examples">
-      <div class="skill-example" v-for="skill in skills">
-        <h4 class="text-contrast">{{ skill.name }}:</h4>
-        <p v-for="desc in skill.description">
-          {{ desc }}
+    <div class="dialog-popup">
+      <div class="item" v-for="skill in skills">
+        <p>
+          <b class="text-contrast">{{ skill.name }}: </b>
+          <template v-for="desc in skill.description">
+            {{ desc }}
+          </template>
         </p>
+      </div>
+    </div>
+  </Dialog>
+  <Dialog modal v-model:visible="isTravelingEventsDialogOpen" header="Travel Events">
+    <div class="dialog-popup">
+      <div class="item" v-for="(travelEvent, index) in travelEvents">
+        <p>
+          <b class="text-contrast">{{index + 1}}. {{ travelEvent.name }}</b>
+        </p>
+        <p>
+          {{ travelEvent.description }}
+        </p>
+        <template v-for="(option, optionIndex) in travelEvent.options">
+          <p>
+            <b class="text-contrast">{{ String.fromCharCode(65 + optionIndex) }}. </b>
+            {{ option.description }}
+          </p>
+          <p>
+            {{ option.outcome }}
+          </p>
+        </template>
       </div>
     </div>
   </Dialog>
@@ -305,6 +342,20 @@ const data: RulesContent[] = [
 </template>
 
 <style lang="css">
+.dialog-popup {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 800px;
+  gap: 20px;
+  
+  .item {
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 20px);
+    gap: 10px;
+  }
+}
 p {
   color: var(--p-stone-200);
 }

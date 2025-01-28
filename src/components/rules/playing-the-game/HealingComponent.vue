@@ -11,4 +11,8 @@
     Healing is only possible for willing creatures. Insane characters or unwilling
     creatures cannot be healed.
   </p>
+  <p>
+    If you fail to heal the character with an intelligence check you can no longer heal
+    the character again until their wounds change.
+  </p>
 </template>

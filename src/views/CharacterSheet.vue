@@ -14,7 +14,6 @@ import {
 } from "../data/character";
 import {
   Menubar,
-  Divider,
   FloatLabel,
   InputText,
   InputNumber,

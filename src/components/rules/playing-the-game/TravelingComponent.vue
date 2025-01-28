@@ -1,3 +1,10 @@
+<script lang="ts" setup>
+import { Button } from "primevue";
+const props = defineProps<{
+  openTravelingEventsDialog?: () => void;
+}>();
+</script>
+
 <template>
   <p>
     When traveling across the world, distances are categorized into three types: Short,
@@ -41,4 +48,5 @@
   <p>
     <i> Wading through hip-deep mud costs 3 endurance per character. </i>
   </p>
+  <Button variant="text" @click="props.openTravelingEventsDialog"> Traveling Events </Button>
 </template>
