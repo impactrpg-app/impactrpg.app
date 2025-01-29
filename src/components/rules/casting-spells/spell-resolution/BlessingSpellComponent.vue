@@ -8,8 +8,8 @@
   <p>
     <i>
       Increasing the an ability from 3 to 4 requires at least 3 mana for a single round.
-      Spending 5 mana would increase the duration to 3 rounds but will not increase the
-      ability score.
+      Spending 5 mana would increase the duration to 3 rounds but only increases the
+      ability score by 1.
     </i>
   </p>
   <p>

@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { skills } from "../data/skills";
 import { Dialog } from "primevue";
+import { travelEvents } from "../data/travel";
 import RulesComponent, { RulesContent } from "../components/RulesComponent.vue";
 import AbilityComponent from "../components/rules/creating-character/AbilityComponent.vue";
 import AgeComponent from "../components/rules/creating-character/AgeComponent.vue";
@@ -54,12 +55,14 @@ import MultiTargetingComponent from "../components/rules/casting-spells/MultiTar
 import AttackSpellComponent from "../components/rules/casting-spells/spell-resolution/AttackSpellComponent.vue";
 import DefenseSpellComponent from "../components/rules/casting-spells/spell-resolution/DefenseSpellComponent.vue";
 import UtilitySpellComponent from "../components/rules/casting-spells/spell-resolution/UtilitySpellComponent.vue";
-import BlessingsComponent from "../components/rules/casting-spells/spell-resolution/BlessingsComponent.vue";
-import CursesComponent from "../components/rules/casting-spells/spell-resolution/CursesComponent.vue";
+import BlessingSpellComponent from "../components/rules/casting-spells/spell-resolution/BlessingSpellComponent.vue";
+import CurseSpellComponent from "../components/rules/casting-spells/spell-resolution/CurseSpellComponent.vue";
 import ApplyCurseComponent from "../components/rules/casting-spells/spell-resolution/ApplyCurseComponent.vue";
 import ModifiersComponent from "../components/rules/fighting-monsters/ModifiersComponent.vue";
 import InsanityComponent from "../components/rules/playing-the-game/InsanityComponent.vue";
-import { travelEvents } from "../data/travel";
+import HealingSpellComponent from "../components/rules/casting-spells/spell-resolution/HealingSpellComponent.vue";
+import SummoningSpellComponent from "../components/rules/casting-spells/spell-resolution/SummoningSpellComponent.vue";
+import IllusionSpellComponent from "../components/rules/casting-spells/spell-resolution/IllusionSpellComponent.vue";
 
 const isSkillsDialogOpen = ref<boolean>(false);
 const isTravelingEventsDialogOpen = ref<boolean>(false);
@@ -295,10 +298,13 @@ const data: RulesContent[] = [
       },
       { content: AttackSpellComponent, rows: 2 },
       { content: DefenseSpellComponent },
-      { content: BlessingsComponent },
-      { content: CursesComponent },
+      { content: BlessingSpellComponent },
+      { content: CurseSpellComponent },
       { content: ApplyCurseComponent },
       { content: UtilitySpellComponent },
+      { content: HealingSpellComponent },
+      { content: SummoningSpellComponent },
+      { content: IllusionSpellComponent }
     ],
   },
 ];

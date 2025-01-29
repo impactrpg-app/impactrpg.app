@@ -13,10 +13,18 @@
     matter or life.
   </p>
   <h4>Magic Cannot</h4>
-  <ul>
-    <li>Heal wounds.</li>
-    <li>Resurrect a character.</li>
-    <li>Summon creatures.</li>
-    <li>Create objects or resources.</li>
-  </ul>
+  <p>
+    <b>Resurrect a character</b>
+  </p>
+  <p>
+    Resurrecting anyone is beyond the understanding of mortals. If you wish to resurrect 
+    someone, you must ask a higher power for assistance. Please look at the resurrection section.
+  </p>
+  <p>
+    <b>Create objects or resources.</b>
+  </p>
+  <p>
+    You cannot create objects or resources from nothing. If you conjure food, when you eat it
+    the food will disapear inside your belly leaving you hungry.
+  </p>
 </template>

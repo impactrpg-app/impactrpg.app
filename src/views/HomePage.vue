@@ -12,6 +12,7 @@ import { Button, Divider } from "primevue";
     <p>A Free Tabletop Role Playing game.</p>
     <Button as="router-link" label="Getting Started" icon="pi pi-info" to="/getting-started" />
     <Button as="router-link" label="Character Sheet" icon="pi pi-user" to="/character-sheet" />
+    <Button as="router-link" label="Encounters" icon="pi pi-users" to="/encounter" />
     <Button as="router-link" label="Rulebook" icon="pi pi-align-justify" to="/rules" />
     <Button as="router-link" label="Monsters" icon="pi pi-eye" to="/monsters" />
     <Button as="router-link" label="World" icon="pi pi-globe" to="/world" />
