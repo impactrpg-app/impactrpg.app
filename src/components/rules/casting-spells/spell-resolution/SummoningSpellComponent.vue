@@ -11,4 +11,7 @@
     instead of the spells effect taking place you can imbue the spell to the creature.
     This will make the creature able to cast the spell you imbued into the creature.
   </p>
+  <p>
+    All of the creatures abilities are set to 1. You may use blessings to increase these.
+  </p>
 </template>

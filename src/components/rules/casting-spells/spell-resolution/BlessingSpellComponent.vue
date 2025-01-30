@@ -1,5 +1,5 @@
 <template>
-  <h3>BLESSINGS</h3>
+  <h3>BLESSING SPELLS</h3>
   <p>Blessings enhance objects or willing creatures.</p>
   <p>
     To increase a creature's ability score, the mana spent must match or exceed the

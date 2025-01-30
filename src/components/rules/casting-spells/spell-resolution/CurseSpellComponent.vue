@@ -1,5 +1,5 @@
 <template>
-  <h3>CURSES</h3>
+  <h3>CURSE SPELLS</h3>
   <p>
     Curses impose negative effects on enemies, such as Hold Person, Slow, Fear, or
     Polymorph.
