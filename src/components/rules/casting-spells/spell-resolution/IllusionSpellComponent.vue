@@ -15,4 +15,8 @@
     Illusion magic has no effect and does not do damage, protect allies, heal creatures or modify anything.
     It is only capable of making people belive something that is not true.
   </p>
+  <p>
+    If you cast illusion magic multiple times against the same character then each subsequent time they will
+    need 1 less success to see through the illusion.
+  </p>
 </template>
