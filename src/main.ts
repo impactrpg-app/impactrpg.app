@@ -20,6 +20,7 @@ app.use(PrimeVue, {
     preset: Material,
     options: {
       prefix: "p",
+      darkModeSelector: '.my-app-dark',
     },
   },
 });

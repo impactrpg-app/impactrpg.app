@@ -17,7 +17,6 @@ import {
   FloatLabel,
   InputText,
   InputNumber,
-  Knob,
   Card,
   Button,
   Dialog,
@@ -25,6 +24,7 @@ import {
   Textarea,
   useConfirm,
   ProgressBar,
+  Rating,
 } from "primevue";
 import { Skill, skills } from "../data/skills";
 import { loadFromFile, saveToFile } from "../service/io";
@@ -35,6 +35,8 @@ import { personalities } from "../data/personality";
 import { injuryEffects } from "../data/injury";
 import { weapons } from "../data/weapons";
 import { armors } from "../data/armor";
+import CustomRatingComponent from "../components/CustomRatingComponent.vue";
+import CustomResourceComponent from "../components/CustomResourceComponent.vue";
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -255,6 +257,9 @@ function finishEditingGearItem() {
   }
 }
 
+// endurance
+const endurancePercent = computed(() => Math.round((selectedCharacter.value.resources.endurance / 20.0) * 100));
+
 // progression
 const progressionPercent = computed(() => Math.round((selectedCharacter.value.progression / 6) * 100.0))
 function updateCharacterProgression(newVal: number) {
@@ -447,44 +452,40 @@ function skillSelectedFromDropdown(skill: Skill) {
       </div>
     </div>
     <div class="row">
-      <div class="knob-field">
-        <Knob v-model="selectedCharacter.abilities.strength" :size="150" :min="0" :max="5" />
-        <span>Strength</span>
-      </div>
-      <div class="knob-field">
-        <Knob v-model="selectedCharacter.abilities.agility" :size="150" :min="0" :max="5" />
-        <span>Agility</span>
-      </div>
-      <div class="knob-field">
-        <Knob v-model="selectedCharacter.abilities.intelligence" :size="150" :min="0" :max="5" />
-        <span>Intelligence</span>
-      </div>
-    </div>
-    <div class="row">
-      <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.mana" :min="0" :max="20" value-color="var(--p-blue-200)" />
-        <span>Mana</span>
-      </div>
-      <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.endurance" :min="0" :max="20" value-color="var(--p-amber-200)" />
-        <span>Endurance</span>
-      </div>
-      <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.corruption" :min="0" :max="10" value-color="var(--p-fuchsia-200)" />
-        <span>Corruption</span>
-      </div>
-      <div class="knob-field">
-        <Knob v-model="selectedCharacter.resources.wounds" :min="0" :max="10" value-color="var(--p-red-300)" />
-        <span>Wounds</span>
-      </div>
-    </div>
-    <div class="row">
       <div class="column">
-        <h4>PROGRESSION</h4>
-        <div class="row" style="align-items: center;">
-          <Button variant="text" @click="updateCharacterProgression(selectedCharacter.progression - 1)">-</Button>
-          <ProgressBar class="progression" :value="progressionPercent"></ProgressBar>
-          <Button variant="text" @click="updateCharacterProgression(selectedCharacter.progression + 1)">+</Button>
+        <div class="stat">
+          <span>Strength</span>
+          <CustomRatingComponent material-icons icon="swords" :stars="6" v-model="selectedCharacter.abilities.strength" />
+        </div>
+        <div class="stat">
+          <span>Agility</span>
+          <CustomRatingComponent icon="pi-bolt" :stars="6" v-model="selectedCharacter.abilities.agility" />
+        </div>
+        <div class="stat">
+          <span>Intelligence</span>
+          <CustomRatingComponent material-icons icon="neurology" :stars="6" v-model="selectedCharacter.abilities.intelligence" />
+        </div>
+        <div class="stat">
+          <span>Progression</span>
+          <CustomRatingComponent icon="pi-sparkles" :stars="6" v-model="selectedCharacter.progression" />
+        </div>
+      </div>
+      <div class="column">
+        <div class="stat">
+          <span>Endurance</span>
+          <CustomResourceComponent v-model:model-value="selectedCharacter.resources.endurance" :min="0" :max="20" />
+        </div>
+        <div class="stat">
+          <span>Wounds</span>
+          <CustomResourceComponent v-model:model-value="selectedCharacter.resources.wounds" :min="0" />
+        </div>
+        <div class="stat">
+          <span>Mana</span>
+          <CustomResourceComponent v-model:model-value="selectedCharacter.resources.mana" :min="0" />
+        </div>
+        <div class="stat">
+          <span>Corruption</span>
+          <CustomResourceComponent v-model:model-value="selectedCharacter.resources.corruption" :min="0" />
         </div>
       </div>
     </div>
@@ -623,15 +624,14 @@ function skillSelectedFromDropdown(skill: Skill) {
     }
   }
 
-  .knob-field {
+  .stat {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 20px;
     align-items: center;
 
     span {
-      text-transform: uppercase;
-      font-size: 18px;
-      font-weight: bold;
+      width: 140px;
     }
   }
 }

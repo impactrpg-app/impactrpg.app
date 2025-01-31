@@ -14,6 +14,7 @@ html {
 }
 body {
   background-color: #1c1b22;
+  color: var(--p-stone-200);
 }
 #app {
   display: flex;
