@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Router from "../router";
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { MenuItem } from "primevue/menuitem";
 import { useToast } from "primevue/usetoast";
 import { goods, GoodsType } from "../data/goods";
@@ -23,8 +23,6 @@ import {
   Select,
   Textarea,
   useConfirm,
-  ProgressBar,
-  Rating,
 } from "primevue";
 import { Skill, skills } from "../data/skills";
 import { loadFromFile, saveToFile } from "../service/io";
@@ -255,15 +253,6 @@ function finishEditingGearItem() {
       gear: [...existingGear],
     };
   }
-}
-
-// endurance
-const endurancePercent = computed(() => Math.round((selectedCharacter.value.resources.endurance / 20.0) * 100));
-
-// progression
-const progressionPercent = computed(() => Math.round((selectedCharacter.value.progression / 6) * 100.0))
-function updateCharacterProgression(newVal: number) {
-  selectedCharacter.value.progression = Math.min(Math.max(newVal, 0), 6);
 }
 
 // skills
