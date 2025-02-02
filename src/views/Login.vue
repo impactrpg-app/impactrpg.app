@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import * as PackageJson from '../../package.json';
-import { FloatLabel, InputText, Button } from 'primevue'
+import { FloatLabel, InputText, Button, Dialog } from 'primevue'
 import { ref } from 'vue';
 import { supabaseClient } from '../service/supabase';
 
 const email = ref<string>('');
+const showSignInDialog = ref<boolean>(false);
 
 async function signIn() {
   localStorage.setItem('login:email', email.value);
@@ -15,10 +16,16 @@ async function signIn() {
       emailRedirectTo: `${window.location.origin}`
     }
   });
+  showSignInDialog.value = true;
 }
 </script>
 
 <template>
+  <Dialog modal v-model:visible="showSignInDialog">
+    <p>
+      Please check your email for a link. You can close this page.
+    </p>
+  </Dialog>
   <div class="login">
     <h1>impact</h1>
     <div class="version">{{ PackageJson.version }}</div>
@@ -28,7 +35,7 @@ async function signIn() {
       <label for="email">Email</label>
     </FloatLabel>
     <div class="buttons">
-    <Button @click="signIn">Sign In</Button>
+    <Button @click="signIn">Continue</Button>
     </div>
   </div>
 </template>
