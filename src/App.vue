@@ -99,4 +99,31 @@ em {
 .text-contrast {
   color: var(--p-lime-200);
 }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  overflow: none !important;
+  margin-top: 20px;
+  flex-grow: 1;
+  gap: 5px;
+
+  &.no-margin {
+    margin-top: 0;
+  }
+
+  .field-label {
+    color: var(--p-floatlabel-active-color);
+    font-size: 12px;
+    margin-left: 15px;
+    font-weight: normal;
+  }
+
+  div.p-autocomplete,div.p-password,input {
+    width: 100%;
+  }
+}
+.p-tooltip {
+  text-align: center;
+}
 </style>

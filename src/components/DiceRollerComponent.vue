@@ -121,26 +121,6 @@ async function rollDice() {
     z-index: 100;
   }
 }
-
-.field {
-  display: flex;
-  flex-direction: column;
-  overflow: none !important;
-  margin-top: 20px;
-  flex-grow: 1;
-  gap: 5px;
-
-  &.no-margin {
-    margin-top: 0;
-  }
-
-  .field-label {
-    color: var(--p-floatlabel-active-color);
-    font-size: 12px;
-    margin-left: 15px;
-    font-weight: normal;
-  }
-}
 </style>
 <style lang="css">
 .input-number-align-text-center {

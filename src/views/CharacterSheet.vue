@@ -44,67 +44,14 @@ function getRandomNumber(max: number) {
 }
 const menuItems: MenuItem[] = [
   {
-    label: "back",
+    label: "Back",
     icon: "pi pi-chevron-left",
     command: () => {
       Router.push("/");
     },
   },
   {
-    label: "load",
-    icon: "pi pi-upload",
-    command: async () => {
-      const character = await loadFromFile();
-      if (character) {
-        selectedCharacter.value = { ...JSON.parse(character) };
-        toast.add({
-          severity: "info",
-          summary: "Character Uploaded",
-          detail: "Character sheet has been updated with the file you provided",
-          life: 3000,
-        });
-      } else {
-        toast.add({
-          severity: "error",
-          summary: "Character Upload Failed",
-          detail: "Failed to update character sheet",
-          life: 3000,
-        });
-      }
-    },
-  },
-  {
-    label: "save",
-    icon: "pi pi-download",
-    command: () => {
-      saveToFile(
-        selectedCharacter.value.info.name ?? "character",
-        JSON.stringify(selectedCharacter.value)
-      );
-      toast.add({
-        severity: "info",
-        summary: "Download Started",
-        detail: "Your browser should start downloading the character",
-        life: 3000,
-      });
-    },
-  },
-  {
-    label: "roll dice",
-    icon: "pi pi-sparkles",
-    command: () => {
-      isDiceRollerOpen.value = true;
-    },
-  },
-  {
-    label: "Notes",
-    icon: "pi pi-book",
-    command: () => {
-      showNotesEditor.value = true;
-    },
-  },
-  {
-    label: 'Randomize',
+    label: 'Create Random Character',
     icon: 'pi pi-refresh',
     command: () => {
       selectedCharacter.value.info.age = ages[getRandomNumber(ages.length)].name;
@@ -170,6 +117,59 @@ const menuItems: MenuItem[] = [
         }
       }
     }
+  },
+  {
+    label: "Import",
+    icon: "pi pi-upload",
+    command: async () => {
+      const character = await loadFromFile();
+      if (character) {
+        selectedCharacter.value = { ...JSON.parse(character) };
+        toast.add({
+          severity: "info",
+          summary: "Character Uploaded",
+          detail: "Character sheet has been updated with the file you provided",
+          life: 3000,
+        });
+      } else {
+        toast.add({
+          severity: "error",
+          summary: "Character Upload Failed",
+          detail: "Failed to update character sheet",
+          life: 3000,
+        });
+      }
+    },
+  },
+  {
+    label: "Export",
+    icon: "pi pi-download",
+    command: () => {
+      saveToFile(
+        selectedCharacter.value.info.name ?? "character",
+        JSON.stringify(selectedCharacter.value)
+      );
+      toast.add({
+        severity: "info",
+        summary: "Download Started",
+        detail: "Your browser should start downloading the character",
+        life: 3000,
+      });
+    },
+  },
+  {
+    label: "Roll Dice",
+    icon: "casino",
+    command: () => {
+      isDiceRollerOpen.value = true;
+    },
+  },
+  {
+    label: "Notes",
+    icon: "pi pi-book",
+    command: () => {
+      showNotesEditor.value = true;
+    },
   }
 ];
 const selectedCharacter = ref<Character>({ ...NewCharacter });
@@ -379,7 +379,14 @@ function skillSelectedFromDropdown(skill: Skill) {
     </div>
   </Dialog>
   <div class="character-sheet">
-    <Menubar :model="menuItems" style="min-width: 100%; justify-content: center" />
+    <Menubar :model="menuItems" style="min-width: 100%;">
+      <template #item="{ item }">
+        <div v-tooltip.bottom="item.label" class="menu-item">
+          <span v-if="item.icon?.startsWith('pi')" :class="`pi ${item.icon}`"></span>
+          <span v-else class="material-symbols-outlined">{{ item.icon }}</span>
+        </div>
+      </template>
+    </Menubar>
     <div class="row">
       <div class="column" style="width: 270px; flex-shrink: 1; flex-grow: 0; flex-basis: 270px">
         <div :style="{
@@ -539,8 +546,15 @@ function skillSelectedFromDropdown(skill: Skill) {
 </template>
 
 <style lang="css" scoped>
-.progression {
-  flex-grow: 1;
+.menu-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px;
+
+  span {
+    font-size: 24px;
+  }
 }
 
 .dialog-content {
@@ -560,24 +574,6 @@ function skillSelectedFromDropdown(skill: Skill) {
   font-size: 12px;
   margin-left: 15px;
   font-weight: normal;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  overflow: none !important;
-  margin-top: 20px;
-  flex-grow: 1;
-  gap: 5px;
-
-  &.no-margin {
-    margin-top: 0;
-  }
-
-  input {
-    font-size: 24px;
-    width: 100%;
-  }
 }
 
 .character-sheet {
