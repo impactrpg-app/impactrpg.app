@@ -39,7 +39,7 @@ function initDiceBox() {
       linearDamping: 0.3,
       spinForce: 2,
       throwForce: 15,
-      restitution: 0.5,
+      restitution: 0.3,
       lightIntensity: 0.8,
     });
     diceBox.init().then(resolve);
