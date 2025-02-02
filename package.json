@@ -9,14 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dice-roller/rpg-dice-roller": "^5.5.0",
+    "@3d-dice/dice-box": "^1.1.4",
     "@primevue/themes": "^4.2.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",
+    "vite-plugin-node-polyfills": "^0.23.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@types/node": "^22.13.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "typescript": "^5.7.2",
     "vite": "^6.0.3"

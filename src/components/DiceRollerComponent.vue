@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import { Dialog, InputNumber, Button } from 'primevue';
-import DiceComponent from './DiceComponent.vue';
-import { DiceRoll } from '@dice-roller/rpg-dice-roller';
+import { $dt } from '@primevue/themes';
+// @ts-ignore dice-box does not support typescript
+import DiceBox from "@3d-dice/dice-box";
+
+let diceBox: any = null;
 
 const props = defineProps<{
   isOpen?: boolean;
@@ -19,59 +22,79 @@ const isOpen = computed({
     emits('update:isOpen', value);
   }
 });
+const diceToRoll = ref<number>(2);
+const successes = ref<number | null>(null);
 
-const diceToRoll = ref<number>(0);
-const diceResults = ref<number[]>([]);
-const totalResult = ref<number>(0);
+function initDiceBox() {
+  successes.value = null;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+    diceBox = new DiceBox({
+      assetPath: '/assets/',
+      theme: 'theme-rock',
+      themeColor: $dt('stone.600').value,
+      id: 'dice-canvas',
+      container: '#dice-box-container',
+      scale: 6,
+      linearDamping: 0.3,
+      spinForce: 2,
+      throwForce: 15,
+      restitution: 0.5,
+      lightIntensity: 0.8,
+    });
+    diceBox.init().then(resolve);
+    }, 0)
+  });
+}
 
-watch(diceToRoll, () => {
-  if (diceToRoll.value > diceResults.value.length) {
-    diceResults.value = [
-      ...diceResults.value,
-      ...new Array(diceToRoll.value - diceResults.value.length).fill(1)
-    ];
-  } else if (diceToRoll.value < diceResults.value.length) {
-    diceResults.value = diceResults.value.slice(0, diceToRoll.value);
-  }
+watch(isOpen, (newValue) => {
+  if (!newValue) return;
+  initDiceBox();
 })
 
-function rollDice() {
-  if (diceToRoll.value <= 0) return;
-  totalResult.value = 0;
-
-  for (let i = 0; i < diceResults.value.length; i++) {
-    diceResults.value[i] = new DiceRoll('1d6').total
-    if (diceResults.value[i] > 3) {
-      totalResult.value += diceResults.value[i] === 6 ? 2 : 1;
+async function rollDice() {
+  successes.value = null;
+  if (diceBox === null)
+    await initDiceBox();
+  const result = await diceBox.roll(`${diceToRoll.value}d6`);
+  let total = 0;
+  for (const dice of result) {
+    if (dice.value === 6) {
+      total += 2;
+    } else if (dice.value >= 4) {
+      total ++;
     }
   }
-}
-function getDiceColor(result: number) {
-  if (result < 4) {
-    return 'var(--p-stone-200)';
-  }
-  if (result < 6) {
-    return 'var(--p-emerald-200)';
-  }
-  return 'var(--p-lime-200)';
+  successes.value = total;
 }
 </script>
 
 <template>
-  <Dialog modal v-model:visible="isOpen" header="Dice Roller" position="top" style="width: 300px;">
+  <Dialog modal v-model:visible="isOpen" header="Dice Roller" position="top" style="width: 400px;">
     <div class="dialog-content">
       <div class="field no-margin">
         <label class="field-label">
           Dice to Roll
         </label>
-        <InputNumber :min="0" show-buttons button-layout="horizontal" placeholder="0" v-model="diceToRoll" />
+        <InputNumber
+          show-buttons
+          button-layout="horizontal"
+          placeholder="# of dice"
+          v-model="diceToRoll"
+          :min="0"
+          class="input-number-align-text-center"
+          >
+          <template #incrementicon>
+              <span class="pi pi-plus" />
+          </template>
+          <template #decrementicon>
+              <span class="pi pi-minus" />
+          </template>
+        </InputNumber>
       </div>
       <Button @click="rollDice">Roll</Button>
-      <h3 v-if="diceResults.length > 0" style="text-align: center;">Result: {{ totalResult }}</h3>
-      <div class="dice-box">
-        <template v-for="result in diceResults">
-          <DiceComponent :show-number="result" :dice-color="getDiceColor(result)" />
-        </template>
+      <div id="dice-box-container">
+        <div class="result">{{ successes }}</div>
       </div>
     </div>
   </Dialog>
@@ -83,6 +106,18 @@ function getDiceColor(result: number) {
   flex-direction: column;
   gap: 20px;
   transition: 0.3s;
+
+  .result {
+    display: block;
+    position: relative;
+    height: 0;
+    top: 50px;
+    width: 100%;
+    text-align: center;
+    text-shadow: 3px 3px 5px var(--p-stone-800);
+    font-size: 42px;
+    z-index: 100;
+  }
 }
 
 .field {
@@ -103,16 +138,31 @@ function getDiceColor(result: number) {
     margin-left: 15px;
     font-weight: normal;
   }
-
+}
+</style>
+<style lang="css">
+.input-number-align-text-center {
   input {
-    font-size: 24px;
-    width: 100%;
+    text-align: center;
   }
 }
+#dice-box-container {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: var(--p-stone-500);
+  border-radius: 20px;
+  box-shadow: inset 10px 10px 20px var(--p-stone-700),
+              inset -10px -10px 20px rgba(168, 162, 158, 0.5);
 
-.dice-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 50px;
+  #dice-canvas {
+    display: block;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 </style>
