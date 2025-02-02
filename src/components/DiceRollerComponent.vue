@@ -54,6 +54,8 @@ watch(isOpen, (newValue) => {
 
 async function rollDice() {
   successes.value = null;
+  const audio = new Audio('/dice-roll.mp3');
+  audio.play();
   if (diceBox === null)
     await initDiceBox();
   const result = await diceBox.roll(`${diceToRoll.value}d6`);
