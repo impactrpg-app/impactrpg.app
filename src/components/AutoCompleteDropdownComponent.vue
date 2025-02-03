@@ -6,7 +6,7 @@ import {
 import { computed, ref } from 'vue';
 
 const props = defineProps<{
-  modelValue: string;
+  modelValue: any;
   suggestions: unknown[]
   optionLabel?: string;
 }>();
@@ -14,11 +14,11 @@ const emits = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>();
 
-const value = computed({
+const value = computed<any>({
   get() {
     return props.modelValue;
   },
-  set(value: string) {
+  set(value: any) {
     emits('update:modelValue', value);
   }
 })

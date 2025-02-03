@@ -15,7 +15,7 @@ function signOut() {
     <p>By Zeeshan Abid</p>
     <div class="spacer"></div>
     <p>A Free Tabletop Role Playing game.</p>
-    <Button as="router-link" label="Characters" icon="pi pi-user" to="/character-sheet" />
+    <Button as="router-link" label="Characters" icon="pi pi-user" to="/characters" />
     <Button as="router-link" label="Encounters" icon="pi pi-users" to="/encounter" />
     <Button as="router-link" label="Rulebook" icon="pi pi-align-justify" to="/rules" />
     <Button as="router-link" label="Monsters" icon="pi pi-eye" to="/monsters" />

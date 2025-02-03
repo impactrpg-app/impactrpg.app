@@ -7,6 +7,7 @@ import Monsters from "./views/Monsters.vue";
 import World from "./views/World.vue";
 import Encounter from "./views/Encounter.vue";
 import Login from "./views/Login.vue";
+import Characters from "./views/Characters.vue";
 
 export default createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,7 +23,12 @@ export default createRouter({
       component: GettingStarted,
     },
     {
-      path: "/character-sheet",
+      path: "/characters",
+      name: "Characters",
+      component: Characters
+    },
+    {
+      path: "/character-sheet/:characterId",
       name: "character sheet",
       component: CharacterSheet,
     },

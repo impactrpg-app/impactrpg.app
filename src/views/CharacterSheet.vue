@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import Router from "../router";
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { MenuItem } from "primevue/menuitem";
 import { useToast } from "primevue/usetoast";
-import { goods, GoodsType } from "../data/goods";
+import { GoodsType } from "../data/goods";
 import {
   Character,
   CharacterGearItem,
@@ -13,7 +12,6 @@ import {
   NewSkill,
 } from "../data/character";
 import {
-  Menubar,
   FloatLabel,
   InputText,
   InputNumber,
@@ -25,136 +23,63 @@ import {
   useConfirm,
 } from "primevue";
 import { Skill, skills } from "../data/skills";
-import { loadFromFile, saveToFile } from "../service/io";
+import { loadFromFile } from "../service/io";
 import { Age, ages } from "../data/age";
 import AutoCompleteDropdown from '../components/AutoCompleteDropdownComponent.vue';
 import DiceRollerComponent from "../components/DiceRollerComponent.vue";
 import { personalities } from "../data/personality";
 import { injuryEffects } from "../data/injury";
-import { weapons } from "../data/weapons";
-import { armors } from "../data/armor";
 import CustomRatingComponent from "../components/CustomRatingComponent.vue";
 import CustomResourceComponent from "../components/CustomResourceComponent.vue";
+import CustomMenuBar from "../components/CustomMenuBar.vue";
+import { supabaseClient } from "../service/supabase";
+import { useRoute, useRouter } from "vue-router";
 
 const toast = useToast();
+const route = useRoute();
+const router = useRouter();
 const confirm = useConfirm();
+const selectedCharacterId = ref<number>(-1);
+const selectedCharacter = ref<Character>({ ...NewCharacter });
+const showNotesEditor = ref<boolean>(false);
+const isDiceRollerOpen = ref<boolean>(false);
 
-function getRandomNumber(max: number) {
-  return Math.floor(Math.random() * max);
-}
+// gear
+const editingGear = ref<CharacterGearItem>({ ...NewGearItem });
+const showGearEditor = ref<boolean>(false);
+const existingGearIndex = ref<number>(-1);
+// skill
+const editingSkill = ref<CharacterSkill>({ ...NewSkill });
+const showSkillEditor = ref<boolean>(false);
+const existingSkillIndex = ref<number>(-1);
+const ageOptions = ref<Age[]>(ages);
+const autoSaveInterval = ref<NodeJS.Timeout | null>(null);
+
+onMounted(async () => {
+  const characterId = Number(route.params['characterId']);
+  if (!characterId || isNaN(characterId)) {
+    throw new Error('character id not found');
+  }
+  selectedCharacterId.value = characterId;
+  const query = await supabaseClient.from('character').select('data').eq('id', characterId).single();
+  if (query.data !== null)
+    selectedCharacter.value = query.data.data as Character;
+
+  autoSaveInterval.value = setInterval(saveCharacter, 60_000);
+});
+
+onUnmounted(() => {
+  if (autoSaveInterval.value)
+    clearInterval(autoSaveInterval.value);
+});
+
+
 const menuItems: MenuItem[] = [
   {
-    label: "Back",
-    icon: "pi pi-chevron-left",
-    command: () => {
-      Router.push("/");
-    },
-  },
-  {
-    label: 'Create Random Character',
-    icon: 'pi pi-refresh',
-    command: () => {
-      selectedCharacter.value.info.age = ages[getRandomNumber(ages.length)].name;
-      selectedCharacter.value.info.personality = personalities[getRandomNumber(personalities.length)].name;
-      const stats = [0, 0, 0];
-      const availablePoints = 6;
-      for (let i = 0; i < availablePoints; i++) {
-        let randomStat = getRandomNumber(stats.length);
-        while(stats[randomStat] + 1 > 3) {
-          randomStat = getRandomNumber(stats.length);
-        }
-        stats[randomStat]++;
-      }
-      const [strength, agility, intelligence] = stats;
-      selectedCharacter.value.abilities.strength = strength;
-      selectedCharacter.value.abilities.agility = agility;
-      selectedCharacter.value.abilities.intelligence = intelligence;
-      selectedCharacter.value.resources.endurance = agility + 10;
-
-      const skill = skills[getRandomNumber(skills.length)];
-      selectedCharacter.value.skills = [
-        { name: skill.name, description: skill.description.join('\n\n') }
-      ];
-      
-      selectedCharacter.value.gear = [];
-      let totalGearAmount = 0;
-      while(totalGearAmount < 4) {
-        switch(getRandomNumber(3)) {
-          case 0: // weapon
-            const weapon = weapons[getRandomNumber(weapons.length)];
-            if (weapon.size === GoodsType.Large)
-              totalGearAmount += 2;
-            else
-              totalGearAmount++;
-            selectedCharacter.value.gear.push({
-              ...weapon,
-              type: weapon.size
-            });
-            break;
-          case 1: // armor
-            const armor = armors[getRandomNumber(armors.length)];
-            if (armor.size === GoodsType.Large)
-              totalGearAmount += 2;
-            else
-              totalGearAmount++;
-            selectedCharacter.value.gear.push({
-              ...armor,
-              type: armor.size
-            });
-            break;
-          case 2: // goods
-            const good = goods[getRandomNumber(goods.length)];
-            if (good.size === GoodsType.Large)
-              totalGearAmount += 2;
-            else
-              totalGearAmount++;
-            selectedCharacter.value.gear.push({
-              ...good,
-              type: good.size,
-              description: good.description.join('\n\n'),
-            });
-            break;
-        }
-      }
-    }
-  },
-  {
-    label: "Import",
-    icon: "pi pi-upload",
+    label: "Save",
+    icon: "pi pi-save",
     command: async () => {
-      const character = await loadFromFile();
-      if (character) {
-        selectedCharacter.value = { ...JSON.parse(character) };
-        toast.add({
-          severity: "info",
-          summary: "Character Uploaded",
-          detail: "Character sheet has been updated with the file you provided",
-          life: 3000,
-        });
-      } else {
-        toast.add({
-          severity: "error",
-          summary: "Character Upload Failed",
-          detail: "Failed to update character sheet",
-          life: 3000,
-        });
-      }
-    },
-  },
-  {
-    label: "Export",
-    icon: "pi pi-download",
-    command: () => {
-      saveToFile(
-        selectedCharacter.value.info.name ?? "character",
-        JSON.stringify(selectedCharacter.value)
-      );
-      toast.add({
-        severity: "info",
-        summary: "Download Started",
-        detail: "Your browser should start downloading the character",
-        life: 3000,
-      });
+      saveCharacter();
     },
   },
   {
@@ -170,29 +95,19 @@ const menuItems: MenuItem[] = [
     command: () => {
       showNotesEditor.value = true;
     },
+  },
+  {
+    label: 'Delete this character',
+    icon: 'pi pi-trash',
+    command: async () => {
+      const query = await supabaseClient.from('character').delete().eq('id', selectedCharacterId.value);
+      router.push('/characters');
+      console.log(query.data);
+    }
   }
 ];
-const selectedCharacter = ref<Character>({ ...NewCharacter });
-
-// dice roller
-const isDiceRollerOpen = ref<boolean>(false);
-
-//image
-async function updateCharacterImage() {
-  const data = await loadFromFile();
-  if (data === null) return;
-  selectedCharacter.value.info.image = `data:image/png;base64,${btoa(data)}`;
-}
-
-const ageOptions = ref<Age[]>(ages);
-
-// notes
-const showNotesEditor = ref<boolean>(false);
 
 // gear
-const editingGear = ref<CharacterGearItem>({ ...NewGearItem });
-const showGearEditor = ref<boolean>(false);
-const existingGearIndex = ref<number>(-1);
 function createNewGearItem() {
   editingGear.value = {
     ...NewGearItem,
@@ -254,11 +169,7 @@ function finishEditingGearItem() {
     };
   }
 }
-
 // skills
-const editingSkill = ref<CharacterSkill>({ ...NewSkill });
-const showSkillEditor = ref<boolean>(false);
-const existingSkillIndex = ref<number>(-1);
 function createSkill() {
   editingSkill.value = { ...NewSkill };
   existingSkillIndex.value = -1;
@@ -321,6 +232,32 @@ function skillSelectedFromDropdown(skill: Skill) {
     description: skill.description.join("\n"),
   };
 }
+//image
+async function updateCharacterImage() {
+  const data = await loadFromFile();
+  if (data === null) return;
+  selectedCharacter.value.info.image = `data:image/png;base64,${btoa(data)}`;
+}
+async function saveCharacter() {
+  const character = selectedCharacter.value;
+  const query = await supabaseClient.from('character').update({
+    image: character.info.image,
+    name: character.info.name,
+    data: character
+  }).eq('id', selectedCharacterId.value);
+  if (query.error === null) {
+    toast.add({
+      severity: 'success',
+      summary: 'Saved Character',
+
+    });
+  } else {
+    toast.add({
+      severity: 'error',
+      summary: 'Failed to save character'
+    })
+  }
+}
 </script>
 
 <template>
@@ -379,14 +316,7 @@ function skillSelectedFromDropdown(skill: Skill) {
     </div>
   </Dialog>
   <div class="character-sheet">
-    <Menubar :model="menuItems" style="min-width: 100%;">
-      <template #item="{ item }">
-        <div v-tooltip.bottom="item.label" class="menu-item">
-          <span v-if="item.icon?.startsWith('pi')" :class="`pi ${item.icon}`"></span>
-          <span v-else class="material-symbols-outlined">{{ item.icon }}</span>
-        </div>
-      </template>
-    </Menubar>
+    <CustomMenuBar :items="menuItems" />
     <div class="row">
       <div class="column" style="width: 270px; flex-shrink: 1; flex-grow: 0; flex-basis: 270px">
         <div :style="{
@@ -546,17 +476,6 @@ function skillSelectedFromDropdown(skill: Skill) {
 </template>
 
 <style lang="css" scoped>
-.menu-item {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 5px;
-
-  span {
-    font-size: 24px;
-  }
-}
-
 .dialog-content {
   display: flex;
   flex-direction: column;
