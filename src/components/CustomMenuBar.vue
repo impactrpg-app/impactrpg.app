@@ -4,7 +4,8 @@ import { MenuItem } from 'primevue/menuitem';
 import Router from '../router';
 
 const props = defineProps<{
-  items: MenuItem[]
+  items: MenuItem[];
+  backUrl?: string;
 }>();
 
 const menuItems: MenuItem[] = [
@@ -12,7 +13,10 @@ const menuItems: MenuItem[] = [
     label: "Back",
     icon: "pi pi-chevron-left",
     command: () => {
-      Router.back()
+      if (props.backUrl)
+        Router.push(props.backUrl);
+      else
+        Router.back();
     },
   },
   ...props.items,

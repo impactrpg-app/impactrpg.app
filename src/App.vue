@@ -126,4 +126,29 @@ em {
 .p-tooltip {
   text-align: center;
 }
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.gap10 {
+  gap: 10px;
+}
+.gap15 {
+  gap: 15px;
+}
+.gap20 {
+  gap: 20px;
+}
+.w100 {
+  width: 100%;
+}
+.w50 {
+  width: 50%;
+}
 </style>

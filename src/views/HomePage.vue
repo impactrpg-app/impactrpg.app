@@ -2,9 +2,16 @@
 import PackageJson from "../../package.json";
 import { Button } from "primevue";
 import { supabaseClient } from "../service/supabase";
+import { useRouter } from "vue-router";
+import * as UUID from 'uuid';
+
+const router = useRouter();
 
 function signOut() {
   supabaseClient.auth.signOut();
+}
+function createRoom() {
+  router.push(`/room/${UUID.v7()}`);
 }
 </script>
 
@@ -15,6 +22,7 @@ function signOut() {
     <p>By Zeeshan Abid</p>
     <div class="spacer"></div>
     <p>A Free Tabletop Role Playing game.</p>
+    <Button label="Create a Room" icon="pi pi-globe" @click="createRoom" />
     <Button as="router-link" label="Characters" icon="pi pi-user" to="/characters" />
     <Button as="router-link" label="Encounters" icon="pi pi-users" to="/encounter" />
     <Button as="router-link" label="Rulebook" icon="pi pi-align-justify" to="/rules" />
