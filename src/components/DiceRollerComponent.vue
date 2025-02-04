@@ -71,10 +71,22 @@ async function rollDice() {
     }
   }
   successes.value = total;
-  sendMessage({
-    type: PayloadTypeEnum.DiceRoll,
-    message: `${props.author} Rolled ${numberOfDice} dice and got ${total} success.`
-  });
+  
+  // get image
+  const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
+  if (canvas) {
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const buffer = await blob.arrayBuffer();
+      const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      // send notification
+      sendMessage({
+        type: PayloadTypeEnum.DiceRoll,
+        message: `${props.author} Rolled ${numberOfDice} dice and got ${total} success.`,
+        image: `data:image/png;base64,${base64String}`
+      });
+    }, 'image/png');
+  }  
 }
 </script>
 

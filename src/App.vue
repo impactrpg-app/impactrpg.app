@@ -2,15 +2,18 @@
 import { onMounted, onUnmounted } from 'vue';
 import { Toast, ConfirmDialog, useToast } from "primevue";
 import { messageReceiver, Payload, PayloadTypeEnum } from './service/room';
+import DiceNotification from './components/DiceNotification.vue';
 
 const toast = useToast();
 
 function onMessageReceived(payload: Payload<any>) {
   if (payload.type === PayloadTypeEnum.DiceRoll) {
     toast.add({
+      group: 'dice-roll',
       severity: 'info',
-      summary: payload.message
-    })
+      summary: payload.message,
+      detail: payload.image
+    });
   }
 }
 
@@ -19,8 +22,9 @@ onUnmounted(() => messageReceiver.delete(onMessageReceived));
 </script>
 
 <template>
-  <ConfirmDialog></ConfirmDialog>
+  <ConfirmDialog />
   <Toast />
+  <DiceNotification />
   <RouterView />
 </template>
 
