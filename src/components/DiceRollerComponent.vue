@@ -4,11 +4,13 @@ import { Dialog, InputNumber, Button } from 'primevue';
 import { $dt } from '@primevue/themes';
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
+import { PayloadTypeEnum, sendMessage } from '../service/room';
 
 let diceBox: any = null;
 
 const props = defineProps<{
   isOpen?: boolean;
+  author?: string;
 }>();
 const emits = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
@@ -54,11 +56,12 @@ watch(isOpen, (newValue) => {
 
 async function rollDice() {
   successes.value = null;
+  const numberOfDice = diceToRoll.value;
   const audio = new Audio('/dice-roll.mp3');
   audio.play();
   if (diceBox === null)
     await initDiceBox();
-  const result = await diceBox.roll(`${diceToRoll.value}d6`);
+  const result = await diceBox.roll(`${numberOfDice}d6`);
   let total = 0;
   for (const dice of result) {
     if (dice.value === 6) {
@@ -68,6 +71,10 @@ async function rollDice() {
     }
   }
   successes.value = total;
+  sendMessage({
+    type: PayloadTypeEnum.DiceRoll,
+    message: `${props.author} Rolled ${numberOfDice} dice and got ${total} success.`
+  });
 }
 </script>
 

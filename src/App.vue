@@ -1,5 +1,21 @@
 <script setup lang="ts">
-import { Toast, ConfirmDialog } from "primevue";
+import { onMounted, onUnmounted } from 'vue';
+import { Toast, ConfirmDialog, useToast } from "primevue";
+import { messageReceiver, Payload, PayloadTypeEnum } from './service/room';
+
+const toast = useToast();
+
+function onMessageReceived(payload: Payload<any>) {
+  if (payload.type === PayloadTypeEnum.DiceRoll) {
+    toast.add({
+      severity: 'info',
+      summary: payload.message
+    })
+  }
+}
+
+onMounted(() => messageReceiver.add(onMessageReceived));
+onUnmounted(() => messageReceiver.delete(onMessageReceived));
 </script>
 
 <template>

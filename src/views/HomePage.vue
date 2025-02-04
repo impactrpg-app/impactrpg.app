@@ -4,13 +4,15 @@ import { Button, Dialog, Divider, FloatLabel, InputText, useToast } from "primev
 import { supabaseClient } from "../service/supabase";
 import { ref, onMounted, computed } from "vue";
 import * as UUID from 'uuid';
+import { getRoomId, joinRoom, leaveRoom, sendMessage } from "../service/room";
 
 const showRoomJoinDialog = ref<boolean>(false);
 const dialogRoomJoinId = ref<string>('');
-const roomId = ref<string | null>(null);
+const roomId = computed(() => getRoomId());
 const roomUrl = computed(() => {
-  if (!roomId.value) return null;
-  return `${window.location.host}?roomId=${roomId.value}`;
+  const roomId = getRoomId();
+  if (!roomId) return null;
+  return `${window.location.host}?roomId=${roomId}`;
 })
 const toast = useToast();
 
@@ -18,21 +20,21 @@ onMounted(() => {
   const searchParams = new URLSearchParams(window.location.search);
   const roomId = searchParams.get('roomId');
   if (!roomId) return;
-  joinRoom(roomId);
+  onJoinRoomClick(roomId);
 });
 
 function signOut() {
   supabaseClient.auth.signOut();
 }
-async function createRoom() {
-  roomId.value = UUID.v7();
+async function onCreateRoomClick() {
+  joinRoom(UUID.v7());
 }
-async function joinRoom(id: string) {
-  roomId.value = id;
+async function onJoinRoomClick(id: string) {
+  joinRoom(id);
   showRoomJoinDialog.value = false;
 }
-async function leaveRoom(){
-  roomId.value = null;
+async function onLeaveRoomClick(){
+  leaveRoom();
 }
 async function copyRoomLink() {
   if (!roomUrl.value) return;
@@ -53,7 +55,7 @@ async function copyRoomLink() {
         <label for="room-join-id">Room Id</label>
       </FloatLabel>
       <div class="row gap20">
-        <Button label="Join" @click="joinRoom(dialogRoomJoinId)" />
+        <Button label="Join" @click="onJoinRoomClick(dialogRoomJoinId)" />
         <Button label="Cancel" variant="text" @click="showRoomJoinDialog = false" />
       </div>
     </div>
@@ -76,7 +78,7 @@ async function copyRoomLink() {
       v-if="!roomId"
       label="Create Room"
       icon="pi pi-globe"
-      @click="createRoom"
+      @click="onCreateRoomClick"
     />
     <Button
       v-if="!roomId"
@@ -88,7 +90,7 @@ async function copyRoomLink() {
       v-if="roomId"
       label="Leave Room"
       icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
-      @click="leaveRoom"
+      @click="onLeaveRoomClick"
     />
     <Button
       v-if="roomId"

@@ -25,7 +25,6 @@ const selectedCharacterId = ref<number>(-1);
 const selectedCharacter = ref<Character>({ ...NewCharacter });
 const showNotesEditor = ref<boolean>(false);
 const isDiceRollerOpen = ref<boolean>(false);
-
 const autoSaveInterval = ref<NodeJS.Timeout | null>(null);
 
 onMounted(async () => {
@@ -104,7 +103,7 @@ async function saveCharacter() {
 </script>
 
 <template>
-  <DiceRollerComponent v-model:is-open="isDiceRollerOpen" />
+  <DiceRollerComponent v-model:is-open="isDiceRollerOpen" :author="selectedCharacter.info.name" />
   <Dialog modal v-model:visible="showNotesEditor" header="Notes" :style="{ width: '650px' }">
     <div class="column">
       <Textarea v-model="selectedCharacter.notes" style="resize: vertical; min-height: 500px" />
