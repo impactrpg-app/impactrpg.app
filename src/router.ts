@@ -7,7 +7,6 @@ import World from "./views/World.vue";
 import Encounter from "./views/Encounter.vue";
 import Login from "./views/Login.vue";
 import Characters from "./views/Characters.vue";
-import Room from "./views/Room.vue";
 
 export default createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,11 +50,6 @@ export default createRouter({
       path: '/login',
       name: 'Login',
       component: Login
-    },
-    {
-      path: '/room/:roomId',
-      name: 'Room',
-      component: Room
     }
   ],
 });

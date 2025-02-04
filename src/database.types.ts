@@ -36,6 +36,45 @@ export type Database = {
         }
         Relationships: []
       }
+      encounter: {
+        Row: {
+          created_at: string
+          data: Json
+          id: number
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data: Json
+          id?: number
+          name: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: number
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      room: {
+        Row: {
+          id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

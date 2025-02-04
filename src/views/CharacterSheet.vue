@@ -91,12 +91,13 @@ async function saveCharacter() {
     toast.add({
       severity: 'success',
       summary: 'Saved Character',
-
+      life: 3000
     });
   } else {
     toast.add({
       severity: 'error',
-      summary: 'Failed to save character'
+      summary: 'Failed to save character',
+      life: 3000
     })
   }
 }
