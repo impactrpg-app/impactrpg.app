@@ -1,20 +1,17 @@
 <script lang="ts" setup>
-import { Menubar } from 'primevue';
 import { MenuItem } from 'primevue/menuitem';
-import Router from '../router';
+import CustomMenuBar from '../components/CustomMenuBar.vue';
+import DiceRollerComponent from '../components/DiceRollerComponent.vue';
+import { ref } from 'vue';
+
+const isDiceRollerOpen = ref(false);
 
 const menuItems: MenuItem[] = [
   {
-    label: "back",
-    icon: "pi pi-chevron-left",
+    label: "Roll Dice",
+    icon: "casino",
     command: () => {
-      Router.push("/");
-    },
-  },
-  {
-    label: "roll dice",
-    icon: "pi pi-sparkles",
-    command: () => {
+      isDiceRollerOpen.value = true;
     },
   },
   {
@@ -29,7 +26,8 @@ const menuItems: MenuItem[] = [
 
 <template>
   <div class="encounters">
-    <Menubar :model="menuItems" style="min-width: 100%; justify-content: left" />
+    <DiceRollerComponent v-model:is-open="isDiceRollerOpen" />
+    <CustomMenuBar :items="menuItems" />
   </div>
 </template>
 

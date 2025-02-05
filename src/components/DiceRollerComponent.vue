@@ -4,11 +4,13 @@ import { Dialog, InputNumber, Button } from 'primevue';
 import { $dt } from '@primevue/themes';
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
+import { PayloadTypeEnum, sendMessage } from '../service/room';
 
 let diceBox: any = null;
 
 const props = defineProps<{
   isOpen?: boolean;
+  author?: string;
 }>();
 const emits = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
@@ -54,11 +56,12 @@ watch(isOpen, (newValue) => {
 
 async function rollDice() {
   successes.value = null;
+  const numberOfDice = diceToRoll.value;
   const audio = new Audio('/dice-roll.mp3');
   audio.play();
   if (diceBox === null)
     await initDiceBox();
-  const result = await diceBox.roll(`${diceToRoll.value}d6`);
+  const result = await diceBox.roll(`${numberOfDice}d6`);
   let total = 0;
   for (const dice of result) {
     if (dice.value === 6) {
@@ -68,6 +71,22 @@ async function rollDice() {
     }
   }
   successes.value = total;
+  
+  // get image
+  const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
+  if (canvas) {
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const buffer = await blob.arrayBuffer();
+      const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      // send notification
+      sendMessage({
+        type: PayloadTypeEnum.DiceRoll,
+        message: `${props.author} Rolled ${numberOfDice} dice and got ${total} success.`,
+        image: `data:image/png;base64,${base64String}`
+      });
+    }, 'image/png');
+  }  
 }
 </script>
 
@@ -119,26 +138,6 @@ async function rollDice() {
     text-shadow: 3px 3px 5px var(--p-stone-800);
     font-size: 42px;
     z-index: 100;
-  }
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  overflow: none !important;
-  margin-top: 20px;
-  flex-grow: 1;
-  gap: 5px;
-
-  &.no-margin {
-    margin-top: 0;
-  }
-
-  .field-label {
-    color: var(--p-floatlabel-active-color);
-    font-size: 12px;
-    margin-left: 15px;
-    font-weight: normal;
   }
 }
 </style>

@@ -1,10 +1,30 @@
 <script setup lang="ts">
-import { Toast, ConfirmDialog } from "primevue";
+import { onMounted, onUnmounted } from 'vue';
+import { Toast, ConfirmDialog, useToast } from "primevue";
+import { messageReceiver, Payload, PayloadTypeEnum } from './service/room';
+import DiceNotification from './components/DiceNotification.vue';
+
+const toast = useToast();
+
+function onMessageReceived(payload: Payload<any>) {
+  if (payload.type === PayloadTypeEnum.DiceRoll) {
+    toast.add({
+      group: 'dice-roll',
+      severity: 'info',
+      summary: payload.message,
+      detail: payload.image
+    });
+  }
+}
+
+onMounted(() => messageReceiver.add(onMessageReceived));
+onUnmounted(() => messageReceiver.delete(onMessageReceived));
 </script>
 
 <template>
-  <ConfirmDialog></ConfirmDialog>
+  <ConfirmDialog />
   <Toast />
+  <DiceNotification />
   <RouterView />
 </template>
 
@@ -98,5 +118,57 @@ em {
 }
 .text-contrast {
   color: var(--p-lime-200);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  overflow: none !important;
+  margin-top: 20px;
+  flex-grow: 1;
+  gap: 5px;
+
+  &.no-margin {
+    margin-top: 0;
+  }
+
+  .field-label {
+    color: var(--p-floatlabel-active-color);
+    font-size: 12px;
+    margin-left: 15px;
+    font-weight: normal;
+  }
+
+  div.p-autocomplete,div.p-password,input {
+    width: 100%;
+  }
+}
+.p-tooltip {
+  text-align: center;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.gap10 {
+  gap: 10px;
+}
+.gap15 {
+  gap: 15px;
+}
+.gap20 {
+  gap: 20px;
+}
+.w100 {
+  width: 100%;
+}
+.w50 {
+  width: 50%;
 }
 </style>
