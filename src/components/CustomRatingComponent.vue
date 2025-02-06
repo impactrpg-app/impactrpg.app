@@ -5,7 +5,7 @@ import { computed } from 'vue';
 const props = defineProps<{
   icon: string;
   stars: number;
-  modelValue: number;
+  modelValue?: number | number;
   materialIcons?: boolean;
 }>();
 const emits = defineEmits<{
@@ -14,7 +14,7 @@ const emits = defineEmits<{
 
 const value = computed({
   get(){
-    return props.modelValue;
+    return props.modelValue ?? 0;
   },
   set(val: number){
     emits('update:modelValue', val);

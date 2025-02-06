@@ -1,4 +1,5 @@
 import { ref } from "vue";
+import * as UUID from 'uuid';
 import { supabaseClient } from "./supabase";
 import { REALTIME_LISTEN_TYPES, REALTIME_PRESENCE_LISTEN_EVENTS } from "@supabase/supabase-js";
 
@@ -9,6 +10,11 @@ export type Payload<T> = { type: PayloadTypeEnum; } & T;
 export type MessageEventCallback<T> = (payload: Payload<T>) => void;
 export const messageReceiver: Set<MessageEventCallback<any>> = new Set();
 const currentRoomId = ref<string | null>(null);
+const userId = ref<string>(UUID.v7());
+
+export function getUserUuid() {
+  return userId;
+}
 
 export function receiveMessage(
   event: {
@@ -33,7 +39,7 @@ export function sendMessage<T>(payload: Payload<T>) {
     return console.error('when sending data, payload must be an object');
   }
   if (!currentRoomId.value) {
-    return console.error('you have not joinned a room yet');
+    return;
   }
   supabaseClient.channel(currentRoomId.value)
     .send({

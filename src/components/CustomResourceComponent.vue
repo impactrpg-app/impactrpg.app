@@ -42,8 +42,9 @@ const value = computed({
 .input-number {
   margin: 0;
   height: 30px;
+
   input {
-    width: 20px;
+    width: 40px;
   }
 }
 </style>

@@ -32,6 +32,22 @@ export type Monster = {
   specials?: MonsterSpecial[];
 };
 
+export const NewMonster: Monster = {
+  name: 'Monster Name',
+  description: '',
+  type: MonsterType.Animal,
+  abilities: {
+    strength: 1,
+    agility: 1,
+    intelligence: 1,
+  },
+  actionsPerTurn: 1,
+  armor: 1,
+  wounds: 5,
+  actions: [],
+  specials: []
+};
+
 export const monsters: Monster[] = [
   {
     name: "Shadow Fox",

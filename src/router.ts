@@ -4,9 +4,10 @@ import CharacterSheet from "./views/CharacterSheet.vue";
 import Rules from "./views/Rules.vue";
 import Monsters from "./views/Monsters.vue";
 import World from "./views/World.vue";
-import Encounter from "./views/Encounter.vue";
+import EncountersList from "./views/EncountersList.vue";
 import Login from "./views/Login.vue";
 import Characters from "./views/Characters.vue";
+import Encounter from "./views/Encounter.vue";
 
 export default createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,7 +43,12 @@ export default createRouter({
       component: World,
     },
     {
-      path: '/encounter',
+      path: '/encounters',
+      name: 'Encounters List',
+      component: EncountersList
+    },
+    {
+      path: '/encounter/:encounterId',
       name: 'Encounter',
       component: Encounter
     },

@@ -12,7 +12,7 @@ const roomId = computed(() => getRoomId());
 const roomUrl = computed(() => {
   const roomId = getRoomId();
   if (!roomId) return null;
-  return `${window.location.host}?roomId=${roomId}`;
+  return `${window.location.origin}?roomId=${roomId}`;
 })
 const toast = useToast();
 
@@ -67,7 +67,7 @@ async function copyRoomLink() {
     <div class="spacer"></div>
     <p>A Free Tabletop Role Playing game.</p>
     <Button as="router-link" label="Characters" icon="pi pi-user" to="/characters" />
-    <Button as="router-link" label="Encounters" icon="pi pi-users" to="/encounter" />
+    <Button as="router-link" label="Encounters" icon="pi pi-users" to="/encounters" />
     <Button as="router-link" label="Rulebook" icon="pi pi-align-justify" to="/rules" />
     <Button as="router-link" label="Monsters" icon="pi pi-eye" to="/monsters" />
     <Button as="router-link" label="World" icon="pi pi-globe" to="/world" />
