@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import { Dialog, InputNumber, Button } from 'primevue';
+import { Dialog, InputNumber, Button, ToggleSwitch } from 'primevue';
 import { $dt } from '@primevue/themes';
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
-import { PayloadTypeEnum, sendMessage } from '../service/room';
+import { PayloadTypeEnum, sendMessage, getUserUuid } from '../service/room';
 
 let diceBox: any = null;
+const announceRolls = ref<boolean>(true);
 
 const props = defineProps<{
   isOpen?: boolean;
-  author?: string;
+  rollAuthor?: string;
 }>();
 const emits = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
@@ -54,6 +55,27 @@ watch(isOpen, (newValue) => {
   initDiceBox();
 })
 
+function announceRoll(numberOfDice: number, result: number) {
+  const rollAuthor = props.rollAuthor ?? 'Someone';
+  
+  const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
+  if (canvas) {
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const buffer = await blob.arrayBuffer();
+      const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+
+      // send notification
+      sendMessage({
+        type: PayloadTypeEnum.DiceRoll,
+        message: `${rollAuthor} Rolled ${numberOfDice} dice and got ${result} success.`,
+        image: `data:image/png;base64,${base64String}`,
+        author: getUserUuid()
+      });
+    }, 'image/png');
+  }
+}
+
 async function rollDice() {
   successes.value = null;
   const numberOfDice = diceToRoll.value;
@@ -71,28 +93,22 @@ async function rollDice() {
     }
   }
   successes.value = total;
-  
-  // get image
-  const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
-  if (canvas) {
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const buffer = await blob.arrayBuffer();
-      const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-      // send notification
-      sendMessage({
-        type: PayloadTypeEnum.DiceRoll,
-        message: `${props.author} Rolled ${numberOfDice} dice and got ${total} success.`,
-        image: `data:image/png;base64,${base64String}`
-      });
-    }, 'image/png');
-  }  
+
+  if (announceRolls) {
+    announceRoll(numberOfDice, total);
+  }
 }
 </script>
 
 <template>
   <Dialog modal v-model:visible="isOpen" header="Dice Roller" position="top" style="width: 400px;">
     <div class="dialog-content">
+      <div class="field no-margin row">
+        <label class="field-label">
+          Announce Rolls
+        </label>
+        <ToggleSwitch v-model="announceRolls" />
+      </div>
       <div class="field no-margin">
         <label class="field-label">
           Dice to Roll
@@ -127,6 +143,7 @@ async function rollDice() {
   flex-direction: column;
   gap: 20px;
   transition: 0.3s;
+  overflow: visible;
 
   .result {
     display: block;
@@ -142,6 +159,9 @@ async function rollDice() {
 }
 </style>
 <style lang="css">
+.p-dialog-content {
+  overflow: visible !important;
+}
 .input-number-align-text-center {
   input {
     text-align: center;

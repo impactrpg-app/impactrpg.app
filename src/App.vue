@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
 import { Toast, ConfirmDialog, useToast } from "primevue";
-import { messageReceiver, Payload, PayloadTypeEnum } from './service/room';
+import { messageReceiver, Payload, PayloadTypeEnum, getRoomId, getUserUuid } from './service/room';
 import DiceNotification from './components/DiceNotification.vue';
 
 const toast = useToast();
 
 function onMessageReceived(payload: Payload<any>) {
   if (payload.type === PayloadTypeEnum.DiceRoll) {
-    toast.add({
-      group: 'dice-roll',
-      severity: 'info',
-      summary: payload.message,
-      detail: payload.image
-    });
+    if (getUserUuid() !== payload.author) {
+      toast.add({
+        group: 'dice-roll',
+        severity: 'info',
+        summary: payload.message,
+        detail: payload.image
+      });
+    }
   }
 }
 
@@ -22,12 +24,23 @@ onUnmounted(() => messageReceiver.delete(onMessageReceived));
 </script>
 
 <template>
+  <p class="joined-room-id" v-if="getRoomId()">Connected</p>
   <ConfirmDialog />
   <Toast />
   <DiceNotification />
   <RouterView />
 </template>
 
+<style lang="css" scoped>
+.joined-room-id {
+  display: fixed;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  color: var(--p-stone-600);
+}
+</style>
 <style lang="css">
 html {
   scroll-behavior: smooth;
@@ -156,6 +169,17 @@ em {
   flex-direction: column;
   flex-grow: 1;
 }
+.align-items-center {
+  align-items: center;
+}
+.grow {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+.shrink {
+  flex-shrink: 1;
+  flex-grow: 0;
+}
 .gap10 {
   gap: 10px;
 }
@@ -170,5 +194,8 @@ em {
 }
 .w50 {
   width: 50%;
+}
+textarea {
+  resize: vertical;
 }
 </style>

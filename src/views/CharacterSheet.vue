@@ -33,9 +33,11 @@ onMounted(async () => {
     throw new Error('character id not found');
   }
   selectedCharacterId.value = characterId;
-  const query = await supabaseClient.from('character').select('data').eq('id', characterId).single();
-  if (query.data !== null)
+  const query = await supabaseClient.from('character').select('image,data').eq('id', characterId).single();
+  if (query.data !== null) {
     selectedCharacter.value = query.data.data as Character;
+    selectedCharacter.value.info.image = query.data.image ?? '';
+  }
 
   autoSaveInterval.value = setInterval(saveCharacter, 60_000);
 });
@@ -80,9 +82,16 @@ const menuItems: MenuItem[] = [
 ];
 
 async function saveCharacter() {
-  const character = selectedCharacter.value;
+  const image = selectedCharacter.value.info.image;
+  const character = {
+    ...selectedCharacter.value,
+    info: {
+      ...selectedCharacter.value.info,
+      image: '',
+    }
+  };
   const query = await supabaseClient.from('character').update({
-    image: character.info.image,
+    image: image,
     name: character.info.name,
     data: character
   }).eq('id', selectedCharacterId.value);
@@ -103,7 +112,11 @@ async function saveCharacter() {
 </script>
 
 <template>
-  <DiceRollerComponent v-model:is-open="isDiceRollerOpen" :author="selectedCharacter.info.name" />
+  <DiceRollerComponent
+    announce-rolls
+    v-model:is-open="isDiceRollerOpen"
+    :rollAuthor="selectedCharacter.info.name"
+  />
   <Dialog modal v-model:visible="showNotesEditor" header="Notes" :style="{ width: '650px' }">
     <div class="column">
       <Textarea v-model="selectedCharacter.notes" style="resize: vertical; min-height: 500px" />
