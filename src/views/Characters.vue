@@ -32,7 +32,7 @@ const menuItems: MenuItem[] = [
     label: "Create New Character",
     icon: 'pi pi-plus',
     command: async () => {
-      await createCharacter({...NewCharacter});
+      await createCharacter({ ...NewCharacter, skills: [], gear: [] });
     },
   },
   {

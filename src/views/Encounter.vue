@@ -3,7 +3,7 @@ import DiceRollerComponent from '../components/DiceRollerComponent.vue';
 import CustomMenuBar from '../components/CustomMenuBar.vue';
 import CustomResourceComponent from '../components/CustomResourceComponent.vue';
 import { MenuItem } from 'primevue/menuitem';
-import { Button, InputText, Textarea } from 'primevue';
+import { Button, InputText, Textarea, Checkbox, Dialog } from 'primevue';
 import { computed, ref, onMounted } from 'vue';
 import { Monster, NewMonster } from '../data/monsters';
 import { supabaseClient } from '../service/supabase';
@@ -11,20 +11,32 @@ import { useRoute } from 'vue-router';
 import router from '../router';
 
 const route = useRoute();
-const isDiceRollerOpen = ref(false);
 const monsters = ref<Monster[]>([]);
 const encounterId = computed(() => {
   const encounterId = Number(route.params['encounterId']);
   if (!encounterId || isNaN(encounterId)) return null;
   return encounterId;
 });
+const encounterName = ref('');
+
+const isDiceRollerOpen = ref(false);
+const isEditActionRollDialogOpen = ref(false);
+const isEditEncounterDialogOpen = ref(false);
+
+const editActionRoll = ref({
+  actionIndex: -1,
+  monsterIndex: -1
+});
+const editActionRollBooleans = ref<boolean[]>(new Array(6).fill(false));
 
 onMounted(async () => {
   if (!encounterId.value) return;
   const encounter = await supabaseClient.from('encounter')
-    .select('data').eq('id', encounterId.value).single();
-  if (encounter.data)
+    .select('name,data').eq('id', encounterId.value).single();
+  if (encounter.data) {
     monsters.value = encounter.data.data as Monster[];
+    encounterName.value = encounter.data.name;
+  }
 });
 
 const menuItems: MenuItem[] = [
@@ -49,7 +61,7 @@ const menuItems: MenuItem[] = [
     label: 'Add New Monster',
     icon: 'pi pi-plus',
     command: () => {
-      monsters.value.push({...NewMonster});
+      monsters.value.push({ ...NewMonster, actions: [], specials: [] });
     }
   },
   {
@@ -65,7 +77,7 @@ const menuItems: MenuItem[] = [
     label: 'Edit Encounter Name',
     icon: 'pi pi-pencil',
     command: () => {
-
+      isEditEncounterDialogOpen.value = true;
     }
   }
 ];
@@ -101,7 +113,7 @@ function removeMonsterAction(index: number, actionIndex: number) {
 function getRollText(rolls: number[]) {
   if (!rolls || rolls.length === 0) return "#";
   if (rolls.length === 1) {
-    return rolls[0];
+    return `${rolls[0]}`;
   }
   return `${rolls[0]}-${rolls[rolls.length - 1]}`;
 }
@@ -120,22 +132,57 @@ function removeMonsterSpecial(index: number, specialIndex: number) {
     ...monsters.value[index].specials.filter((_, i) => i !== specialIndex)
   ];
 }
+function adjustActionNumbers(index: number, actionIndex: number) {
+  editActionRoll.value = {
+    monsterIndex: index,
+    actionIndex,
+  }
+  for (let i = 0; i < editActionRollBooleans.value.length; i++) {
+    editActionRollBooleans.value[i] = 
+      monsters.value[index].actions[actionIndex].rolls.includes(i+1);
+  }
+  isEditActionRollDialogOpen.value = true;
+}
+function saveActionNumbers() {
+  const rolls: number[] = [];
+  for (let i = 0; i < editActionRollBooleans.value.length; i++) {
+    if (editActionRollBooleans.value[i])
+      rolls.push(i+1);
+  }
+  monsters.value[editActionRoll.value.monsterIndex]
+    .actions[editActionRoll.value.actionIndex].rolls = [...rolls];
+}
 </script>
 
 <template>
+  <Dialog
+    modal
+    title="Edit Action Rolls"
+    v-model:visible="isEditActionRollDialogOpen"
+  >
+    <div class="row align-items-center gap10" v-for="(_, index) in editActionRollBooleans">
+      <Checkbox
+        binary
+        v-model="editActionRollBooleans[index]"
+        @change="saveActionNumbers"
+      />
+      <p>{{ index + 1 }}</p>
+    </div>
+  </Dialog>
+  <Dialog modal v-model:visible="isEditEncounterDialogOpen" title="Edit Encounter">
+    <InputText v-model="encounterName" />
+  </Dialog>
   <DiceRollerComponent v-model:is-open="isDiceRollerOpen" roll-author="DM" />
   <div class="encounter">
     <CustomMenuBar :items="menuItems" back-url="/encounters" />
     <div class="monster" v-for="(monster, index) in monsters">
-      <div class="row gap10">
+      <div class="row gap10 align-items-center">
         <h3>{{ index + 1 }}.</h3>
-        <InputText v-model="monster.name" placeholder="Monster Name" />
+        <Button v-tooltip.bottom="'Delete Monster'" variant="text" icon="pi pi-trash" @click="deleteMonster(index)" />
+        <Button v-tooltip.bottom="'Move up'"  variant="text" icon="pi pi-angle-up" @click="moveMonsterUp(index)" />
+        <Button v-tooltip.bottom="'Move Down'" variant="text" icon="pi pi-angle-down" @click="moveMonsterDown(index)" />
       </div>
-      <div class="actions">
-        <Button variant="text" icon="pi pi-trash" @click="deleteMonster(index)" />
-        <Button variant="text" icon="pi pi-angle-up" @click="moveMonsterUp(index)" />
-        <Button variant="text" icon="pi pi-angle-down" @click="moveMonsterDown(index)" />
-      </div>
+      <InputText class="grow" v-model="monster.name" placeholder="Monster Name" />
       <div class="stats">
         <span>Strength</span>
         <CustomResourceComponent v-model="monster.abilities.strength" />
@@ -160,41 +207,46 @@ function removeMonsterSpecial(index: number, specialIndex: number) {
         <span># of Actions</span>
         <CustomResourceComponent v-model="monster.actionsPerTurn" />
       </div>
+
       <div class="info">
-        <h4>
-          ACTIONS
-          <span class="small-action-text">
-            ({{ monster.actionsPerTurn }} 
-            Action<template v-if="monster.actionsPerTurn > 1">s</template>)
-          </span>
-        </h4>
-        <div class="actions">
-          <Button variant="text" icon="pi pi-plus" @click="addMonsterAction(index)" />
+        <div class="row align-items-center gap10">
+          <h4>
+            ACTIONS
+            <span class="small-action-text">
+              ({{ monster.actionsPerTurn }} 
+              Action<template v-if="monster.actionsPerTurn > 1">s</template>)
+            </span>
+          </h4>
+          <Button v-tooltip.bottom="'Add new Action'" variant="text" icon="pi pi-plus" @click="addMonsterAction(index)" />
         </div>
         <template v-for="(action, actionIndex) in monster.actions">
           <div class="column gap10 grow">
             <div class="row gap10 align-items-center">
-              <b class="action-rolls">{{ getRollText(action.rolls) }}:</b>
+              <Button
+                variant="text"
+                :label="getRollText(action.rolls)"
+                @click="adjustActionNumbers(index, actionIndex)"
+              />
               <InputText class="grow" v-model="action.name" placeholder="Action Name" />
-              <Button variant="text" icon="pi pi-trash" @click="removeMonsterAction(index, actionIndex)" />
+              <Button v-tooltip.bottom="`Delete '${action.name}' Action`" variant="text" icon="pi pi-trash" @click="removeMonsterAction(index, actionIndex)" />
             </div>
             <Textarea placeholder="Action Description" v-model="action.description" />
           </div>
         </template>
         <template v-if="monster.specials">
-          <h4>SPECIALS</h4>
-          <div class="actions">
-            <Button variant="text" icon="pi pi-plus" @click="addMonsterSpecial(index)" />
+          <div class="row align-items-center gap10">
+            <h4>SPECIALS</h4>
+            <Button v-tooltip.bottom="'Add new Special'" variant="text" icon="pi pi-plus" @click="addMonsterSpecial(index)" />
           </div>
-          <p v-for="(special, specialIndex) in monster.specials">
+          <template v-for="(special, specialIndex) in monster.specials">
             <div class="column gap10">
               <div class="row gap10 align-items-center grow">
-                <InputText class=" grow" v-model="special.name" placeholder="Special Name" />
-                <Button variant="text" icon="pi pi-trash" @click="removeMonsterSpecial(index, specialIndex)" />
+                <InputText class="grow" v-model="special.name" placeholder="Special Name" />
+                <Button v-tooltip.bottom="`Delete '${special.name}' Special`" variant="text" icon="pi pi-trash" @click="removeMonsterSpecial(index, specialIndex)" />
               </div>
               <Textarea placeholder="Special Description" v-model="special.description" />
             </div>
-          </p>
+          </template>
         </template>
       </div>
     </div>
@@ -230,9 +282,12 @@ function removeMonsterSpecial(index: number, specialIndex: number) {
     .stats {
       display: flex;
       flex-direction: row;
+      justify-content: space-between;
+
       span {
         width: 150px;
       }
+
     }
     .info {
       display: flex;
