@@ -1,17 +1,9 @@
 <script lang="ts" setup>
-import { Monster } from "../data/monsters";
+import { getMonsterActionRollText, Monster } from "../data/monsters";
 
 const props = defineProps<{
   monster: Monster;
 }>();
-
-function getRollText(rolls: number[]) {
-  if (!rolls || rolls.length === 0) return "#";
-  if (rolls.length === 1) {
-    return rolls[0];
-  }
-  return `${rolls[0]}-${rolls[rolls.length - 1]}`;
-}
 </script>
 
 <template>
@@ -35,7 +27,7 @@ function getRollText(rolls: number[]) {
   <h3>ACTIONS</h3>
   <ul>
     <li v-for="action in props.monster.actions">
-      <b class="text-contrast">{{ getRollText(action.rolls) }}: {{ action.name }}</b>
+      <b class="text-contrast">{{ getMonsterActionRollText(action.rolls) }}: {{ action.name }}</b>
       <br />
       {{ action.description }}
     </li>

@@ -123,7 +123,7 @@ async function saveCharacter() {
     </div>
   </Dialog>
   <div class="character-sheet">
-    <CustomMenuBar :items="menuItems" back-url="/characters" />
+    <CustomMenuBar :items="menuItems" back-url="/characters" :before-back-callback="saveCharacter" />
     <CharacterInfoComponent v-model="selectedCharacter" />
     <CharacterStatsComponent v-model="selectedCharacter" />
     <CharacterSkillAndGearComponent v-model="selectedCharacter" />
