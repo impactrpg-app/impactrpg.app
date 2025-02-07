@@ -3,14 +3,16 @@ import DiceRollerComponent from '../components/DiceRollerComponent.vue';
 import CustomMenuBar from '../components/CustomMenuBar.vue';
 import CustomResourceComponent from '../components/CustomResourceComponent.vue';
 import { MenuItem } from 'primevue/menuitem';
-import { Button, InputText, Textarea, Checkbox, Dialog } from 'primevue';
+import { Button, InputText, Textarea, Checkbox, Dialog, useToast } from 'primevue';
 import { computed, ref, onMounted } from 'vue';
-import { Monster, NewMonster } from '../data/monsters';
+import { getMonsterActionRollText, Monster, NewMonster } from '../data/monsters';
 import { supabaseClient } from '../service/supabase';
 import { useRoute } from 'vue-router';
 import router from '../router';
+import { handleLoading } from '../service/loading';
 
 const route = useRoute();
+const toast = useToast();
 const monsters = ref<Monster[]>([]);
 const encounterId = computed(() => {
   const encounterId = Number(route.params['encounterId']);
@@ -29,14 +31,16 @@ const editActionRoll = ref({
 });
 const editActionRollBooleans = ref<boolean[]>(new Array(6).fill(false));
 
-onMounted(async () => {
-  if (!encounterId.value) return;
-  const encounter = await supabaseClient.from('encounter')
-    .select('name,data').eq('id', encounterId.value).single();
-  if (encounter.data) {
-    monsters.value = encounter.data.data as Monster[];
-    encounterName.value = encounter.data.name;
-  }
+onMounted(() => {
+  handleLoading(async () => {
+    if (!encounterId.value) return;
+    const encounter = await supabaseClient.from('encounter')
+      .select('name,data').eq('id', encounterId.value).single();
+    if (encounter.data) {
+      monsters.value = encounter.data.data as Monster[];
+      encounterName.value = encounter.data.name;
+    }
+  });
 });
 
 const menuItems: MenuItem[] = [
@@ -51,10 +55,7 @@ const menuItems: MenuItem[] = [
     label: "Save Encounter",
     icon: 'pi pi-save',
     command: async () => {
-      if (!encounterId.value) return;
-      await supabaseClient.from('encounter').update({
-        data: [...monsters.value]
-      }).eq('id', encounterId.value);
+      saveEncounter();
     }
   },
   {
@@ -67,11 +68,11 @@ const menuItems: MenuItem[] = [
   {
     label: 'Delete Encounter',
     icon: 'pi pi-trash',
-    command: async () => {
+    command: () => handleLoading(async () => {
       if (!encounterId.value) return;
       await supabaseClient.from('encounter').delete().eq('id', encounterId.value);
       router.push('/encounters');
-    }
+    })
   },
   {
     label: 'Edit Encounter Name',
@@ -110,13 +111,6 @@ function removeMonsterAction(index: number, actionIndex: number) {
     ...monsters.value[index].actions.filter((_, i) => i !== actionIndex)
   ];
 }
-function getRollText(rolls: number[]) {
-  if (!rolls || rolls.length === 0) return "#";
-  if (rolls.length === 1) {
-    return `${rolls[0]}`;
-  }
-  return `${rolls[0]}-${rolls[rolls.length - 1]}`;
-}
 function addMonsterSpecial(index: number) {
   if (!monsters.value[index].specials) {
     monsters.value[index].specials = [];
@@ -152,6 +146,19 @@ function saveActionNumbers() {
   monsters.value[editActionRoll.value.monsterIndex]
     .actions[editActionRoll.value.actionIndex].rolls = [...rolls];
 }
+async function saveEncounter() {
+  await handleLoading(async () => {
+    if (!encounterId.value) return;
+    await supabaseClient.from('encounter').update({
+      data: [...monsters.value]
+    }).eq('id', encounterId.value);
+  });
+  toast.add({
+    severity: 'success',
+    summary: 'Saved Encounter',
+    life: 3000
+  })
+}
 </script>
 
 <template>
@@ -174,7 +181,7 @@ function saveActionNumbers() {
   </Dialog>
   <DiceRollerComponent v-model:is-open="isDiceRollerOpen" roll-author="DM" />
   <div class="encounter">
-    <CustomMenuBar :items="menuItems" back-url="/encounters" />
+    <CustomMenuBar :items="menuItems" back-url="/encounters" :before-back-callback="saveEncounter" />
     <div class="monster" v-for="(monster, index) in monsters">
       <div class="row gap10 align-items-center">
         <h3>{{ index + 1 }}.</h3>
@@ -224,8 +231,10 @@ function saveActionNumbers() {
             <div class="row gap10 align-items-center">
               <Button
                 variant="text"
-                :label="getRollText(action.rolls)"
+                :label="getMonsterActionRollText(action.rolls)"
                 @click="adjustActionNumbers(index, actionIndex)"
+                size="small"
+                style="min-width: 60px;"
               />
               <InputText class="grow" v-model="action.name" placeholder="Action Name" />
               <Button v-tooltip.bottom="`Delete '${action.name}' Action`" variant="text" icon="pi pi-trash" @click="removeMonsterAction(index, actionIndex)" />

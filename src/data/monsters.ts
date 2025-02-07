@@ -668,3 +668,25 @@ export const monsters: Monster[] = [
     ],
   },
 ];
+
+export function getMonsterActionRollText(rolls: number[]) {
+  if (rolls.length === 0) return '#';
+  rolls = rolls.sort();
+  let text = '';
+  let series = false;
+  for (let i = 0; i < rolls.length; i++) {
+    const nextSeries = rolls[i] + 1 === rolls[i + 1];
+    if (!series) {
+      if (i > 0) {
+        text += ',';
+      }
+      text += rolls[i];
+    } else {
+      if (!nextSeries) {
+        text += `-${rolls[i]}`;
+      }
+    }
+    series = nextSeries;
+  }
+  return text;
+}

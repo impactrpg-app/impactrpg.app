@@ -6,13 +6,17 @@ import Router from '../router';
 const props = defineProps<{
   items: MenuItem[];
   backUrl?: string;
+  beforeBackCallback?: () => Promise<void>;
 }>();
 
 const menuItems: MenuItem[] = [
   {
     label: "Back",
     icon: "pi pi-chevron-left",
-    command: () => {
+    command: async () => {
+      if (props.beforeBackCallback)
+        await props.beforeBackCallback();
+
       if (props.backUrl)
         Router.push(props.backUrl);
       else
