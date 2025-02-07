@@ -9,6 +9,7 @@ import { getMonsterActionRollText, Monster, NewMonster } from '../data/monsters'
 import { supabaseClient } from '../service/supabase';
 import { useRoute } from 'vue-router';
 import router from '../router';
+import { handleLoading } from '../service/loading';
 
 const route = useRoute();
 const toast = useToast();
@@ -30,14 +31,16 @@ const editActionRoll = ref({
 });
 const editActionRollBooleans = ref<boolean[]>(new Array(6).fill(false));
 
-onMounted(async () => {
-  if (!encounterId.value) return;
-  const encounter = await supabaseClient.from('encounter')
-    .select('name,data').eq('id', encounterId.value).single();
-  if (encounter.data) {
-    monsters.value = encounter.data.data as Monster[];
-    encounterName.value = encounter.data.name;
-  }
+onMounted(() => {
+  handleLoading(async () => {
+    if (!encounterId.value) return;
+    const encounter = await supabaseClient.from('encounter')
+      .select('name,data').eq('id', encounterId.value).single();
+    if (encounter.data) {
+      monsters.value = encounter.data.data as Monster[];
+      encounterName.value = encounter.data.name;
+    }
+  });
 });
 
 const menuItems: MenuItem[] = [
@@ -65,11 +68,11 @@ const menuItems: MenuItem[] = [
   {
     label: 'Delete Encounter',
     icon: 'pi pi-trash',
-    command: async () => {
+    command: () => handleLoading(async () => {
       if (!encounterId.value) return;
       await supabaseClient.from('encounter').delete().eq('id', encounterId.value);
       router.push('/encounters');
-    }
+    })
   },
   {
     label: 'Edit Encounter Name',
@@ -144,10 +147,12 @@ function saveActionNumbers() {
     .actions[editActionRoll.value.actionIndex].rolls = [...rolls];
 }
 async function saveEncounter() {
-  if (!encounterId.value) return;
-  await supabaseClient.from('encounter').update({
-    data: [...monsters.value]
-  }).eq('id', encounterId.value);
+  await handleLoading(async () => {
+    if (!encounterId.value) return;
+    await supabaseClient.from('encounter').update({
+      data: [...monsters.value]
+    }).eq('id', encounterId.value);
+  });
   toast.add({
     severity: 'success',
     summary: 'Saved Encounter',

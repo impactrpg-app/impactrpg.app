@@ -4,6 +4,7 @@ import { MenuItem } from 'primevue/menuitem';
 import CustomMenuBar from '../components/CustomMenuBar.vue';
 import { supabaseClient } from '../service/supabase';
 import router from '../router';
+import { handleLoading } from '../service/loading';
 
 const encounters = ref<{
   id: number;
@@ -13,26 +14,30 @@ const menuItems: MenuItem[] = [
   {
     label: "Create New Encounter",
     icon: "pi pi-plus",
-    command: async () => {
-      const result = await supabaseClient.from('encounter').insert({
-        name: 'New Encounter',
-        data: [],
-      }).select().single();
+    command: () => {
+      handleLoading(async () => {
+        const result = await supabaseClient.from('encounter').insert({
+          name: 'New Encounter',
+          data: [],
+        }).select().single();
 
-      if (!result.data) {
-        return;
-      }
-      router.push(`/encounter/${result.data.id}`);
+        if (!result.data) {
+          return;
+        }
+        router.push(`/encounter/${result.data.id}`);
+      });
     },
   }
 ];
 
-onMounted(async () => {
-  const result = await supabaseClient.from('encounter').select('id,name');
-  if (!result.data) {
-    return;
-  }
-  encounters.value = result.data;
+onMounted(() => {
+  handleLoading(async () => {
+    const result = await supabaseClient.from('encounter').select('id,name');
+    if (!result.data) {
+      return;
+    }
+    encounters.value = result.data;
+  });
 });
 </script>
 

@@ -6,6 +6,7 @@ import { RouterLink, useRouter } from 'vue-router';
 import { Character, NewCharacter } from '../data/character';
 import CustomMenuBar from '../components/CustomMenuBar.vue';
 import { loadFromFile } from '../service/io';
+import { handleLoading } from '../service/loading';
 
 const router = useRouter();
 
@@ -31,18 +32,18 @@ const menuItems: MenuItem[] = [
   {
     label: "Create New Character",
     icon: 'pi pi-plus',
-    command: async () => {
+    command: () => handleLoading(async () => {
       await createCharacter({ ...NewCharacter, skills: [], gear: [] });
-    },
+    }),
   },
   {
     label: 'Import Character',
     icon: 'pi pi-upload',
-    command: async () => {
+    command: () => handleLoading(async () => {
       const data = await loadFromFile('json');
       if (!data) return;
-      await createCharacter(JSON.parse(data) as Character);
-    }
+        await createCharacter(JSON.parse(data) as Character);
+    })
   }
 ];
 

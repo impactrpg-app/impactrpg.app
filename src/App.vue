@@ -3,6 +3,8 @@ import { onMounted, onUnmounted } from 'vue';
 import { Toast, ConfirmDialog, useToast } from "primevue";
 import { messageReceiver, Payload, PayloadTypeEnum, getRoomId, getUserUuid } from './service/room';
 import DiceNotification from './components/DiceNotification.vue';
+import ProgressSpinner from 'primevue/progressspinner';
+import { isLoading } from './service/loading';
 
 const toast = useToast();
 
@@ -25,6 +27,9 @@ onUnmounted(() => messageReceiver.delete(onMessageReceived));
 
 <template>
   <p class="joined-room-id" v-if="getRoomId()">Connected</p>
+  <div v-if="isLoading" class="spinner">
+    <ProgressSpinner />
+  </div>
   <ConfirmDialog />
   <Toast />
   <DiceNotification />
@@ -32,8 +37,19 @@ onUnmounted(() => messageReceiver.delete(onMessageReceived));
 </template>
 
 <style lang="css" scoped>
+.spinner {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+}
 .joined-room-id {
-  display: fixed;
+  display: block;
   position: absolute;
   top: 0;
   left: 0;

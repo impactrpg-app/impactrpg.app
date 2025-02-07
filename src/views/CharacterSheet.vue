@@ -17,6 +17,7 @@ import { useRoute, useRouter } from "vue-router";
 import CharacterInfoComponent from "../components/character-sheet/CharacterInfoComponent.vue";
 import CharacterStatsComponent from "../components/character-sheet/CharacterStatsComponent.vue";
 import CharacterSkillAndGearComponent from "../components/character-sheet/CharacterSkillAndGearComponent.vue";
+import { handleLoading } from "../service/loading";
 
 const toast = useToast();
 const route = useRoute();
@@ -73,11 +74,10 @@ const menuItems: MenuItem[] = [
   {
     label: 'Delete this character',
     icon: 'pi pi-trash',
-    command: async () => {
-      const query = await supabaseClient.from('character').delete().eq('id', selectedCharacterId.value);
+    command: () => handleLoading(async () => {
+      await supabaseClient.from('character').delete().eq('id', selectedCharacterId.value);
       router.push('/characters');
-      console.log(query.data);
-    }
+    })
   }
 ];
 
@@ -90,24 +90,26 @@ async function saveCharacter() {
       image: '',
     }
   };
-  const query = await supabaseClient.from('character').update({
-    image: image,
-    name: character.info.name,
-    data: character
-  }).eq('id', selectedCharacterId.value);
-  if (query.error === null) {
-    toast.add({
-      severity: 'success',
-      summary: 'Saved Character',
-      life: 3000
-    });
-  } else {
-    toast.add({
-      severity: 'error',
-      summary: 'Failed to save character',
-      life: 3000
-    })
-  }
+  handleLoading(async () => {
+    const query = await supabaseClient.from('character').update({
+      image: image,
+      name: character.info.name,
+      data: character
+    }).eq('id', selectedCharacterId.value);
+    if (query.error === null) {
+      toast.add({
+        severity: 'success',
+        summary: 'Saved Character',
+        life: 3000
+      });
+    } else {
+      toast.add({
+        severity: 'error',
+        summary: 'Failed to save character',
+        life: 3000
+      })
+    }
+  });
 }
 </script>
 
