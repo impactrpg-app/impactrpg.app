@@ -6,10 +6,13 @@ import { REALTIME_LISTEN_TYPES, REALTIME_PRESENCE_LISTEN_EVENTS } from "@supabas
 export enum PayloadTypeEnum {
   DiceRoll
 }
+const CONNECTED_ROOM_KEY = 'connected:room';
 export type Payload<T> = { type: PayloadTypeEnum; } & T;
 export type MessageEventCallback<T> = (payload: Payload<T>) => void;
 export const messageReceiver: Set<MessageEventCallback<any>> = new Set();
-const currentRoomId = ref<string | null>(null);
+const currentRoomId = ref<string | null>(
+  window.localStorage.getItem(CONNECTED_ROOM_KEY)
+);
 const userId = ref<string>(UUID.v7());
 
 export function getUserUuid() {
@@ -62,6 +65,7 @@ export function joinRoom(roomId: string) {
     receiveMessage
   );
   supabaseClient.channel(roomId).subscribe();
+  window.localStorage.setItem(CONNECTED_ROOM_KEY, roomId);
 }
 
 export function leaveRoom() {
@@ -70,4 +74,5 @@ export function leaveRoom() {
   }
   supabaseClient.channel(currentRoomId.value).unsubscribe();
   currentRoomId.value = null;
+  window.localStorage.removeItem(CONNECTED_ROOM_KEY);
 }
