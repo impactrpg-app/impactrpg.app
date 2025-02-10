@@ -8,6 +8,7 @@ import EncountersList from "./views/EncountersList.vue";
 import Login from "./views/Login.vue";
 import Characters from "./views/Characters.vue";
 import Encounter from "./views/Encounter.vue";
+import Tabletop from "./views/Tabletop.vue";
 
 export default createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,6 +57,11 @@ export default createRouter({
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/tabletop',
+      name: 'Tabletop',
+      component: Tabletop
     }
   ],
 });
