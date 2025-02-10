@@ -1,5 +1,5 @@
 <template>
-  <p>Ambushed characters skip their first turn.</p>
+  <p>Any character that is ambushed can only defend themselves.</p>
   <p>
     To set up an ambush or a trap describe some information that could hint the player
     there is a trap or an ambush.

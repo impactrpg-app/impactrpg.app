@@ -1,11 +1,16 @@
 <template>
   <p>
-    To flee combat, Spend 1 action and 1 endurance to perform an Agility check against the
-    highest Agility score among your enemies.
+    To flee combat, declare your intent to flee combat.
+    When you resolve your action you move far away from all enemies.
+    Then roll an agility check to flee combat.
   </p>
-  <p><b>On Success</b> You escape, and enemies cannot persue you.</p>
   <p>
-    <b> On Failure </b>
-    You remain in combat.
+    The DM will set a target number based on the number of enemies and how difficult it is to flee.
+  </p>
+  <p>
+    <b>On Success</b> You escape, and enemies cannot persue you.
+  </p>
+  <p>
+    <b>On Failure</b> You remain in combat.
   </p>
 </template>

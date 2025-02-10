@@ -1,21 +1,23 @@
 <template>
   <p>
-    At the start of your turn, you gain one action. You can spend your action to do any of
-    the following:
+    All player characters can perform one main action per round.
+    It is up to the DM to allow any other small actions in addition to the main action.
+  </p>
+  <p>
+    <b class="text-contrast">Main Action</b>
   </p>
   <ul>
     <li>Attack</li>
     <li>Performing Maneuvers</li>
     <li>Throwing Items</li>
     <li>Casting Spell</li>
-    <li>Or any other activity that comes to your imagination.</li>
   </ul>
   <p>
-    Most actions you perform will lower your endurance. This is how long you can last
-    before your body gives up and you collapse to the ground.
+    <b class="text-contrast">Free Actions</b>
   </p>
-  <p>
-    The DM may allow you to perform certain acts without spending your action. This can be
-    such as drinking a potion or communicating with other characters.
-  </p>
+  <ul>
+    <li>Moving</li>
+    <li>Drinking a potion</li>
+    <li>Communicating with other characters</li>
+  </ul>
 </template>

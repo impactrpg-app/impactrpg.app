@@ -32,9 +32,9 @@ import RestingEventsComponent from "../components/rules/playing-the-game/Resting
 import CraftingComponent from "../components/rules/playing-the-game/CraftingComponent.vue";
 import CraftingMaterialsComponent from "../components/rules/playing-the-game/CraftingMaterialsComponent.vue";
 import FightingMonstersComponent from "../components/rules/fighting-monsters/FightingMonstersComponent.vue";
-import TurnOrderComponent from "../components/rules/fighting-monsters/TurnOrderComponent.vue";
 import ActionsComponent from "../components/rules/fighting-monsters/ActionsComponent.vue";
 import AttackingComponent from "../components/rules/fighting-monsters/AttackingComponent.vue";
+import DefendingComponent from "../components/rules/fighting-monsters/DefendingComponent.vue";
 import MovementComponent from "../components/rules/fighting-monsters/MovementComponent.vue";
 import ManeuversComponent from "../components/rules/fighting-monsters/ManeuversComponent.vue";
 import UnarmedCombat from "../components/rules/fighting-monsters/UnarmedCombat.vue";
@@ -204,22 +204,21 @@ const data: RulesContent[] = [
     section: [
       { content: FightingMonstersComponent },
       {
-        title: "Turn Order",
-        content: TurnOrderComponent,
-        rows: 2,
-      },
-      {
         title: "Actions",
         content: ActionsComponent,
       },
       {
-        title: "Attacking",
-        content: AttackingComponent,
+        title: "Movement",
+        content: MovementComponent,
         rows: 2,
       },
       {
-        title: "Movement",
-        content: MovementComponent,
+        title: "Attacking",
+        content: AttackingComponent
+      },
+      {
+        title: "Defending",
+        content: DefendingComponent
       },
       {
         title: "Unarmed Combat",
