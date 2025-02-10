@@ -19,13 +19,16 @@
   <p>
     Player character's can declare their action for this round.
   </p>
+  <p>
+    The DM can share some basic information about the monster's action with the players.
+  </p>
   <ul>
     <li>
       <b class="text-contrast">Resolve Actions</b>
     </li>
   </ul>
   <p>
-    Resolve all actions performed by player characters and monsters.
+    Resolve all actions performed by player characters and monsters starting with the character with the highest agility.
   </p>
   <ul>
     <li>

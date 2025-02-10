@@ -1,10 +1,7 @@
 <template>
   <p>Casting a spell involves shaping raw mana into an effect.</p>
-  <p>
-    Casting a spell does not require an action. You can cast spells as long as you have
-    sufficient mana.
-  </p>
-  <p>Pouring more mana into a spell typically results in stronger effects.</p>
+  <p>Pouring more mana into a spell typically yields stronger effects.</p>
+  <p>A spell should stick to one effect such as healing, damage e.t.c.</p>
   <h3>How to cast a spell</h3>
   <p>
     <b class="text-contrast">Define Your Intent:</b>
@@ -18,5 +15,8 @@
     <b class="text-contrast">Unpredictable Results:</b>
     Even identical spells may have varied effects. However, spells cast with significant
     mana are more likely to achieve precise results.
+  </p>
+  <p>
+    The DM should read the section on spell resolution to determine how they can resolve spells from the players' imagination. 
   </p>
 </template>

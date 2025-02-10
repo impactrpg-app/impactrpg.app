@@ -46,7 +46,7 @@ import FleeingComponent from "../components/rules/fighting-monsters/FleeingCompo
 import AmbushComponent from "../components/rules/fighting-monsters/AmbushComponent.vue";
 import AilmentComponent from "../components/rules/fighting-monsters/AilmentComponent.vue";
 import CastingSpellComponent from "../components/rules/casting-spells/CastingSpellComponent.vue";
-import ChannelingManaComponent from "../components/rules/casting-spells/ChannelingManaComponent.vue";
+import ManaComponent from "../components/rules/casting-spells/ManaComponent.vue";
 import SpellResolution from "../components/rules/casting-spells/SpellResolution.vue";
 import SpellRulesComponent from "../components/rules/casting-spells/SpellRulesComponent.vue";
 import ManaSurgeComponent from "../components/rules/casting-spells/ManaSurgeComponent.vue";
@@ -57,7 +57,6 @@ import DefenseSpellComponent from "../components/rules/casting-spells/spell-reso
 import UtilitySpellComponent from "../components/rules/casting-spells/spell-resolution/UtilitySpellComponent.vue";
 import BlessingSpellComponent from "../components/rules/casting-spells/spell-resolution/BlessingSpellComponent.vue";
 import CurseSpellComponent from "../components/rules/casting-spells/spell-resolution/CurseSpellComponent.vue";
-import ApplyCurseComponent from "../components/rules/casting-spells/spell-resolution/ApplyCurseComponent.vue";
 import ModifiersComponent from "../components/rules/fighting-monsters/ModifiersComponent.vue";
 import InsanityComponent from "../components/rules/playing-the-game/InsanityComponent.vue";
 import HealingSpellComponent from "../components/rules/casting-spells/spell-resolution/HealingSpellComponent.vue";
@@ -274,9 +273,8 @@ const data: RulesContent[] = [
         rows: 2,
       },
       {
-        title: "Channeling Mana",
-        content: ChannelingManaComponent,
-        rows: 2,
+        title: "Mana",
+        content: ManaComponent,
       },
       {
         title: "Mana Surge",
@@ -298,12 +296,11 @@ const data: RulesContent[] = [
       { content: AttackSpellComponent, rows: 2 },
       { content: DefenseSpellComponent },
       { content: BlessingSpellComponent },
-      { content: CurseSpellComponent },
-      { content: ApplyCurseComponent },
+      { content: CurseSpellComponent, rows: 2 },
       { content: UtilitySpellComponent },
-      { content: HealingSpellComponent },
+      { content: IllusionSpellComponent },
       { content: SummoningSpellComponent },
-      { content: IllusionSpellComponent }
+      { content: HealingSpellComponent },
     ],
   },
 ];
