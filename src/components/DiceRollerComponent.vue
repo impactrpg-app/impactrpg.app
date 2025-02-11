@@ -4,7 +4,7 @@ import { Dialog, InputNumber, Button, ToggleSwitch } from 'primevue';
 import { $dt } from '@primevue/themes';
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
-import { PayloadTypeEnum, sendMessage, getUserUuid } from '../service/room';
+import { PayloadTypeEnum, sendMessage, userId } from '../service/room';
 
 let diceBox: any = null;
 const announceRolls = ref<boolean>(true);
@@ -70,7 +70,7 @@ function announceRoll(numberOfDice: number, result: number) {
         type: PayloadTypeEnum.DiceRoll,
         message: `${rollAuthor} Rolled ${numberOfDice} dice and got ${result} success.`,
         image: `data:image/png;base64,${base64String}`,
-        author: getUserUuid()
+        author: userId.value
       });
     }, 'image/png');
   }

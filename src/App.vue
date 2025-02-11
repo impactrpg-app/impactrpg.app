@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
 import { Toast, ConfirmDialog, useToast } from "primevue";
-import { messageReceiver, Payload, PayloadTypeEnum, getRoomId, getUserUuid } from './service/room';
+import { messageReceiver, Payload, PayloadTypeEnum, getRoomId, userId } from './service/room';
 import DiceNotification from './components/DiceNotification.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import { isLoading } from './service/loading';
@@ -10,7 +10,7 @@ const toast = useToast();
 
 function onMessageReceived(payload: Payload<any>) {
   if (payload.type === PayloadTypeEnum.DiceRoll) {
-    if (getUserUuid() !== payload.author) {
+    if (userId.value !== payload.author) {
       toast.add({
         group: 'dice-roll',
         severity: 'info',
