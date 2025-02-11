@@ -26,7 +26,6 @@ export const contextMenuItems = ref<MenuItem[]>([
         label: 'Unlock Object',
         icon: 'pi pi-lock-open',
         command: () => {
-            console.log(selectedObject.value);
             if (selectedObject.value === -1) return;
             delete tabletopObjects.value[selectedObject.value].locked;
             selectedObject.value = -1;
