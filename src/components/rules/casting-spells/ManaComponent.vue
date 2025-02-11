@@ -13,6 +13,7 @@
     the total armor value you are wearing.
   </p>
   <p>
-    If you generate more mana out of combat. you must expend 1 endurance to do so.
+    While out of combat you may do an intelligence roll to generate more mana but 
+    you must expend 1 endurance to do so.
   </p>
 </template>

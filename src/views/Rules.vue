@@ -299,7 +299,7 @@ const data: RulesContent[] = [
       { content: CurseSpellComponent, rows: 2 },
       { content: UtilitySpellComponent },
       { content: IllusionSpellComponent },
-      { content: SummoningSpellComponent },
+      { content: SummoningSpellComponent, rows: 2 },
       { content: HealingSpellComponent },
     ],
   },

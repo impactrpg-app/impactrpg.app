@@ -1,7 +1,6 @@
 <template>
-  <p>Casting a spell involves shaping raw mana into an effect.</p>
+  <p>In a single round, If you choose to cast a spell, you may cast as many spells as you want, as long as you have the mana to cast them.</p>
   <p>Pouring more mana into a spell typically yields stronger effects.</p>
-  <p>A spell should stick to one effect such as healing, damage e.t.c.</p>
   <h3>How to cast a spell</h3>
   <p>
     <b class="text-contrast">Define Your Intent:</b>

@@ -10,6 +10,6 @@
     <li><b>Mana Overload:</b> If your current mana exceeds your endurance value.</li>
   </ul>
   <h4>When a Mana Surge Happens</h4>
-  <p>All stored mana is lost.</p>
+  <p>Current mana is lost.</p>
   <p>You suffer an Injury (roll on the injury table).</p>
 </template>
