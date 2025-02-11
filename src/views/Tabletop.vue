@@ -2,7 +2,7 @@
 import { InputText, Button } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
-import { onUpdate, tabletopObjects, onKeyDown, onKeyUp, onMouseDown, onMousemove, onMouseUp } from '../service/tabletop';
+import { onUpdate, insertObject, onKeyDown, onKeyUp, onMouseDown, onMousemove, onMouseUp } from '../service/tabletop';
 
 const generator = ref('');
 const updateInterval = ref<NodeJS.Timeout | null>(null);
@@ -15,12 +15,7 @@ async function uploadImage() {
     const imageElement = new Image();
     imageElement.src = `data:image/png;base64,${btoa(image ?? '')}`;
     imageElement.crossOrigin = 'Anonymous';
-    tabletopObjects.value.push({
-        image: imageElement,
-        position: [0, 0],
-        rotation: 0,
-        scale: 1,
-    });
+    insertObject(imageElement);
 }
 
 onMounted(() => {
@@ -34,7 +29,7 @@ onMounted(() => {
     updateInterval.value = setInterval(() => {
         if (!canvas.value || !context.value) return;
         onUpdate(canvas.value, context.value);
-    }, 100);
+    }, 10);
 });
 
 onUnmounted(() => {
