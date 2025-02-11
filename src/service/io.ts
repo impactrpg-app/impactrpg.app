@@ -28,8 +28,12 @@ export function loadFromFile(
     input.onchange = async function () {
       if (!input.files) return;
       const file = input.files[0];
-      const data = await file.arrayBuffer();
-      resolve(String.fromCharCode(...new Uint8Array(data)));
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      const result = bytes.reduce(
+        (data, byte) => data + String.fromCharCode(byte), ''
+      )
+      resolve(result);
     };
     input.onabort = function () {
       document.body.removeChild(input);

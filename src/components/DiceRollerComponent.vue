@@ -63,7 +63,10 @@ function announceRoll(numberOfDice: number, result: number) {
     canvas.toBlob(async (blob) => {
       if (!blob) return;
       const buffer = await blob.arrayBuffer();
-      const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const bytes = new Uint8Array(buffer);
+      const base64String = btoa(bytes.reduce(
+          (data, byte) => data + String.fromCharCode(byte), ''
+      ));
 
       // send notification
       sendMessage({
