@@ -277,9 +277,10 @@ async function saveEncounter() {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    flex-basis: calc(50% - 60px);
+    flex-basis: 290px;
     margin-left: 20px;
     margin-right: 20px;
+    width: 290px;
 
     .actions {
       display: flex;

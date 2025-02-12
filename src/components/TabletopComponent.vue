@@ -78,7 +78,7 @@ function handleContextMenu(event: MouseEvent) {
 <style scoped lang="css">
 .tabletop-canvas {
     display: block;
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     width: 100%;
