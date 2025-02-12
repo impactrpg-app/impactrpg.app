@@ -11,6 +11,10 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
         tabletopCamera.value.position[0],
         tabletopCamera.value.position[1]
     );
+    context.scale(
+        tabletopCamera.value.zoom,
+        tabletopCamera.value.zoom
+    );
 
     // draw objects
     for (let i = 0; i < tabletopObjects.value.length; i++) {

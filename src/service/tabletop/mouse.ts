@@ -2,7 +2,6 @@ import { PayloadTypeEnum, sendMessage } from "../room";
 import { MenuItem } from "primevue/menuitem";
 import { ref } from "vue";
 import {
-    onResize,
     screenPositionToWorldPosition,
     selectedObject,
     tabletopCamera,
@@ -78,8 +77,8 @@ export function onMousemove(event: MouseEvent) {
 }
 
 export function onScroll(event: WheelEvent) {
-    tabletopCamera.value.zoom += event.deltaY / 1000;
-    onResize(new UIEvent('resize'));
+    tabletopCamera.value.zoom -= event.deltaY / 1000;
+    tabletopCamera.value.zoom = Math.max(tabletopCamera.value.zoom, 0.28);
 }
 
 export function handleDrag() {
@@ -103,10 +102,18 @@ export function handleDrag() {
 }
 
 export function objectCollider(
-    [mouseX, mouseY]: [number, number],
-    [posX, posY]: [number, number],
-    [width, height]: [number, number]
+    mouse: [number, number],
+    position: [number, number],
+    size: [number, number],
+    zoom: number
 ) {
+    const mouseX = mouse[0];
+    const mouseY = mouse[1];
+    const posX = position[0] * zoom;
+    const posY = position[1] * zoom;
+    const width = size[0] * zoom;
+    const height = size[1] * zoom;
+
     return (
         mouseX >= posX &&
         mouseX <= posX + width &&
@@ -125,7 +132,8 @@ export function handleObjectSelection() {
             objectCollider(
                 mouseWorldPosition,
                 object.position,
-                [object.image.width, object.image.height]
+                [object.image.width, object.image.height],
+                tabletopCamera.value.zoom
             )
         ) {
             selected = true;
@@ -146,8 +154,9 @@ export function handleObjectContextMenu() {
         if (objectCollider(
             mouseWorldPosition,
             object.position,
-            [object.image.width, object.image.height])
-        ) {
+            [object.image.width, object.image.height],
+            tabletopCamera.value.zoom
+        )) {
             selected = true;
             selectedObject.value = i;
             break;

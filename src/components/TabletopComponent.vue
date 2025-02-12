@@ -12,6 +12,7 @@ const context = computed(() => canvas.value?.getContext('2d'));
 
 async function uploadImage() {
     const image = await loadFromFile('image/*');
+    if (!image) return;
     if (!context.value) return;
     const imageElement = new Image();
     imageElement.src = `data:image/png;base64,${btoa(image ?? '')}`;
