@@ -1,6 +1,7 @@
 import { MenuItem } from "primevue/menuitem";
 import { ref } from "vue";
 import {
+    canvasRef,
     getImageSize,
     objectCollider,
     screenPositionToWorldPosition,
@@ -87,6 +88,15 @@ export function onMousemove(event: MouseEvent) {
 }
 
 export function onScroll(event: WheelEvent) {
+    if (canvasRef.value) {
+        const rect = canvasRef.value.getBoundingClientRect();
+        if (
+            event.clientX < rect.left ||
+            event.clientY < rect.top ||
+            event.clientX > rect.right ||
+            event.clientY > rect.bottom
+        ) return;
+    }
     tabletopCamera.value.zoom -= event.deltaY / 1000;
     tabletopCamera.value.zoom = Math.max(tabletopCamera.value.zoom, 0.28);
 }
