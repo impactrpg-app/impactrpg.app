@@ -3,7 +3,6 @@ import { onMounted, onUnmounted } from 'vue';
 import { Toast, ConfirmDialog, useToast } from "primevue";
 import { messageReceiver, Payload, PayloadTypeEnum, getRoomId, userId } from './service/room';
 import DiceNotification from './components/DiceNotification.vue';
-import TabletopComponent from './components/TabletopComponent.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import { isLoading } from './service/loading';
 
@@ -34,12 +33,7 @@ onUnmounted(() => messageReceiver.delete(onMessageReceived));
   <ConfirmDialog />
   <Toast />
   <DiceNotification />
-  <div class="tabletop">
-    <div class="router">
-      <RouterView />
-    </div>
-    <TabletopComponent />
-  </div>
+  <RouterView />
 </template>
 
 <style lang="css" scoped>
@@ -61,36 +55,6 @@ onUnmounted(() => messageReceiver.delete(onMessageReceived));
   left: 0;
   z-index: -1;
   color: var(--p-stone-600);
-}
-.tabletop {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
-
-    .router {
-      display: flex;
-      justify-content: center;
-      align-items: start;
-      margin: 0px;
-      padding: 10px;
-      margin-top: 50px;
-      max-height: 100vh;
-      height: 100vh;
-      min-width: 800px;
-      width: 800px;
-      overflow-y: auto;
-    }
-
-    iframe {
-        min-width: 700px;
-        min-height: 100%;
-        border: none;
-        overflow: hidden;
-    }
 }
 </style>
 <style lang="css">

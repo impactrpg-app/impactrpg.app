@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { Button, ContextMenu } from 'primevue';
+import { Button, ContextMenu, Divider } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
 import * as TabletopService from '../service/tabletop';
+import { getRoomId } from '../service/room';
 
-const menu = ref();
+const isCharactersOpen = ref(false);
+const isEncountersOpen = ref(false);
+const isRulebookOpen = ref(false);
+const isJoinRoomOpen = ref(false);
+
+const contextMenuRef = ref();
 const updateInterval = ref<NodeJS.Timeout | null>(null);
 const canvas = useTemplateRef<HTMLCanvasElement>('canvas');
 const context = computed(() => canvas.value?.getContext('2d'));
@@ -46,15 +52,51 @@ onUnmounted(() => {
 function handleContextMenu(event: MouseEvent) {
     event.preventDefault();
     if (TabletopService.selectedObject.value === -1) return;
-    menu.value?.show(event);
+    contextMenuRef.value?.show(event);
 }
 </script>
 
 <template>
     <div class="tabletop">
-        <ContextMenu ref="menu" :model="TabletopService.contextMenuItems.value" />
+        <ContextMenu ref="contextMenuRef" :model="TabletopService.contextMenuItems.value" />
         <canvas class="tabletop-canvas" ref="canvas" @contextmenu="handleContextMenu" />
         <div class="tools">
+            <Button
+                :variant="!isCharactersOpen ? 'outlined' : undefined"
+                class="upload-button"
+                icon="pi pi-user"
+                v-tooltip.top="'Characters'"
+                @click="isCharactersOpen = !isCharactersOpen"
+            />
+            <Button
+                :variant="!isEncountersOpen ? 'outlined' : undefined"
+                class="upload-button"
+                icon="pi pi-eye"
+                v-tooltip.top="'Encounters'"
+                @click="isEncountersOpen = !isEncountersOpen"
+            />
+            <Button
+                :variant="!isRulebookOpen ? 'outlined' : undefined"
+                class="upload-button"
+                icon="pi pi-align-justify"
+                v-tooltip.top="'Rulebook'"
+                @click="isRulebookOpen = !isRulebookOpen"
+            />
+            <Button
+                v-if="!getRoomId()"
+                variant="outlined"
+                class="upload-button"
+                icon="pi pi-globe"
+                v-tooltip.top="'Join Room'"
+                @click="isJoinRoomOpen = !isJoinRoomOpen"
+            />
+            <Button
+                v-if="getRoomId()"
+                class="upload-button"
+                icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
+                v-tooltip.top="'Leave Room'"
+            />
+            <Divider layout="vertical" />
             <Button
                 variant="outlined"
                 class="upload-button"
@@ -62,6 +104,14 @@ function handleContextMenu(event: MouseEvent) {
                 v-tooltip.top="'Upload Image'"
                 @click="uploadImage"
             />
+            <Button
+                variant="outlined"
+                class="upload-button"
+                icon="pi pi-search"
+                v-tooltip.top="'Generate Image'"
+                @click="uploadImage"
+            />
+            <Divider layout="vertical" />
             <template v-for="tool in TabletopService.ALL_TOOLS">
                 <Button
                     :variant="TabletopService.tool.value.name !== tool.name ? 'outlined' : undefined"
@@ -78,7 +128,7 @@ function handleContextMenu(event: MouseEvent) {
 <style scoped lang="css">
 .tabletop-canvas {
     display: block;
-    position: relative;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
