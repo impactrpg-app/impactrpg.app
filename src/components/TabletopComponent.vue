@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { InputText, Button, ContextMenu } from 'primevue';
+import { Button, ContextMenu } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
 import * as TabletopService from '../service/tabletop';
 
 const menu = ref();
-const generator = ref('');
 const updateInterval = ref<NodeJS.Timeout | null>(null);
 const canvas = useTemplateRef<HTMLCanvasElement>('canvas');
 const context = computed(() => canvas.value?.getContext('2d'));
@@ -57,16 +56,21 @@ function handleContextMenu(event: MouseEvent) {
         <canvas class="tabletop-canvas" ref="canvas" @contextmenu="handleContextMenu" />
         <div class="tools">
             <Button
+                variant="outlined"
                 class="upload-button"
-                v-tooltip.top="'Upload Image'"
                 icon="pi pi-upload"
+                v-tooltip.top="'Upload Image'"
                 @click="uploadImage"
             />
-            <InputText
-                class="search-input"
-                v-model="generator"
-                placeholder="Generate image using Ai..."
-            />
+            <template v-for="tool in TabletopService.ALL_TOOLS">
+                <Button
+                    :variant="TabletopService.tool.value.name !== tool.name ? 'outlined' : undefined"
+                    class="generate-button"
+                    :icon="tool.icon"
+                    v-tooltip.top="tool.name"
+                    @click="TabletopService.tool.value = tool"
+                />
+            </template>
         </div>
     </div>
 </template>
@@ -91,7 +95,7 @@ function handleContextMenu(event: MouseEvent) {
     gap: 10px;
     z-index: 10;
     padding: 10px 15px;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.7);
     border-radius: 50px;
 
     .upload-button, .generate-button {

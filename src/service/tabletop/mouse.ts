@@ -1,14 +1,23 @@
-import { PayloadTypeEnum, sendMessage } from "../room";
 import { MenuItem } from "primevue/menuitem";
 import { ref } from "vue";
 import {
+    getImageSize,
+    objectCollider,
     screenPositionToWorldPosition,
     selectedObject,
     tabletopCamera,
+    TabletopImageObject,
     tabletopMouse,
-    tabletopObjects
+    tabletopObjects,
+    TabletopObjectType
 } from ".";
+import { GrabTool, TabletopTool, DrawTool } from "./tools";
 
+export const ALL_TOOLS = [
+    new GrabTool(),
+    new DrawTool()
+];
+export const tool = ref<TabletopTool>(ALL_TOOLS[0]);
 export const contextMenuItems = ref<MenuItem[]>([
     {
         visible: () => selectedObject.value !== -1 && !tabletopObjects.value[selectedObject.value].locked,
@@ -46,7 +55,7 @@ export function onMouseDown(event: MouseEvent) {
 
     if (event.button === 0) {
         tabletopMouse.value.pressed = true;
-        handleObjectSelection();
+        tool.value.onMouseDown(event);
     }
     else if (event.button === 2) {
         tabletopMouse.value.rightPressed = true;
@@ -59,6 +68,7 @@ export function onMouseUp(event: MouseEvent) {
 
     if (event.button === 0) {
         tabletopMouse.value.pressed = false;
+        tool.value.onMouseUp(event);
     }
     else if (event.button === 2) {
         tabletopMouse.value.rightPressed = false;
@@ -73,7 +83,7 @@ export function onMousemove(event: MouseEvent) {
         event.clientY - tabletopMouse.value.position[1]
     ];
     tabletopMouse.value.position = [event.clientX, event.clientY];
-    handleDrag();
+    tool.value.onMouseMove(event);
 }
 
 export function onScroll(event: WheelEvent) {
@@ -81,82 +91,19 @@ export function onScroll(event: WheelEvent) {
     tabletopCamera.value.zoom = Math.max(tabletopCamera.value.zoom, 0.28);
 }
 
-export function handleDrag() {
-    if (!tabletopMouse.value.pressed) return;
-    if (selectedObject.value !== -1) {
-        tabletopObjects.value[selectedObject.value].position[0] += tabletopMouse.value.delta[0];
-        tabletopObjects.value[selectedObject.value].position[1] += tabletopMouse.value.delta[1];
-        sendMessage({
-            type: PayloadTypeEnum.UpdateTabletopObject,
-            payload: {
-                id: tabletopObjects.value[selectedObject.value].id,
-                position: tabletopObjects.value[selectedObject.value].position,
-                rotation: tabletopObjects.value[selectedObject.value].rotation,
-                scale: tabletopObjects.value[selectedObject.value].scale
-            }
-        });
-    } else {
-        tabletopCamera.value.position[0] += tabletopMouse.value.delta[0];
-        tabletopCamera.value.position[1] += tabletopMouse.value.delta[1];
-    }
-}
-
-export function objectCollider(
-    mouse: [number, number],
-    position: [number, number],
-    size: [number, number],
-    zoom: number
-) {
-    const mouseX = mouse[0];
-    const mouseY = mouse[1];
-    const posX = position[0] * zoom;
-    const posY = position[1] * zoom;
-    const width = size[0] * zoom;
-    const height = size[1] * zoom;
-
-    return (
-        mouseX >= posX &&
-        mouseX <= posX + width &&
-        mouseY >= posY &&
-        mouseY <= posY + height
-    )
-}
-
-export function handleObjectSelection() {
-    let selected = false;
-    const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
-    for (let i = tabletopObjects.value.length - 1; i >= 0; i--) {
-        const object = tabletopObjects.value[i];
-        if (
-            !object.locked &&
-            objectCollider(
-                mouseWorldPosition,
-                object.position,
-                [object.image.width, object.image.height],
-                tabletopCamera.value.zoom
-            )
-        ) {
-            selected = true;
-            selectedObject.value = i;
-            break;
-        }
-    }
-    if (!selected) {
-        selectedObject.value = -1;
-    }
-}
-
 export function handleObjectContextMenu() {
     let selected = false;
     const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
     for (let i = tabletopObjects.value.length - 1; i >= 0; i--) {
         const object = tabletopObjects.value[i];
-        if (objectCollider(
-            mouseWorldPosition,
-            object.position,
-            [object.image.width, object.image.height],
-            tabletopCamera.value.zoom
-        )) {
+        if (object.type === TabletopObjectType.Image && 
+            objectCollider(
+                mouseWorldPosition,
+                object.position,
+                getImageSize((object as TabletopImageObject).image),
+                tabletopCamera.value.zoom
+            )
+        ) {
             selected = true;
             selectedObject.value = i;
             break;

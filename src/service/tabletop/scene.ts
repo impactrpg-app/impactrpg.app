@@ -1,17 +1,37 @@
 import { ref } from "vue";
 import * as UUID from 'uuid';
 
-export type TabletopObject = {
-    id: string;
-    position: [number, number];
-    rotation: number;
-    scale: number;
-    image: HTMLImageElement;
-    locked?: boolean; // locked object cannot be moved or selected
-    owner?: string; // only owner can move the object
-};
+export enum TabletopObjectType {
+    None,
+    Image,
+    Stroke
+}
 
-export const tabletopObjects = ref<TabletopObject[]>([]);
+export class TabletopObject {
+    public type: TabletopObjectType = TabletopObjectType.None;
+    public id: string = UUID.v7();
+    public position: [number, number] = [0, 0];
+    public rotation: number = 0;
+    public scale: number = 1;
+    public locked?: boolean = false; // locked object cannot be moved or selected
+    public owner?: string = undefined; // only owner can move the object;
+}
+
+export class TabletopImageObject extends TabletopObject {
+    public type: TabletopObjectType = TabletopObjectType.Image;
+    public image: HTMLImageElement = new Image();
+}
+
+export class TabletopStrokeObject extends TabletopObject {
+    public type: TabletopObjectType = TabletopObjectType.Stroke;
+    public strokes: [number, number][] = [];
+    public strokeColor: string = '#000000';
+    public strokeWidth: number = 1;
+}
+
+export type ALL_TABLETOP_OBJECT_TYPES = TabletopObject | TabletopImageObject | TabletopStrokeObject;
+
+export const tabletopObjects = ref<ALL_TABLETOP_OBJECT_TYPES[]>([]);
 export const tabletopCamera = ref<{
     position: [number, number];
     zoom: number;
@@ -35,11 +55,13 @@ export const selectedObject = ref<number>(-1);
 export function addObjectToScene(image: HTMLImageElement) {
     tabletopObjects.value.push({
         id: UUID.v7(),
+        type: TabletopObjectType.Image,
         position: [-tabletopCamera.value.position[0], -tabletopCamera.value.position[1]],
         rotation: 0,
         scale: 1,
         image: image
-    });
+    } as TabletopImageObject);
+    console.log(tabletopObjects.value);
 }
 
 export function removeObjectFromScene(id: string) {
