@@ -37,7 +37,7 @@ async function updateCharacterImage() {
 </script>
 
 <template>
-  <div class="row">
+  <div class="row gap20">
     <div class="column">
       <div :style="{
         width: '215px',

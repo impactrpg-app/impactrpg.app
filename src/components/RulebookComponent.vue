@@ -1,67 +1,67 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { ref } from "vue";
 import { skills } from "../data/skills";
-import { Dialog, Button } from "primevue";
+import { Dialog } from "primevue";
 import { travelEvents } from "../data/travel";
-import RulesComponent, { RulesContent } from "../components/RulesComponent.vue";
-import AbilityComponent from "../components/rules/creating-character/AbilityComponent.vue";
-import AgeComponent from "../components/rules/creating-character/AgeComponent.vue";
-import ApperanceComponent from "../components/rules/creating-character/ApperanceComponent.vue";
-import CorruptionComponent from "../components/rules/creating-character/CorruptionComponent.vue";
-import EnduranceComponent from "../components/rules/creating-character/EnduranceComponent.vue";
-import PersonalityComponent from "../components/rules/creating-character/PersonalityComponent.vue";
-import ProgressionComponent from "../components/rules/creating-character/ProgressionComponent.vue";
-import SkillsComponent from "../components/rules/creating-character/SkillsComponent.vue";
-import GearComponent from "../components/rules/creating-character/GearComponent.vue";
-import SkillsExampleComponent from "../components/rules/creating-character/SkillsExampleComponent.vue";
-import GoodsComponent from "../components/rules/creating-character/GoodsComponent.vue";
-import RolePlayingComponent from "../components/rules/playing-the-game/RolePlayingComponent.vue";
-import AbilityCheckComponent from "../components/rules/playing-the-game/AbilityCheckComponent.vue";
-import TargetComponent from "../components/rules/playing-the-game/TargetComponent.vue";
-import EffortComponent from "../components/rules/playing-the-game/EffortComponent.vue";
-import BonusComponent from "../components/rules/playing-the-game/BonusComponent.vue";
-import HelpingComponent from "../components/rules/playing-the-game/HelpingComponent.vue";
-import WoundsComponent from "../components/rules/playing-the-game/WoundsComponent.vue";
-import HealingComponent from "../components/rules/playing-the-game/HealingComponent.vue";
-import DeathComponent from "../components/rules/playing-the-game/DeathComponent.vue";
-import InjuryComponent from "../components/rules/playing-the-game/InjuryComponent.vue";
-import ResurrectionComponent from "../components/rules/playing-the-game/ResurrectionComponent.vue";
-import TravelingComponent from "../components/rules/playing-the-game/TravelingComponent.vue";
-import RestingComponent from "../components/rules/playing-the-game/RestingComponent.vue";
-import RestingEventsComponent from "../components/rules/playing-the-game/RestingEventsComponent.vue";
-import CraftingComponent from "../components/rules/playing-the-game/CraftingComponent.vue";
-import CraftingMaterialsComponent from "../components/rules/playing-the-game/CraftingMaterialsComponent.vue";
-import FightingMonstersComponent from "../components/rules/fighting-monsters/FightingMonstersComponent.vue";
-import ActionsComponent from "../components/rules/fighting-monsters/ActionsComponent.vue";
-import AttackingComponent from "../components/rules/fighting-monsters/AttackingComponent.vue";
-import DefendingComponent from "../components/rules/fighting-monsters/DefendingComponent.vue";
-import MovementComponent from "../components/rules/fighting-monsters/MovementComponent.vue";
-import ManeuversComponent from "../components/rules/fighting-monsters/ManeuversComponent.vue";
-import UnarmedCombat from "../components/rules/fighting-monsters/UnarmedCombat.vue";
-import AdvantageComponent from "../components/rules/fighting-monsters/AdvantageComponent.vue";
-import ThrowingComponent from "../components/rules/fighting-monsters/ThrowingComponent.vue";
-import ReflexComponent from "../components/rules/fighting-monsters/ReflexComponent.vue";
-import DifficultTerrainComponent from "../components/rules/fighting-monsters/DifficultTerrainComponent.vue";
-import FleeingComponent from "../components/rules/fighting-monsters/FleeingComponent.vue";
-import AmbushComponent from "../components/rules/fighting-monsters/AmbushComponent.vue";
-import AilmentComponent from "../components/rules/fighting-monsters/AilmentComponent.vue";
-import CastingSpellComponent from "../components/rules/casting-spells/CastingSpellComponent.vue";
-import ManaComponent from "../components/rules/casting-spells/ManaComponent.vue";
-import SpellResolution from "../components/rules/casting-spells/SpellResolution.vue";
-import SpellRulesComponent from "../components/rules/casting-spells/SpellRulesComponent.vue";
-import ManaSurgeComponent from "../components/rules/casting-spells/ManaSurgeComponent.vue";
-import SpellcastingComponent from "../components/rules/casting-spells/SpellcastingComponent.vue";
-import MultiTargetingComponent from "../components/rules/casting-spells/MultiTargetingComponent.vue";
-import AttackSpellComponent from "../components/rules/casting-spells/spell-resolution/AttackSpellComponent.vue";
-import DefenseSpellComponent from "../components/rules/casting-spells/spell-resolution/DefenseSpellComponent.vue";
-import UtilitySpellComponent from "../components/rules/casting-spells/spell-resolution/UtilitySpellComponent.vue";
-import BlessingSpellComponent from "../components/rules/casting-spells/spell-resolution/BlessingSpellComponent.vue";
-import CurseSpellComponent from "../components/rules/casting-spells/spell-resolution/CurseSpellComponent.vue";
-import ModifiersComponent from "../components/rules/fighting-monsters/ModifiersComponent.vue";
-import InsanityComponent from "../components/rules/playing-the-game/InsanityComponent.vue";
-import HealingSpellComponent from "../components/rules/casting-spells/spell-resolution/HealingSpellComponent.vue";
-import SummoningSpellComponent from "../components/rules/casting-spells/spell-resolution/SummoningSpellComponent.vue";
-import IllusionSpellComponent from "../components/rules/casting-spells/spell-resolution/IllusionSpellComponent.vue";
+import RulesComponent, { RulesContent } from "./RulesComponent.vue";
+import AbilityComponent from "./rules/creating-character/AbilityComponent.vue";
+import AgeComponent from "./rules/creating-character/AgeComponent.vue";
+import ApperanceComponent from "./rules/creating-character/ApperanceComponent.vue";
+import CorruptionComponent from "./rules/creating-character/CorruptionComponent.vue";
+import EnduranceComponent from "./rules/creating-character/EnduranceComponent.vue";
+import PersonalityComponent from "./rules/creating-character/PersonalityComponent.vue";
+import ProgressionComponent from "./rules/creating-character/ProgressionComponent.vue";
+import SkillsComponent from "./rules/creating-character/SkillsComponent.vue";
+import GearComponent from "./rules/creating-character/GearComponent.vue";
+import SkillsExampleComponent from "./rules/creating-character/SkillsExampleComponent.vue";
+import GoodsComponent from "./rules/creating-character/GoodsComponent.vue";
+import RolePlayingComponent from "./rules/playing-the-game/RolePlayingComponent.vue";
+import AbilityCheckComponent from "./rules/playing-the-game/AbilityCheckComponent.vue";
+import TargetComponent from "./rules/playing-the-game/TargetComponent.vue";
+import EffortComponent from "./rules/playing-the-game/EffortComponent.vue";
+import BonusComponent from "./rules/playing-the-game/BonusComponent.vue";
+import HelpingComponent from "./rules/playing-the-game/HelpingComponent.vue";
+import WoundsComponent from "./rules/playing-the-game/WoundsComponent.vue";
+import HealingComponent from "./rules/playing-the-game/HealingComponent.vue";
+import DeathComponent from "./rules/playing-the-game/DeathComponent.vue";
+import InjuryComponent from "./rules/playing-the-game/InjuryComponent.vue";
+import ResurrectionComponent from "./rules/playing-the-game/ResurrectionComponent.vue";
+import TravelingComponent from "./rules/playing-the-game/TravelingComponent.vue";
+import RestingComponent from "./rules/playing-the-game/RestingComponent.vue";
+import RestingEventsComponent from "./rules/playing-the-game/RestingEventsComponent.vue";
+import CraftingComponent from "./rules/playing-the-game/CraftingComponent.vue";
+import CraftingMaterialsComponent from "./rules/playing-the-game/CraftingMaterialsComponent.vue";
+import FightingMonstersComponent from "./rules/fighting-monsters/FightingMonstersComponent.vue";
+import ActionsComponent from "./rules/fighting-monsters/ActionsComponent.vue";
+import AttackingComponent from "./rules/fighting-monsters/AttackingComponent.vue";
+import DefendingComponent from "./rules/fighting-monsters/DefendingComponent.vue";
+import MovementComponent from "./rules/fighting-monsters/MovementComponent.vue";
+import ManeuversComponent from "./rules/fighting-monsters/ManeuversComponent.vue";
+import UnarmedCombat from "./rules/fighting-monsters/UnarmedCombat.vue";
+import AdvantageComponent from "./rules/fighting-monsters/AdvantageComponent.vue";
+import ThrowingComponent from "./rules/fighting-monsters/ThrowingComponent.vue";
+import ReflexComponent from "./rules/fighting-monsters/ReflexComponent.vue";
+import DifficultTerrainComponent from "./rules/fighting-monsters/DifficultTerrainComponent.vue";
+import FleeingComponent from "./rules/fighting-monsters/FleeingComponent.vue";
+import AmbushComponent from "./rules/fighting-monsters/AmbushComponent.vue";
+import AilmentComponent from "./rules/fighting-monsters/AilmentComponent.vue";
+import CastingSpellComponent from "./rules/casting-spells/CastingSpellComponent.vue";
+import ManaComponent from "./rules/casting-spells/ManaComponent.vue";
+import SpellResolution from "./rules/casting-spells/SpellResolution.vue";
+import SpellRulesComponent from "./rules/casting-spells/SpellRulesComponent.vue";
+import ManaSurgeComponent from "./rules/casting-spells/ManaSurgeComponent.vue";
+import SpellcastingComponent from "./rules/casting-spells/SpellcastingComponent.vue";
+import MultiTargetingComponent from "./rules/casting-spells/MultiTargetingComponent.vue";
+import AttackSpellComponent from "./rules/casting-spells/spell-resolution/AttackSpellComponent.vue";
+import DefenseSpellComponent from "./rules/casting-spells/spell-resolution/DefenseSpellComponent.vue";
+import UtilitySpellComponent from "./rules/casting-spells/spell-resolution/UtilitySpellComponent.vue";
+import BlessingSpellComponent from "./rules/casting-spells/spell-resolution/BlessingSpellComponent.vue";
+import CurseSpellComponent from "./rules/casting-spells/spell-resolution/CurseSpellComponent.vue";
+import ModifiersComponent from "./rules/fighting-monsters/ModifiersComponent.vue";
+import InsanityComponent from "./rules/playing-the-game/InsanityComponent.vue";
+import HealingSpellComponent from "./rules/casting-spells/spell-resolution/HealingSpellComponent.vue";
+import SummoningSpellComponent from "./rules/casting-spells/spell-resolution/SummoningSpellComponent.vue";
+import IllusionSpellComponent from "./rules/casting-spells/spell-resolution/IllusionSpellComponent.vue";
 
 const isSkillsDialogOpen = ref<boolean>(false);
 const isTravelingEventsDialogOpen = ref<boolean>(false);
@@ -71,18 +71,6 @@ function openSkillsDialog() {
 function openTravelingEventsDialog() {
   isTravelingEventsDialogOpen.value = true;
 }
-
-
-const scroll = ref<number>(0);
-function updateScroll() {
-  scroll.value = document.scrollingElement?.scrollTop ?? 0;
-}
-onMounted(() => {
-  window.addEventListener("scroll", updateScroll);
-});
-onBeforeUnmount(() => {
-  window.removeEventListener("scroll", updateScroll);
-});
 
 const data: RulesContent[] = [
   {
@@ -316,6 +304,10 @@ const data: RulesContent[] = [
     ],
   },
 ];
+
+const props = defineProps<{
+  container?: HTMLDivElement | null;
+}>();
 </script>
 
 <template>
@@ -352,26 +344,8 @@ const data: RulesContent[] = [
       </div>
     </div>
   </Dialog>
-  <Button
-      class="back-button"
-      :as="scroll > 100 ? 'a' : 'router-link'"
-      :icon="`pi pi-chevron-${scroll > 100 ? 'up' : 'left'}`"
-      :href="scroll > 100 ? '#' : undefined"
-      :to="scroll <= 100 ? '/' : undefined"
-    />
-  <RulesComponent show-contents title="Rulebook" :data="data" />
+  <RulesComponent show-contents title="Rulebook" :data="data" :container="props.container" />
 </template>
-
-<style lang="css" scoped>
-.back-button {
-  position: fixed;
-  top: 20px;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  transition: 0.3s;
-}
-</style>
 
 <style lang="css">
 .dialog-popup {

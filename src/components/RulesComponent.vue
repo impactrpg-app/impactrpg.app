@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from "primevue";
-import { defineComponent, onBeforeUnmount, onMounted, ref } from "vue";
+import { defineComponent } from "vue";
 
 export type RulesContent = {
   title: string;
@@ -17,29 +17,21 @@ const props = defineProps<{
   showContents?: boolean;
   title?: string;
   data: RulesContent[];
+  container?: HTMLDivElement | null;
 }>();
-const scroll = ref<number>(0);
 
-function updateScroll() {
-  scroll.value = document.scrollingElement?.scrollTop ?? 0;
+function scrollToTop() {
+  props.container?.scrollTo({ top: 0, behavior: "smooth" });
 }
-
-onMounted(() => {
-  window.addEventListener("scroll", updateScroll);
-});
-onBeforeUnmount(() => {
-  window.removeEventListener("scroll", updateScroll);
-});
 </script>
 
 <template>
   <div class="rules">
     <Button
+      v-if="props.container"
       class="back-button"
-      :as="scroll > 100 ? 'a' : 'router-link'"
-      :icon="`pi pi-chevron-${scroll > 100 ? 'up' : 'left'}`"
-      :href="scroll > 100 ? '#' : undefined"
-      :to="scroll <= 100 ? '/' : undefined"
+      icon="pi pi-chevron-up"
+      @click="scrollToTop"
     />
     <h1 v-if="props.title">{{ title }}</h1>
     <div class="contents" v-if="props.showContents">
@@ -108,7 +100,7 @@ li {
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  margin-top: 200px;
+  margin-top: 50px;
   margin-bottom: 200px;
 
   h1 {

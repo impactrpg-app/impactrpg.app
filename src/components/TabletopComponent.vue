@@ -1,15 +1,23 @@
 <script setup lang="ts">
-import { Button, ContextMenu, Divider } from 'primevue';
+import { Button, ContextMenu, Divider, Dialog } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
-import * as TabletopService from '../service/tabletop';
 import { getRoomId } from '../service/room';
-
+import { Character, NewCharacter } from '../data/character';
+import * as TabletopService from '../service/tabletop';
+import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue';
+import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
+import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
+import DiceRollerComponent from './DiceRollerComponent.vue';
+import RulebookComponent from './RulebookComponent.vue';
 const isCharactersOpen = ref(false);
+const selectedCharacter = ref<Character>({...NewCharacter});
+const isDiceTrayOpen = ref(false);
 const isEncountersOpen = ref(false);
 const isRulebookOpen = ref(false);
 const isJoinRoomOpen = ref(false);
 
+const rulebookContainer = useTemplateRef<HTMLDivElement>('rulebookContainer');
 const contextMenuRef = ref();
 const updateInterval = ref<NodeJS.Timeout | null>(null);
 const canvas = useTemplateRef<HTMLCanvasElement>('canvas');
@@ -58,6 +66,60 @@ function handleContextMenu(event: MouseEvent) {
 
 <template>
     <div class="tabletop">
+        <DiceRollerComponent
+            :modal="false"
+            :roll-author="selectedCharacter.info.name"
+            v-model:is-open="isDiceTrayOpen"
+        />
+        <Dialog
+            :modal="false"
+            position="left"
+            header="Character Sheet"
+            v-model:visible="isCharactersOpen"
+            style="
+                width: 700px; 
+                height: 700px;
+            "
+
+        >
+            <div
+                class="column gap20"
+                style="
+                    overflow-y: auto;
+                    max-height: calc(700px - 120px);
+                    padding-bottom: 20px;
+                    padding-right: 20px;
+                "
+            >
+                <CharacterInfoComponent v-model="selectedCharacter" />
+                <CharacterStatsComponent v-model="selectedCharacter" />
+                <CharacterSkillAndGearComponent v-model="selectedCharacter" />
+            </div>
+        </Dialog>
+        <Dialog
+            :modal="false"
+            position="top"
+            header="Rulebook"
+            v-model:visible="isRulebookOpen"
+            style="
+                width: 1000px;
+                height: 1000px;
+            "
+        >
+            <div
+                ref="rulebookContainer"
+                class="column gap20"
+                style="
+                    overflow-y: auto;
+                    max-height: calc(1000px - 120px);
+                    padding-bottom: 20px;
+                    padding-right: 20px;
+                    scroll-behavior: smooth;
+                "
+            >
+                <RulebookComponent :container="rulebookContainer" />
+            </div>
+        </Dialog>
         <ContextMenu ref="contextMenuRef" :model="TabletopService.contextMenuItems.value" />
         <canvas class="tabletop-canvas" ref="canvas" @contextmenu="handleContextMenu" />
         <div class="tools">
@@ -65,9 +127,19 @@ function handleContextMenu(event: MouseEvent) {
                 :variant="!isCharactersOpen ? 'outlined' : undefined"
                 class="upload-button"
                 icon="pi pi-user"
-                v-tooltip.top="'Characters'"
+                v-tooltip.top="'Character Sheet'"
                 @click="isCharactersOpen = !isCharactersOpen"
             />
+            <Button
+                :variant="!isDiceTrayOpen ? 'outlined' : undefined"
+                class="upload-button"
+                v-tooltip.top="'Dice Tray'"
+                @click="isDiceTrayOpen = !isDiceTrayOpen"
+            >
+                <template #icon>
+                    <span class="material-symbols-outlined">casino</span>
+                </template>
+            </Button>
             <Button
                 :variant="!isEncountersOpen ? 'outlined' : undefined"
                 class="upload-button"
@@ -125,7 +197,13 @@ function handleContextMenu(event: MouseEvent) {
     </div>
 </template>
 
-<style scoped lang="css">
+<style lang="css" scoped>
+.drawer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
 .tabletop-canvas {
     display: block;
     position: absolute;
@@ -143,7 +221,7 @@ function handleContextMenu(event: MouseEvent) {
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    z-index: 10;
+    z-index: 5000;
     padding: 10px 15px;
     background-color: rgba(0, 0, 0, 0.7);
     border-radius: 50px;
