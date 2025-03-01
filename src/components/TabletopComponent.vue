@@ -1,24 +1,31 @@
 <script setup lang="ts">
-import { Button, ContextMenu, Divider, Dialog } from 'primevue';
+import { Button, ContextMenu, Divider, Dialog, useToast } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
 import { getRoomId } from '../service/room';
-import { Character, NewCharacter } from '../data/character';
+import { Character } from '../data/character';
 import * as TabletopService from '../service/tabletop';
 import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue';
 import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
 import DiceRollerComponent from './DiceRollerComponent.vue';
 import RulebookComponent from './RulebookComponent.vue';
+import { supabaseClient } from '../service/supabase';
+
+
+const toast = useToast();
 const isCharactersOpen = ref(false);
-const selectedCharacter = ref<Character>({...NewCharacter});
+const selectedCharacterId = ref<number>(-1);
+const selectedCharacter = ref<Character | null>(null);
+const characters = ref<{id: number, name: string, image: string | null}[]>([]);
 const isDiceTrayOpen = ref(false);
 const isEncountersOpen = ref(false);
 const isRulebookOpen = ref(false);
 const isJoinRoomOpen = ref(false);
+const autoSaveInterval = ref<NodeJS.Timeout | null>(null);
 
-const rulebookContainer = useTemplateRef<HTMLDivElement>('rulebookContainer');
 const contextMenuRef = ref();
+const rulebookContainer = useTemplateRef<HTMLDivElement>('rulebookContainer');
 const updateInterval = ref<NodeJS.Timeout | null>(null);
 const canvas = useTemplateRef<HTMLCanvasElement>('canvas');
 const context = computed(() => canvas.value?.getContext('2d'));
@@ -33,7 +40,7 @@ async function uploadImage() {
     TabletopService.addObjectToScene(imageElement);
 }
 
-onMounted(() => {
+onMounted(async () => {
     TabletopService.init(canvas.value);
     TabletopService.onResize(new UIEvent('resize'));
     window.addEventListener('resize', TabletopService.onResize);
@@ -45,9 +52,19 @@ onMounted(() => {
         if (!canvas.value || !context.value) return;
         TabletopService.onUpdate(canvas.value, context.value);
     }, 10);
+
+
+    const query = await supabaseClient.from('character').select('id,name,image');
+    if (!query?.data)
+        return;
+
+    characters.value = [...query.data];
+    autoSaveInterval.value = setInterval(saveCharacter, 60_000);
 });
 
 onUnmounted(() => {
+    if (autoSaveInterval.value)
+        clearInterval(autoSaveInterval.value);
     if (updateInterval.value)
         clearInterval(updateInterval.value);
     window.removeEventListener('resize', TabletopService.onResize);
@@ -57,10 +74,48 @@ onUnmounted(() => {
     window.removeEventListener('wheel', TabletopService.onScroll);
 });
 
+async function saveCharacter() {
+    if (!selectedCharacter.value || selectedCharacterId.value === -1) return;
+    const image = selectedCharacter.value.info.image;
+    const character = {
+        ...selectedCharacter.value,
+        info: {
+      ...selectedCharacter.value.info,
+      image: '',
+    }
+  };
+  const query = await supabaseClient.from('character').update({
+      image: image,
+      name: character.info.name,
+      data: character
+    }).eq('id', selectedCharacterId.value);
+    if (query.error === null) {
+      toast.add({
+        severity: 'success',
+        summary: 'Saved Character',
+        life: 3000
+      });
+    } else {
+      toast.add({
+        severity: 'error',
+        summary: 'Failed to save character',
+        life: 3000
+      })
+    }
+}
+
 function handleContextMenu(event: MouseEvent) {
     event.preventDefault();
     if (TabletopService.selectedObject.value === -1) return;
     contextMenuRef.value?.show(event);
+}
+async function selectCharacter(characterId: number) {
+    selectedCharacterId.value = characterId;
+    const query = await supabaseClient.from('character').select('image,data').eq('id', characterId).single();
+    if (query.data !== null) {
+        selectedCharacter.value = query.data.data as Character;
+        selectedCharacter.value.info.image = query.data.image ?? '';
+    }
 }
 </script>
 
@@ -68,7 +123,7 @@ function handleContextMenu(event: MouseEvent) {
     <div class="tabletop">
         <DiceRollerComponent
             :modal="false"
-            :roll-author="selectedCharacter.info.name"
+            :roll-author="selectedCharacter?.info.name"
             v-model:is-open="isDiceTrayOpen"
         />
         <Dialog
@@ -91,9 +146,22 @@ function handleContextMenu(event: MouseEvent) {
                     padding-right: 20px;
                 "
             >
-                <CharacterInfoComponent v-model="selectedCharacter" />
-                <CharacterStatsComponent v-model="selectedCharacter" />
-                <CharacterSkillAndGearComponent v-model="selectedCharacter" />
+                <template v-if="selectedCharacter">
+                    <CharacterInfoComponent v-model="selectedCharacter" />
+                    <CharacterStatsComponent v-model="selectedCharacter" />
+                    <CharacterSkillAndGearComponent v-model="selectedCharacter" />
+                </template>
+                <template v-else>
+                    <div class="column gap20">
+                        <Button
+                            v-for="character in characters"
+                            :key="character.id"
+                            @click="selectCharacter(character.id)"
+                            :label="character.name"
+                            variant="outlined"
+                        />
+                    </div>
+                </template>
             </div>
         </Dialog>
         <Dialog
@@ -224,7 +292,9 @@ function handleContextMenu(event: MouseEvent) {
     z-index: 5000;
     padding: 10px 15px;
     background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
     border-radius: 50px;
+    border: 0;
 
     .upload-button, .generate-button {
         border-radius: 50%;

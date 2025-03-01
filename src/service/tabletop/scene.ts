@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import * as UUID from 'uuid';
+import { addObjectToSceneNetwork } from "./sync";
 
 export enum TabletopObjectType {
     None,
@@ -53,15 +54,19 @@ export const tabletopMouse = ref<{
 export const selectedObject = ref<number>(-1);
 
 export function addObjectToScene(image: HTMLImageElement) {
+    const id = UUID.v7();
     tabletopObjects.value.push({
-        id: UUID.v7(),
+        id: id,
         type: TabletopObjectType.Image,
         position: [-tabletopCamera.value.position[0], -tabletopCamera.value.position[1]],
         rotation: 0,
         scale: 1,
         image: image
     } as TabletopImageObject);
-    console.log(tabletopObjects.value);
+    addObjectToSceneNetwork(
+        id,
+        image.src
+    );
 }
 
 export function removeObjectFromScene(id: string) {

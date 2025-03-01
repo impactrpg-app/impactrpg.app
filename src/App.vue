@@ -86,6 +86,13 @@ div {
   z-index: 9000 !important;
 }
 
+.p-dialog {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(5px) !important;
+  border: 0 !important;
+  border-radius: 10px !important;
+}
+
 /** HEADINGS */
 h1,
 h2,
