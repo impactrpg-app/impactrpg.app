@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue';
 import { Toast, ConfirmDialog, useToast } from "primevue";
-import { messageReceiver, Payload, PayloadTypeEnum, getRoomId, getUserUuid } from './service/room';
+import { messageReceiver, Payload, PayloadTypeEnum, getRoomId } from './service/room';
 import DiceNotification from './components/DiceNotification.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import { isLoading } from './service/loading';
@@ -10,14 +10,12 @@ const toast = useToast();
 
 function onMessageReceived(payload: Payload<any>) {
   if (payload.type === PayloadTypeEnum.DiceRoll) {
-    if (getUserUuid() !== payload.author) {
-      toast.add({
-        group: 'dice-roll',
-        severity: 'info',
-        summary: payload.message,
-        detail: payload.image
-      });
-    }
+    toast.add({
+      group: 'dice-roll',
+      severity: 'info',
+      summary: payload.message,
+      detail: payload.image
+    });
   }
 }
 
@@ -64,6 +62,8 @@ html {
 body {
   background-color: #1c1b22;
   color: var(--p-stone-200);
+  padding: 0;
+  margin: 0;
 }
 #app {
   display: flex;
@@ -80,6 +80,17 @@ div {
   font-family: "Roboto", sans-serif;
   font-weight: 500;
   font-style: normal;
+}
+
+.p-tooltip {
+  z-index: 9000 !important;
+}
+
+.p-dialog {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(5px) !important;
+  border: 0 !important;
+  border-radius: 10px !important;
 }
 
 /** HEADINGS */

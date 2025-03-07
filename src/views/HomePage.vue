@@ -4,7 +4,7 @@ import { Button, Dialog, Divider, FloatLabel, InputText, useToast } from "primev
 import { supabaseClient } from "../service/supabase";
 import { ref, onMounted, computed } from "vue";
 import * as UUID from 'uuid';
-import { getRoomId, joinRoom, leaveRoom, sendMessage } from "../service/room";
+import { getRoomId, joinRoom, leaveRoom } from "../service/room";
 
 const showRoomJoinDialog = ref<boolean>(false);
 const dialogRoomJoinId = ref<string>('');

@@ -29,7 +29,7 @@ const menuItems: MenuItem[] = [
 </script>
 
 <template>
-<Menubar :model="menuItems" style="min-width: 100%;">
+<Menubar :model="menuItems" style="min-width: 100%;" breakpoint="800">
   <template #item="{ item }">
     <div v-tooltip.bottom="item.label" class="menu-item">
       <span v-if="item.icon?.startsWith('pi')" :class="`pi ${item.icon}`"></span>

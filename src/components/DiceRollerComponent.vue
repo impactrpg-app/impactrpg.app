@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
-import { Dialog, InputNumber, Button, ToggleSwitch } from 'primevue';
+import { Dialog, InputNumber, Button, ToggleSwitch, InputText } from 'primevue';
 import { $dt } from '@primevue/themes';
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
-import { PayloadTypeEnum, sendMessage, getUserUuid } from '../service/room';
+import { PayloadTypeEnum, sendMessage, userId } from '../service/room';
 
 let diceBox: any = null;
 const announceRolls = ref<boolean>(true);
+const author = ref<string>('');
 
 const props = defineProps<{
+  modal?: boolean;
   isOpen?: boolean;
   rollAuthor?: string;
 }>();
@@ -53,24 +55,33 @@ function initDiceBox() {
 watch(isOpen, (newValue) => {
   if (!newValue) return;
   initDiceBox();
-})
+});
+
+function getRollAuthor() {
+  if (author.value !== '') return author.value;
+  if (props.rollAuthor && props.rollAuthor !== '') return props.rollAuthor;
+  return 'Someone';
+}
 
 function announceRoll(numberOfDice: number, result: number) {
-  const rollAuthor = props.rollAuthor ?? 'Someone';
+  const rollAuthor = getRollAuthor();
   
   const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
   if (canvas) {
     canvas.toBlob(async (blob) => {
       if (!blob) return;
       const buffer = await blob.arrayBuffer();
-      const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      const bytes = new Uint8Array(buffer);
+      const base64String = btoa(bytes.reduce(
+          (data, byte) => data + String.fromCharCode(byte), ''
+      ));
 
       // send notification
       sendMessage({
         type: PayloadTypeEnum.DiceRoll,
         message: `${rollAuthor} Rolled ${numberOfDice} dice and got ${result} success.`,
         image: `data:image/png;base64,${base64String}`,
-        author: getUserUuid()
+        author: userId.value
       });
     }, 'image/png');
   }
@@ -101,8 +112,14 @@ async function rollDice() {
 </script>
 
 <template>
-  <Dialog modal v-model:visible="isOpen" header="Dice Roller" position="top" style="width: 400px;">
+  <Dialog :modal="props.modal" v-model:visible="isOpen" header="Dice Roller" position="top" style="width: 400px;">
     <div class="dialog-content">
+      <div class="field no-margin column">
+        <label class="field-label">
+          Who is rolling?
+        </label>
+        <InputText v-model="author" :placeholder="props.rollAuthor" />
+      </div>
       <div class="field no-margin row">
         <label class="field-label">
           Announce Rolls

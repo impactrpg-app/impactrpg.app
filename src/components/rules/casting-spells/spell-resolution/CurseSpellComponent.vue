@@ -15,27 +15,38 @@
   <table>
     <thead>
       <tr>
-        <td>Mana R.</td>
         <td>Effect</td>
+        <td>Required Successes</td>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>1</td>
         <td>Effecting movement</td>
+        <td>1</td>
       </tr>
       <tr>
-        <td>2</td>
         <td>Effecting abilities or stats</td>
+        <td>2</td>
       </tr>
       <tr>
+        <td>Effecting actions</td>
         <td>3</td>
-        <td>Effecting actions or endurance</td>
       </tr>
       <tr>
-        <td>4</td>
         <td>Target skips a turn</td>
+        <td>4</td>
       </tr>
     </tbody>
   </table>
+  <h4>APPLY A CURSE</h4>
+  <p>
+    When you apply a curse to a target, make an attack roll equal to the mana spent.
+  </p>
+  <p>
+    The target's armor value cancel's each success you get. From the remaining successes,
+    if you have the required successes for the curse shown in the table above. 
+  </p>
+  <p>
+    Then the curse applies to the target. Otherwise the curse fails and nothing happens.
+  </p>
 </template>

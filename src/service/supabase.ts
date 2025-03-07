@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../database.types';
+import { userId } from './room';
 
 export const supabaseClient = createClient<Database>(
   'https://xjtnojqcyhztaamvjagn.supabase.co',
@@ -9,6 +10,7 @@ export const supabaseClient = createClient<Database>(
 // handle auto redirect to login page
 supabaseClient.auth.onAuthStateChange((_, session) => {
     if (session?.user) {
+      userId.value = session.user.id;
       if (window.location.pathname === '/login') {
         window.location.pathname = '/';
       }

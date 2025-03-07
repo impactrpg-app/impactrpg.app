@@ -7,7 +7,7 @@ export const restActions: RestAction[] = [
   {
     name: "Sleeping",
     description: [
-      "Restore your energy by sleeping. Gain all of your endurance and heal 1 wound.",
+      "Restore your energy by sleeping. Gain endurance equal to your maximum endurance, gain mana equal to your maximum mana and heal 1 wound.",
     ],
   },
   {
