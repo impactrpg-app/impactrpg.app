@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import * as UUID from 'uuid';
-import { addObjectToSceneNetwork } from "./sync";
+import { addObjectToSceneNetwork, removeObjectFromSceneNetwork } from "./sync";
 
 export enum TabletopObjectType {
     None,
@@ -16,6 +16,7 @@ export class TabletopObject {
     public scale: number = 1;
     public locked?: boolean = false; // locked object cannot be moved or selected
     public owner?: string = undefined; // only owner can move the object;
+    public isDirty: boolean = false; // if object is dirty then it will be updated on the network
 }
 
 export class TabletopImageObject extends TabletopObject {
@@ -49,7 +50,7 @@ export const tabletopMouse = ref<{
     delta: [0, 0],
     position: [0, 0],
     pressed: false,
-    rightPressed: false
+    rightPressed: false,
 });
 export const selectedObject = ref<number>(-1);
 
@@ -71,4 +72,5 @@ export function addObjectToScene(image: HTMLImageElement) {
 
 export function removeObjectFromScene(id: string) {
     tabletopObjects.value = tabletopObjects.value.filter(obj => obj.id !== id);
+    removeObjectFromSceneNetwork(id);
 }

@@ -4,6 +4,7 @@ import {
     canvasRef,
     getImageSize,
     objectCollider,
+    removeObjectFromScene,
     screenPositionToWorldPosition,
     selectedObject,
     tabletopCamera,
@@ -27,6 +28,7 @@ export const contextMenuItems = ref<MenuItem[]>([
         command: () => {
             if (selectedObject.value === -1) return;
             tabletopObjects.value[selectedObject.value].locked = true;
+            tabletopObjects.value[selectedObject.value].isDirty = true;
             selectedObject.value = -1;
         }
     },
@@ -37,6 +39,7 @@ export const contextMenuItems = ref<MenuItem[]>([
         command: () => {
             if (selectedObject.value === -1) return;
             delete tabletopObjects.value[selectedObject.value].locked;
+            tabletopObjects.value[selectedObject.value].isDirty = true;
             selectedObject.value = -1;
         }
     },
@@ -45,7 +48,7 @@ export const contextMenuItems = ref<MenuItem[]>([
         icon: 'pi pi-trash',
         command: () => {
             if (selectedObject.value === -1) return;
-            tabletopObjects.value = tabletopObjects.value.filter((_, index) => index !== selectedObject.value);
+            removeObjectFromScene(tabletopObjects.value[selectedObject.value].id);
             selectedObject.value = -1;
         }
     }

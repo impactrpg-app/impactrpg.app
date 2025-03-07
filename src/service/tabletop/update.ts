@@ -1,6 +1,7 @@
-import { selectedObject, tabletopCamera, TabletopImageObject, tabletopObjects, TabletopObjectType, TabletopStrokeObject } from ".";
+import { selectedObject, tabletopCamera, TabletopImageObject, tabletopObjects, TabletopObjectType, TabletopStrokeObject, updateObjectsOnSceneNetwork } from ".";
 
 export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+    updateObjectsOnSceneNetwork();
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
 
