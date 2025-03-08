@@ -1,5 +1,5 @@
 import { tabletopCamera, TabletopImageObject, tabletopObjects, TabletopObjectType } from ".";
-import { PayloadTypeEnum, sendMessage } from "../room";
+import { PayloadTypeEnum, sendMessage, getRoomId } from "../room";
 
 export function onMessageReceived(payload: any): void {
     if (payload.type === PayloadTypeEnum.AddTabletopObject) {
@@ -37,6 +37,8 @@ export function onMessageReceived(payload: any): void {
 }
 
 export function addObjectToSceneNetwork(id: string, src: string) {
+    if (getRoomId() === null) return;
+
     sendMessage({
         type: PayloadTypeEnum.AddTabletopObject,
         payload: {
@@ -47,6 +49,8 @@ export function addObjectToSceneNetwork(id: string, src: string) {
 }
 
 export function removeObjectFromSceneNetwork(id: string) {
+    if (getRoomId() === null) return;
+
     sendMessage({
         type: PayloadTypeEnum.RemoveTabletopObject,
         payload: { id }
@@ -54,6 +58,8 @@ export function removeObjectFromSceneNetwork(id: string) {
 }
 
 export function updateObjectsOnSceneNetwork() {
+    if (getRoomId() === null) return;
+
     const objectsToUpdate = tabletopObjects.value.filter(obj => obj.isDirty).map(obj => {
         return {
             id: obj.id,
