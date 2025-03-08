@@ -123,5 +123,5 @@ export function onMouseOver(event: MouseEvent) {
 
 export function handleObjectContextMenu() {
     const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
-    selectedObject.value = getObjectAtPosition(mouseWorldPosition);
+    selectedObject.value = getObjectAtPosition(mouseWorldPosition, true);
 }
