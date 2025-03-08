@@ -2,17 +2,13 @@ import { MenuItem } from "primevue/menuitem";
 import { ref } from "vue";
 import {
     canvasRef,
-    getImageSize,
     getObjectAtPosition,
-    objectCollider,
     removeObjectFromScene,
     screenPositionToWorldPosition,
     selectedObject,
     tabletopCamera,
-    TabletopImageObject,
     tabletopMouse,
     tabletopObjects,
-    TabletopObjectType
 } from ".";
 import { GrabTool, TabletopTool, DrawTool } from "./tools";
 
