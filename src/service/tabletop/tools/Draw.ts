@@ -7,12 +7,12 @@ export class DrawTool extends TabletopTool {
     public drawingObjectId: string | null = null;
     public drawingObjectIndex: number = -1;
 
-    public onMouseDown(event: MouseEvent): void {
+    public onMouseDown(_: MouseEvent): void {
         this.drawingObjectId = addObjectToScene(TabletopObjectType.Stroke);
         this.drawingObjectIndex = tabletopObjects.value.findIndex(obj => obj.id === this.drawingObjectId);
     }
 
-    public onMouseUp(event: MouseEvent): void {
+    public onMouseUp(_: MouseEvent): void {
         this.drawingObjectId = null;
         this.drawingObjectIndex = -1;
     }
