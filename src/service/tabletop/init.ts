@@ -1,5 +1,5 @@
 import { canvasRef, onMessageReceived, onResize } from ".";
-import { messageReceiver, PayloadTypeEnum, sendMessage } from "../room";
+import { messageReceiver, PayloadTypeEnum, sendMessage, getRoomId } from "../room";
 
 export function init(canvas?: HTMLCanvasElement | null) {
     if (!canvas) {
@@ -8,5 +8,7 @@ export function init(canvas?: HTMLCanvasElement | null) {
     canvasRef.value = canvas;
     onResize(new UIEvent('resize'));
     messageReceiver.add(onMessageReceived);
-    sendMessage({ type: PayloadTypeEnum.RequestTabletopObjects });
+    if (getRoomId()) {
+        sendMessage({ type: PayloadTypeEnum.RequestTabletopObjects });
+    }
 }

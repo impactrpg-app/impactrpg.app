@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { Button, ContextMenu, Divider, Dialog, useToast } from 'primevue';
+import { Button, ContextMenu, Dialog, useToast, InputText } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
-import { getRoomId } from '../service/room';
 import { Character } from '../data/character';
+import { getRoomId, joinRoom, leaveRoom } from '../service/room';
+import { supabaseClient } from '../service/supabase';
 import * as TabletopService from '../service/tabletop';
 import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue';
 import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
 import DiceRollerComponent from './DiceRollerComponent.vue';
 import RulebookComponent from './RulebookComponent.vue';
-import { supabaseClient } from '../service/supabase';
+import TabletopToolsComponent from './TabletopToolsComponent.vue';
 
-
+const roomId = ref('');
 const toast = useToast();
 const isCharactersOpen = ref(false);
 const selectedCharacterId = ref<number>(-1);
@@ -38,6 +39,9 @@ async function uploadImage() {
     imageElement.src = `data:image/png;base64,${btoa(image ?? '')}`;
     imageElement.crossOrigin = 'Anonymous';
     TabletopService.addObjectToScene(imageElement);
+}
+async function generateImage() {
+
 }
 
 onMounted(async () => {
@@ -181,7 +185,7 @@ async function selectCharacter(characterId: number) {
             v-model:visible="isRulebookOpen"
             style="
                 width: 1000px;
-                height: 1000px;
+                height: 800px;
             "
         >
             <div
@@ -189,7 +193,7 @@ async function selectCharacter(characterId: number) {
                 class="column gap20"
                 style="
                     overflow-y: auto;
-                    max-height: calc(1000px - 120px);
+                    max-height: calc(800px - 120px);
                     padding-bottom: 20px;
                     padding-right: 20px;
                     scroll-behavior: smooth;
@@ -198,80 +202,39 @@ async function selectCharacter(characterId: number) {
                 <RulebookComponent :container="rulebookContainer" />
             </div>
         </Dialog>
+        <Dialog
+            :modal="false"
+            position="top"
+            :header="getRoomId() ? 'Leave Room' : 'Join Room'"
+            v-model:visible="isJoinRoomOpen"
+        >
+            <div class="column gap20">
+                <template  v-if="!getRoomId()">
+                    <InputText v-model="roomId" placeholder="Room ID" />
+                    <Button label="Join" @click="() => joinRoom(roomId)" />
+                </template>
+                <template v-else>
+                    <span>Room ID: {{ getRoomId() }}</span>
+                    <Button label="Leave" @click="leaveRoom" />
+                </template>
+            </div>
+        </Dialog>
         <ContextMenu ref="contextMenuRef" :model="TabletopService.contextMenuItems.value" />
         <canvas class="tabletop-canvas" ref="canvas" @contextmenu="handleContextMenu" />
-        <div class="tools">
-            <Button
-                :variant="!isCharactersOpen ? 'outlined' : undefined"
-                class="upload-button"
-                icon="pi pi-user"
-                v-tooltip.top="'Character Sheet'"
-                @click="isCharactersOpen = !isCharactersOpen"
-            />
-            <Button
-                :variant="!isDiceTrayOpen ? 'outlined' : undefined"
-                class="upload-button"
-                v-tooltip.top="'Dice Tray'"
-                @click="isDiceTrayOpen = !isDiceTrayOpen"
-            >
-                <template #icon>
-                    <span class="material-symbols-outlined">casino</span>
-                </template>
-            </Button>
-            <Button
-                :variant="!isEncountersOpen ? 'outlined' : undefined"
-                class="upload-button"
-                icon="pi pi-eye"
-                v-tooltip.top="'Encounters'"
-                @click="isEncountersOpen = !isEncountersOpen"
-            />
-            <Button
-                :variant="!isRulebookOpen ? 'outlined' : undefined"
-                class="upload-button"
-                icon="pi pi-align-justify"
-                v-tooltip.top="'Rulebook'"
-                @click="isRulebookOpen = !isRulebookOpen"
-            />
-            <Button
-                v-if="!getRoomId()"
-                variant="outlined"
-                class="upload-button"
-                icon="pi pi-globe"
-                v-tooltip.top="'Join Room'"
-                @click="isJoinRoomOpen = !isJoinRoomOpen"
-            />
-            <Button
-                v-if="getRoomId()"
-                class="upload-button"
-                icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
-                v-tooltip.top="'Leave Room'"
-            />
-            <Divider layout="vertical" />
-            <Button
-                variant="outlined"
-                class="upload-button"
-                icon="pi pi-upload"
-                v-tooltip.top="'Upload Image'"
-                @click="uploadImage"
-            />
-            <Button
-                variant="outlined"
-                class="upload-button"
-                icon="pi pi-search"
-                v-tooltip.top="'Generate Image'"
-                @click="uploadImage"
-            />
-            <Divider layout="vertical" />
-            <template v-for="tool in TabletopService.ALL_TOOLS">
-                <Button
-                    :variant="TabletopService.tool.value.name !== tool.name ? 'outlined' : undefined"
-                    class="generate-button"
-                    :icon="tool.icon"
-                    v-tooltip.top="tool.name"
-                    @click="TabletopService.tool.value = tool"
-                />
-            </template>
-        </div>
+        <TabletopToolsComponent
+            :is-characters-open="isCharactersOpen"
+            :is-dice-tray-open="isDiceTrayOpen"
+            :is-encounters-open="isEncountersOpen"
+            :is-rulebook-open="isRulebookOpen"
+            :is-join-room-open="isJoinRoomOpen"
+            @update:is-characters-open="isCharactersOpen = $event"
+            @update:is-dice-tray-open="isDiceTrayOpen = $event"
+            @update:is-encounters-open="isEncountersOpen = $event"
+            @update:is-rulebook-open="isRulebookOpen = $event"
+            @update:is-join-room-open="isJoinRoomOpen = $event"
+            @upload-image="uploadImage"
+            @generate-image="generateImage"
+        />
     </div>
 </template>
 
@@ -289,30 +252,5 @@ async function selectCharacter(characterId: number) {
     left: 0;
     width: 100%;
     height: 100%;
-}
-.tools {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    z-index: 5000;
-    padding: 10px 15px;
-    background-color: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
-    border-radius: 50px;
-    border: 0;
-
-    .upload-button, .generate-button {
-        border-radius: 50%;
-    }
-
-    .search-input {
-        border-radius: 20px;
-        min-width: 400px;
-    }
 }
 </style>
