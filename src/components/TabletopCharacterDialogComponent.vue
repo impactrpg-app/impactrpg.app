@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Character } from '../data/character';
+import { Character, NewCharacter } from '../data/character';
 import { onMounted, ref, watch } from 'vue';
 import { supabaseClient } from '../service/supabase';
 import { useToast } from 'primevue/usetoast';
@@ -20,6 +20,7 @@ const emits = defineEmits<{
 const toast = useToast();
 const selectedCharacter = ref<Character | null>(null);
 const selectedCharacterId = ref<number>(-1);
+const showNotesEditor = ref(false);
 
 const characters = ref<{id: number, name: string, image: string | null}[]>([]);
 onMounted(async () => {
@@ -70,9 +71,54 @@ async function selectCharacter(characterId: number) {
         selectedCharacter.value.info.image = query.data.image ?? '';
     }
 }
+async function deSelectCharacter() {
+    await saveCharacter();
+    selectedCharacterId.value = -1;
+    selectedCharacter.value = null;
+}
+async function createCharacter(character: Character) {
+  if (character.info.name === '') {
+    character.info.name = 'New Character';
+  }
+  const query = await supabaseClient.from('character').insert({
+    name: 'New Character',
+    image: null,
+    data: {
+      ...character,
+    }
+  }).select().single();
+  if (query.error) {
+    toast.add({
+        severity: 'error',
+        summary: 'Failed to create character'
+    });
+    return;
+  }
+  selectCharacter(query.data.id);
+  characters.value.push({
+    id: query.data.id,
+    name: query.data.name,
+    image: query.data.image,
+  });
+}
+async function deleteCharacter(characterId: number) {
+    const query = await supabaseClient.from('character').delete().eq('id', characterId);
+    if (query.error) {
+        toast.add({
+            severity: 'error',
+            summary: 'Failed to delete character'
+        });
+    }
+    characters.value = characters.value.filter(c => c.id !== characterId);
+}
 </script>
 
 <template>
+    <Dialog modal v-model:visible="showNotesEditor" header="Notes" :style="{ width: '650px' }">
+        <div class="column" v-if="selectedCharacter">
+            <Textarea v-model="selectedCharacter.notes" style="resize: vertical; min-height: 500px" />
+        </div>
+    </Dialog>
     <Dialog
         :modal="false"
         position="left"
@@ -85,26 +131,31 @@ async function selectCharacter(characterId: number) {
 
     >
         <template #header>
-            <div class="row gap20 align-items-center">
+            <div class="row gap20 align-items-center" style="margin-right: 10px;">
                 <Button
                     v-if="selectedCharacter"
+                    variant="outlined"
                     icon="pi pi-chevron-left"
                     style="border-radius: 100%; height: 40px; width: 40px;"
-                    @click="selectedCharacter = null"
                     v-tooltip.top="'Back to characters'"
+                    @click="deSelectCharacter"
                 />
-                <span>Character Sheet</span>
+                <span style="flex-grow: 1;">Character Sheet</span>
                 <Button
                     v-if="!selectedCharacter"
+                    variant="outlined"
                     icon="pi pi-plus"
                     style="border-radius: 100%; height: 40px; width: 40px;"
                     v-tooltip.top="'Create Character'"
+                    @click="createCharacter({...NewCharacter})"
                 />
                 <Button
-                    v-if="!selectedCharacter"
-                    icon="pi pi-upload"
+                    v-if="selectedCharacter"
+                    variant="outlined"
+                    icon="pi pi-book"
                     style="border-radius: 100%; height: 40px; width: 40px;"
-                    v-tooltip.top="'Upload Character'"
+                    v-tooltip.top="'Notes'"
+                    @click="showNotesEditor = true"
                 />
             </div>
         </template>
@@ -134,6 +185,7 @@ async function selectCharacter(characterId: number) {
                         <Button
                             icon="pi pi-trash"
                             v-tooltip.top="'Delete Character'"
+                            @click="deleteCharacter(character.id)"
                         />
                     </div>
                 </div>
@@ -142,5 +194,15 @@ async function selectCharacter(characterId: number) {
     </Dialog>
 </template>
 
-<style lang="css" scoped>
+<style lang="css">
+.field {
+  span {
+    width: 100%;
+
+    input {
+      font-size: 24px;
+      width: 100%;
+    }
+  }
+}
 </style>
