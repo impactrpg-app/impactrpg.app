@@ -4,7 +4,7 @@ import { Dialog, InputNumber, Button, ToggleSwitch, InputText } from 'primevue';
 import { $dt } from '@primevue/themes';
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
-import { PayloadTypeEnum, sendMessage, userId } from '../service/room';
+import { getRoomId, PayloadTypeEnum, sendMessage, userId } from '../service/room';
 
 let diceBox: any = null;
 const announceRolls = ref<boolean>(true);
@@ -64,6 +64,7 @@ function getRollAuthor() {
 }
 
 function announceRoll(numberOfDice: number, result: number) {
+  if (getRoomId() === null) return;
   const rollAuthor = getRollAuthor();
   
   const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;

@@ -58,20 +58,45 @@ export const tabletopMouse = ref<{
 });
 export const selectedObject = ref<number>(-1);
 
-export function addObjectToScene(image: HTMLImageElement) {
+export function addObjectToScene(type: TabletopObjectType, image?: HTMLImageElement): string {
     const id = UUID.v7();
-    tabletopObjects.value.push({
-        id: id,
-        type: TabletopObjectType.Image,
-        position: [-tabletopCamera.value.position[0], -tabletopCamera.value.position[1]],
-        rotation: 0,
-        scale: 1,
-        image: image
-    } as TabletopImageObject);
-    addObjectToSceneNetwork(
-        id,
-        image.src
-    );
+    if (type === TabletopObjectType.Image) {
+        if (!image) throw new Error('Image is required');
+        tabletopObjects.value.push({
+            id: id,
+            type: TabletopObjectType.Image,
+            position: [-tabletopCamera.value.position[0], -tabletopCamera.value.position[1]],
+            rotation: 0,
+            scale: 1,
+            image: image,
+            isDirty: true,
+        } as TabletopImageObject);
+        addObjectToSceneNetwork(
+            id,
+            type,
+            image.src
+        );
+    } else if (type === TabletopObjectType.Stroke) {
+        tabletopObjects.value.push({
+            id: id,
+            type: TabletopObjectType.Stroke,
+            position: [-tabletopCamera.value.position[0], -tabletopCamera.value.position[1]],
+            rotation: 0,
+            scale: 1,
+            isDirty: true,
+            strokes: [],
+            strokeColor: '#000000',
+            strokeWidth: 5
+        } as TabletopStrokeObject);
+        addObjectToSceneNetwork(
+            id,
+            type,
+            ''
+        );
+    } else {
+        throw new Error('Invalid object type');
+    }
+    return id;
 }
 
 export function removeObjectFromScene(id: string) {
