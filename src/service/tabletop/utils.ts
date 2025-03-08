@@ -43,7 +43,7 @@ export function getStrokeBounds(strokes: [number, number][]) {
 export function getObjectAtPosition(targetPosition: [number, number], ignoreLocked: boolean = false): number {
     for (let i = tabletopObjects.value.length - 1; i >= 0; i--) {
         const object = tabletopObjects.value[i];
-        if (ignoreLocked && object.locked) continue;
+        if (!ignoreLocked && object.locked) continue;
 
         if (object.type === TabletopObjectType.Stroke) {
             const strokeObject = object as TabletopStrokeObject;
