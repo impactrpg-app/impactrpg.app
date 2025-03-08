@@ -1,14 +1,9 @@
 import {
-    getImageSize,
-    objectCollider,
     screenPositionToWorldPosition,
     tabletopCamera,
-    TabletopImageObject,
     tabletopMouse,
     tabletopObjects,
-    TabletopObjectType,
     selectedObject,
-    TabletopStrokeObject,
     getObjectAtPosition
 } from "..";
 import { TabletopTool } from "./base";
