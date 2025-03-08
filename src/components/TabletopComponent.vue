@@ -44,6 +44,7 @@ onMounted(async () => {
     window.addEventListener('mousemove', TabletopService.onMousemove);
     window.addEventListener('mouseup', TabletopService.onMouseUp);
     window.addEventListener('mousedown', TabletopService.onMouseDown);
+    window.addEventListener('mouseover', TabletopService.onMouseOver);
     window.addEventListener('wheel', TabletopService.onScroll);
     updateInterval.value = setInterval(() => {
         if (!canvas.value || !context.value) return;
@@ -58,6 +59,7 @@ onUnmounted(() => {
     window.removeEventListener('mousemove', TabletopService.onMousemove);
     window.removeEventListener('mouseup', TabletopService.onMouseUp);
     window.removeEventListener('mousedown', TabletopService.onMouseDown);
+    window.removeEventListener('mouseover', TabletopService.onMouseOver);
     window.removeEventListener('wheel', TabletopService.onScroll);
 });
 
