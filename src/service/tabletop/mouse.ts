@@ -102,6 +102,7 @@ export function onMousemove(event: MouseEvent) {
 }
 
 export function onScroll(event: WheelEvent) {
+    if (!tabletopMouse.value.overCanvas) return;
     if (canvasRef.value) {
         const rect = canvasRef.value.getBoundingClientRect();
         if (
@@ -113,6 +114,10 @@ export function onScroll(event: WheelEvent) {
     }
     tabletopCamera.value.zoom -= event.deltaY / 1000;
     tabletopCamera.value.zoom = Math.max(tabletopCamera.value.zoom, 0.28);
+}
+
+export function onMouseOver(event: MouseEvent) {
+    tabletopMouse.value.overCanvas = !!(event.target instanceof HTMLCanvasElement);
 }
 
 export function handleObjectContextMenu() {

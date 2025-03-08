@@ -47,12 +47,14 @@ export const tabletopMouse = ref<{
     pressed: boolean;
     rightPressed: boolean;
     middlePressed: boolean;
+    overCanvas: boolean;
 }>({
     delta: [0, 0],
     position: [0, 0],
     pressed: false,
     rightPressed: false,
     middlePressed: false,
+    overCanvas: false,
 });
 export const selectedObject = ref<number>(-1);
 

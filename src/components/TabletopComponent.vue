@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import * as uuid from "uuid";
 import { Button, ContextMenu, Dialog, InputText } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
@@ -43,6 +44,7 @@ onMounted(async () => {
     window.addEventListener('mousemove', TabletopService.onMousemove);
     window.addEventListener('mouseup', TabletopService.onMouseUp);
     window.addEventListener('mousedown', TabletopService.onMouseDown);
+    window.addEventListener('mouseover', TabletopService.onMouseOver);
     window.addEventListener('wheel', TabletopService.onScroll);
     updateInterval.value = setInterval(() => {
         if (!canvas.value || !context.value) return;
@@ -57,6 +59,7 @@ onUnmounted(() => {
     window.removeEventListener('mousemove', TabletopService.onMousemove);
     window.removeEventListener('mouseup', TabletopService.onMouseUp);
     window.removeEventListener('mousedown', TabletopService.onMouseDown);
+    window.removeEventListener('mouseover', TabletopService.onMouseOver);
     window.removeEventListener('wheel', TabletopService.onScroll);
 });
 
@@ -64,6 +67,10 @@ function handleContextMenu(event: MouseEvent) {
     event.preventDefault();
     if (TabletopService.selectedObject.value === -1) return;
     contextMenuRef.value?.show(event);
+}
+
+function generateRoomId() {
+    roomId.value = uuid.v7();
 }
 </script>
 
@@ -110,7 +117,15 @@ function handleContextMenu(event: MouseEvent) {
         >
             <div class="column gap20">
                 <template  v-if="!getRoomId()">
-                    <InputText v-model="roomId" placeholder="Room ID" />
+                    <div class="row gap20">
+                        <InputText v-model="roomId" placeholder="Room ID" />
+                        <Button
+                            variant="outlined"
+                            icon="pi pi-refresh"
+                            v-tooltip.top="'Generate Unique Room ID'"
+                            @click="generateRoomId"
+                        />
+                    </div>
                     <Button label="Join" @click="() => joinRoom(roomId)" />
                 </template>
                 <template v-else>
