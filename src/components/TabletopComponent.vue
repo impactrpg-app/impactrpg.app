@@ -129,7 +129,6 @@ async function selectCharacter(characterId: number) {
         <Dialog
             :modal="false"
             position="left"
-            header="Character Sheet"
             v-model:visible="isCharactersOpen"
             style="
                 width: 700px; 
@@ -137,6 +136,17 @@ async function selectCharacter(characterId: number) {
             "
 
         >
+            <template #header>
+                <div class="row gap20 align-items-center">
+                    <Button
+                        v-if="selectedCharacter"
+                        icon="pi pi-chevron-left"
+                        style="border-radius: 100%; margin-top: 10px"
+                        @click="selectedCharacter = null"
+                    />
+                    <span>Character Sheet</span>
+                </div>
+            </template>
             <div
                 class="column gap20"
                 style="
