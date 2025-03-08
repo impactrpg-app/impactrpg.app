@@ -33,9 +33,17 @@ function addNetworkObject(payload: { id: string, type: TabletopObjectType, src?:
     }
 }
 
+function addNetworkImageChunk(payload: { id: string, chunk: string }) {
+    const objectIndex = tabletopObjects.value.findIndex(obj => obj.id === payload.id);
+    if (objectIndex === -1) return;
+    (tabletopObjects.value[objectIndex] as TabletopImageObject).image.src += payload.chunk;
+}
+
 export function onMessageReceived(payload: any): void {
     if (payload.type === PayloadTypeEnum.AddTabletopObject) {
         addNetworkObject(payload.payload);
+    } else if (payload.type === PayloadTypeEnum.AddTabletopImageChunk) {
+        addNetworkImageChunk(payload.payload);
     } else if (payload.type === PayloadTypeEnum.RemoveTabletopObject) {
         tabletopObjects.value = tabletopObjects.value.filter(obj => obj.id !== payload.payload.id);
     } else if (payload.type === PayloadTypeEnum.UpdateTabletopObject) {
@@ -58,17 +66,37 @@ export function onMessageReceived(payload: any): void {
     }
 }
 
-export function addObjectToSceneNetwork(id: string, type: TabletopObjectType, src: string) {
+async function waitForSecond(seconds: number) {
+    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+}
+
+export async function addObjectToSceneNetwork(id: string, type: TabletopObjectType, src: string) {
     if (getRoomId() === null) return;
+
+    let chunked = src;
+    if (src.length > 1000) {
+        chunked = chunked.substring(0, 1000);
+    }
 
     sendMessage({
         type: PayloadTypeEnum.AddTabletopObject,
         payload: {
             id,
             type,
-            src
+            chunked
         }
     });
+
+
+    if (src.length > 1000) {
+        for (let i = 1000; i < src.length; i += 1000) {
+            sendMessage({
+                type: PayloadTypeEnum.AddTabletopImageChunk,
+                payload: { id, chunk: src.substring(i, i + 1000) }
+            });
+            await waitForSecond(1);
+        }
+    }
 }
 
 export function removeObjectFromSceneNetwork(id: string) {

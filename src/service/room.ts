@@ -5,6 +5,7 @@ import { REALTIME_LISTEN_TYPES, RealtimeChannel } from "@supabase/supabase-js";
 export enum PayloadTypeEnum {
   DiceRoll,
   AddTabletopObject,
+  AddTabletopImageChunk,
   RemoveTabletopObject,
   UpdateTabletopObject,
   RequestTabletopObjects,
