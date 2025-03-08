@@ -66,37 +66,17 @@ export function onMessageReceived(payload: any): void {
     }
 }
 
-async function waitForSecond(seconds: number) {
-    return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-}
-
 export async function addObjectToSceneNetwork(id: string, type: TabletopObjectType, src: string) {
     if (getRoomId() === null) return;
-
-    let chunked = src;
-    if (src.length > 1000) {
-        chunked = chunked.substring(0, 1000);
-    }
 
     sendMessage({
         type: PayloadTypeEnum.AddTabletopObject,
         payload: {
             id,
             type,
-            chunked
+            src
         }
     });
-
-
-    if (src.length > 1000) {
-        for (let i = 1000; i < src.length; i += 1000) {
-            sendMessage({
-                type: PayloadTypeEnum.AddTabletopImageChunk,
-                payload: { id, chunk: src.substring(i, i + 1000) }
-            });
-            await waitForSecond(1);
-        }
-    }
 }
 
 export function removeObjectFromSceneNetwork(id: string) {
