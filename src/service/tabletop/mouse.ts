@@ -61,6 +61,9 @@ export function onMouseDown(event: MouseEvent) {
         tabletopMouse.value.pressed = true;
         tool.value.onMouseDown(event);
     }
+    else if (event.button === 1) {
+        tabletopMouse.value.middlePressed = true;
+    }
     else if (event.button === 2) {
         tabletopMouse.value.rightPressed = true;
         handleObjectContextMenu();
@@ -74,6 +77,9 @@ export function onMouseUp(event: MouseEvent) {
         tabletopMouse.value.pressed = false;
         tool.value.onMouseUp(event);
     }
+    else if (event.button === 1) {
+        tabletopMouse.value.middlePressed = false;
+    }
     else if (event.button === 2) {
         tabletopMouse.value.rightPressed = false;
     }
@@ -81,6 +87,11 @@ export function onMouseUp(event: MouseEvent) {
 
 export function onMousemove(event: MouseEvent) {
     if (!(event.target instanceof HTMLCanvasElement)) return;
+
+    if (tabletopMouse.value.middlePressed) {
+        tabletopCamera.value.position[0] += tabletopMouse.value.delta[0];
+        tabletopCamera.value.position[1] += tabletopMouse.value.delta[1];
+    }
 
     tabletopMouse.value.delta = [
         event.clientX - tabletopMouse.value.position[0],
