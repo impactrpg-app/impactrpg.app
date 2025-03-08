@@ -59,7 +59,7 @@ const emits = defineEmits<{
         />
         <Button
             v-if="!getRoomId()"
-            variant="outlined"
+            :variant="!props.isJoinRoomOpen ? 'outlined' : undefined"
             class="upload-button"
             icon="pi pi-globe"
             v-tooltip.top="'Join Room'"
@@ -67,6 +67,7 @@ const emits = defineEmits<{
         />
         <Button
             v-if="getRoomId()"
+            :variant="!props.isJoinRoomOpen ? 'outlined' : undefined"
             class="upload-button"
             icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
             v-tooltip.top="'Leave Room'"
