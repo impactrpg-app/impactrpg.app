@@ -3,7 +3,7 @@ import { Character, NewCharacter } from '../data/character';
 import { onMounted, ref, watch } from 'vue';
 import { supabaseClient } from '../service/supabase';
 import { useToast } from 'primevue/usetoast';
-import { Button, Dialog } from 'primevue';
+import { Button, Dialog, Textarea } from 'primevue';
 import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue';
 import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
