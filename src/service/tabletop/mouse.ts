@@ -3,6 +3,7 @@ import { ref } from "vue";
 import {
     canvasRef,
     getImageSize,
+    getObjectAtPosition,
     objectCollider,
     removeObjectFromScene,
     screenPositionToWorldPosition,
@@ -121,24 +122,6 @@ export function onMouseOver(event: MouseEvent) {
 }
 
 export function handleObjectContextMenu() {
-    let selected = false;
     const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
-    for (let i = tabletopObjects.value.length - 1; i >= 0; i--) {
-        const object = tabletopObjects.value[i];
-        if (object.type === TabletopObjectType.Image && 
-            objectCollider(
-                mouseWorldPosition,
-                object.position,
-                getImageSize((object as TabletopImageObject).image),
-                tabletopCamera.value.zoom
-            )
-        ) {
-            selected = true;
-            selectedObject.value = i;
-            break;
-        }
-    }
-    if (!selected) {
-        selectedObject.value = -1;
-    }
+    selectedObject.value = getObjectAtPosition(mouseWorldPosition);
 }

@@ -7,7 +7,9 @@ import {
     tabletopMouse,
     tabletopObjects,
     TabletopObjectType,
-    selectedObject
+    selectedObject,
+    TabletopStrokeObject,
+    getObjectAtPosition
 } from "..";
 import { TabletopTool } from "./base";
 export class GrabTool extends TabletopTool {
@@ -38,19 +40,6 @@ export class GrabTool extends TabletopTool {
 
     private selectObject(): number {
         const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
-        for (let i = tabletopObjects.value.length - 1; i >= 0; i--) {
-            const object = tabletopObjects.value[i];
-            if (object.type !== TabletopObjectType.Image) continue;
-            if (object.locked) continue;
-            const collision = objectCollider(
-                mouseWorldPosition,
-                object.position,
-                getImageSize((object as TabletopImageObject).image),
-                tabletopCamera.value.zoom
-            );
-            if (!collision) continue;
-                return i;
-        }
-        return -1;
+        return getObjectAtPosition(mouseWorldPosition);
     }
 }

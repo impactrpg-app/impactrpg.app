@@ -9,6 +9,7 @@ import TabletopCharacterDialogComponent from './TabletopCharacterDialogComponent
 import DiceRollerComponent from './DiceRollerComponent.vue';
 import RulebookComponent from './RulebookComponent.vue';
 import TabletopToolsComponent from './TabletopToolsComponent.vue';
+import { TabletopObjectType } from "../service/tabletop";
 
 const roomId = ref('');
 const isCharactersOpen = ref(false);
@@ -31,7 +32,7 @@ async function uploadImage() {
     const imageElement = new Image();
     imageElement.src = `data:image/png;base64,${btoa(image ?? '')}`;
     imageElement.crossOrigin = 'Anonymous';
-    TabletopService.addObjectToScene(imageElement);
+    TabletopService.addObjectToScene(TabletopObjectType.Image, imageElement);
 }
 async function generateImage() {
 
