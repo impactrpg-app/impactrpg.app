@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import * as uuid from "uuid";
 import { Button, ContextMenu, Dialog, InputText } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
@@ -65,6 +66,10 @@ function handleContextMenu(event: MouseEvent) {
     if (TabletopService.selectedObject.value === -1) return;
     contextMenuRef.value?.show(event);
 }
+
+function generateRoomId() {
+    roomId.value = uuid.v7();
+}
 </script>
 
 <template>
@@ -110,7 +115,15 @@ function handleContextMenu(event: MouseEvent) {
         >
             <div class="column gap20">
                 <template  v-if="!getRoomId()">
-                    <InputText v-model="roomId" placeholder="Room ID" />
+                    <div class="row gap20">
+                        <InputText v-model="roomId" placeholder="Room ID" />
+                        <Button
+                            variant="outlined"
+                            icon="pi pi-refresh"
+                            v-tooltip.top="'Generate Unique Room ID'"
+                            @click="generateRoomId"
+                        />
+                    </div>
                     <Button label="Join" @click="() => joinRoom(roomId)" />
                 </template>
                 <template v-else>
