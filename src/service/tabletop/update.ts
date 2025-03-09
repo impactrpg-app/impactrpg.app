@@ -54,7 +54,7 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
 
             if (i === selectedObject.value) {
                 context.strokeStyle = '#58c9af';
-                context.lineWidth = 5;
+                context.lineWidth = 5 / tabletopCamera.value.zoom;
                 context.strokeRect(
                     0,
                     0,
@@ -97,7 +97,7 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
 
                 if (i === selectedObject.value) {
                     context.strokeStyle = '#58c9af';
-                    context.lineWidth = 5;
+                    context.lineWidth = 5 / tabletopCamera.value.zoom;
                     context.strokeRect(
                         min[0],
                         min[1],
