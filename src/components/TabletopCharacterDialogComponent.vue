@@ -114,7 +114,12 @@ async function deleteCharacter(characterId: number) {
 </script>
 
 <template>
-    <Dialog modal v-model:visible="showNotesEditor" header="Notes" :style="{ width: '650px' }">
+    <Dialog
+        :modal="false"
+        v-model:visible="showNotesEditor"
+        header="Notes"
+        :style="{ width: '650px' }"
+    >
         <div class="column" v-if="selectedCharacter">
             <Textarea v-model="selectedCharacter.notes" style="resize: vertical; min-height: 500px" />
         </div>
@@ -155,7 +160,7 @@ async function deleteCharacter(characterId: number) {
                     icon="pi pi-book"
                     style="border-radius: 100%; height: 40px; width: 40px;"
                     v-tooltip.top="'Notes'"
-                    @click="showNotesEditor = true"
+                    @click="showNotesEditor = !showNotesEditor"
                 />
             </div>
         </template>
