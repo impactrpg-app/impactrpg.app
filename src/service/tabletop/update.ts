@@ -14,14 +14,19 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
 
     context.save();
 
-    // translate to camera position
+    // move to canvas centre
+    const canvasSizeHalf = [canvas.width / 2, canvas.height / 2];
     context.translate(
-        tabletopCamera.value.position[0],
-        tabletopCamera.value.position[1]
+        canvasSizeHalf[0],
+        canvasSizeHalf[1],
     );
     context.scale(
         tabletopCamera.value.zoom,
         tabletopCamera.value.zoom
+    );
+    context.translate(
+        tabletopCamera.value.position[0],
+        tabletopCamera.value.position[1]
     );
 
     // draw objects
@@ -32,9 +37,10 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
         if (object.type === TabletopObjectType.Image) {
             const imageObject = object as TabletopImageObject;
             // translate to object position
+            const objectSizeHalf = [imageObject.image.width / 2, imageObject.image.height / 2];
             context.translate(
-                object.position[0],
-                object.position[1]
+                object.position[0] - objectSizeHalf[0],
+                object.position[1] - objectSizeHalf[1]
             );
             // rotate object
             context.rotate(object.rotation);
@@ -48,7 +54,7 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
 
             if (i === selectedObject.value) {
                 context.strokeStyle = '#58c9af';
-                context.lineWidth = 5;
+                context.lineWidth = 5 / tabletopCamera.value.zoom;
                 context.strokeRect(
                     0,
                     0,
@@ -77,7 +83,7 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
             context.beginPath();
             if (strokeObject.strokes.length > 1) {
             context.moveTo(strokeObject.strokes[0][0], strokeObject.strokes[0][1]);
-                let max: [number, number] = [0, 0];
+                let max: [number, number] = [-Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
                 let min: [number, number] = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
                 for (let j = 1; j < strokeObject.strokes.length; j++) {
                     context.lineTo(strokeObject.strokes[j][0], strokeObject.strokes[j][1]);
@@ -91,7 +97,7 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
 
                 if (i === selectedObject.value) {
                     context.strokeStyle = '#58c9af';
-                    context.lineWidth = 5;
+                    context.lineWidth = 5 / tabletopCamera.value.zoom;
                     context.strokeRect(
                         min[0],
                         min[1],

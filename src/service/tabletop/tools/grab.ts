@@ -1,14 +1,8 @@
 import {
-    getImageSize,
-    objectCollider,
-    screenPositionToWorldPosition,
     tabletopCamera,
-    TabletopImageObject,
     tabletopMouse,
     tabletopObjects,
-    TabletopObjectType,
     selectedObject,
-    TabletopStrokeObject,
     getObjectAtPosition
 } from "..";
 import { TabletopTool } from "./base";
@@ -39,7 +33,6 @@ export class GrabTool extends TabletopTool {
     }
 
     private selectObject(): number {
-        const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
-        return getObjectAtPosition(mouseWorldPosition);
+        return getObjectAtPosition(tabletopMouse.value.position);
     }
 }
