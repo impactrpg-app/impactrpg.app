@@ -73,8 +73,7 @@ export function addObjectToScene(type: TabletopObjectType, image?: HTMLImageElem
         } as TabletopImageObject);
         addObjectToSceneNetwork(
             id,
-            type,
-            image.src
+            type
         );
     } else if (type === TabletopObjectType.Stroke) {
         tabletopObjects.value.push({
@@ -90,8 +89,7 @@ export function addObjectToScene(type: TabletopObjectType, image?: HTMLImageElem
         } as TabletopStrokeObject);
         addObjectToSceneNetwork(
             id,
-            type,
-            ''
+            type
         );
     } else {
         throw new Error('Invalid object type');

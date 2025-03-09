@@ -8,12 +8,12 @@ function addNetworkObject(id: string, type: TabletopObjectType) {
         const image = new Image();
         image.crossOrigin = 'Anonymous';
         image.src = "";
-    tabletopObjects.value.push({
-        id: id,
-        type: TabletopObjectType.Image,
-        position: [-tabletopCamera.value.position[0], -tabletopCamera.value.position[1]],
-        rotation: 0,
-        scale: 1,
+        tabletopObjects.value.push({
+            id: id,
+            type: TabletopObjectType.Image,
+            position: [-tabletopCamera.value.position[0], -tabletopCamera.value.position[1]],
+            rotation: 0,
+            scale: 1,
             image
         } as TabletopImageObject);
     } else if (type === TabletopObjectType.Stroke) {
@@ -36,7 +36,6 @@ function addNetworkObject(id: string, type: TabletopObjectType) {
 const networkChunksReceived: Map<string, { chunks: any, order: number }[]> = new Map();
 
 function addNetworkImageChunk(id: string, chunks: string, order: number) {
-    console.log("addNetworkImageChunk", id, chunks, order);
     const existingChunks = networkChunksReceived.get(id) || [];
     existingChunks.push({ chunks, order });
     networkChunksReceived.set(id, existingChunks);
@@ -52,7 +51,7 @@ async function addNetworkImageChunkEnd(id: string, total: number) {
 
     let chunks = networkChunksReceived.get(id) || [];
     let attempts = 0;
-    while (chunks.length !== total && attempts < 3) {
+    while (chunks.length !== total && attempts < 10) {
         await waitForSeconds(1);
         chunks = networkChunksReceived.get(id) || [];
         attempts++;
