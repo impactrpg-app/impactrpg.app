@@ -83,7 +83,7 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
             context.beginPath();
             if (strokeObject.strokes.length > 1) {
             context.moveTo(strokeObject.strokes[0][0], strokeObject.strokes[0][1]);
-                let max: [number, number] = [0, 0];
+                let max: [number, number] = [-Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
                 let min: [number, number] = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
                 for (let j = 1; j < strokeObject.strokes.length; j++) {
                     context.lineTo(strokeObject.strokes[j][0], strokeObject.strokes[j][1]);

@@ -71,14 +71,18 @@ export function getObjectAtPosition(targetPosition: [number, number], ignoreLock
         if (object.type === TabletopObjectType.Stroke) {
             const strokeObject = object as TabletopStrokeObject;
             const bounds = getStrokeBounds(strokeObject.strokes);
+            const size: [number, number] = [
+                bounds.maxX - bounds.minX,
+                bounds.maxY - bounds.minY
+            ];
             const position: [number, number] = [
-                bounds.minX + object.position[0],
-                bounds.minY + object.position[1]
+                bounds.minX + object.position[0] + size[0] / 2,
+                bounds.minY + object.position[1] + size[1] / 2
             ]
             const collision = objectCollider(
                 targetPosition,
                 position,
-                [bounds.maxX - bounds.minX, bounds.maxY - bounds.minY]
+                size
             );
             if (!collision) continue;
             return i;
