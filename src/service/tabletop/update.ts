@@ -14,14 +14,19 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
 
     context.save();
 
-    // translate to camera position
+    // move to canvas centre
+    const canvasSizeHalf = [canvas.width / 2, canvas.height / 2];
     context.translate(
-        tabletopCamera.value.position[0],
-        tabletopCamera.value.position[1]
+        canvasSizeHalf[0],
+        canvasSizeHalf[1],
     );
     context.scale(
         tabletopCamera.value.zoom,
         tabletopCamera.value.zoom
+    );
+    context.translate(
+        tabletopCamera.value.position[0],
+        tabletopCamera.value.position[1]
     );
 
     // draw objects
@@ -32,9 +37,10 @@ export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingCont
         if (object.type === TabletopObjectType.Image) {
             const imageObject = object as TabletopImageObject;
             // translate to object position
+            const objectSizeHalf = [imageObject.image.width / 2, imageObject.image.height / 2];
             context.translate(
-                object.position[0],
-                object.position[1]
+                object.position[0] - objectSizeHalf[0],
+                object.position[1] - objectSizeHalf[1]
             );
             // rotate object
             context.rotate(object.rotation);

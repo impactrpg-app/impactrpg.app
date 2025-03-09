@@ -4,7 +4,7 @@ import {
     canvasRef,
     getObjectAtPosition,
     removeObjectFromScene,
-    screenPositionToWorldPosition,
+    mouseToScreenSpace,
     selectedObject,
     tabletopCamera,
     tabletopMouse,
@@ -89,12 +89,16 @@ export function onMousemove(event: MouseEvent) {
         tabletopCamera.value.position[0] += tabletopMouse.value.delta[0];
         tabletopCamera.value.position[1] += tabletopMouse.value.delta[1];
     }
+    const newMousePosition: [number, number] = mouseToScreenSpace([event.clientX, event.clientY]);
 
     tabletopMouse.value.delta = [
-        event.clientX - tabletopMouse.value.position[0],
-        event.clientY - tabletopMouse.value.position[1]
+        newMousePosition[0] - tabletopMouse.value.position[0],
+        newMousePosition[1] - tabletopMouse.value.position[1]
     ];
-    tabletopMouse.value.position = [event.clientX, event.clientY];
+
+    // get mouse position in world coordinates
+    tabletopMouse.value.position = newMousePosition
+
     tool.value.onMouseMove(event);
 }
 
@@ -110,7 +114,7 @@ export function onScroll(event: WheelEvent) {
         ) return;
     }
     tabletopCamera.value.zoom -= event.deltaY / 1000;
-    tabletopCamera.value.zoom = Math.max(tabletopCamera.value.zoom, 0.28);
+    tabletopCamera.value.zoom = Math.min(Math.max(tabletopCamera.value.zoom, 0.28), 3.0);
 }
 
 export function onMouseOver(event: MouseEvent) {
@@ -118,6 +122,5 @@ export function onMouseOver(event: MouseEvent) {
 }
 
 export function handleObjectContextMenu() {
-    const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
-    selectedObject.value = getObjectAtPosition(mouseWorldPosition, true);
+    selectedObject.value = getObjectAtPosition(tabletopMouse.value.position, true);
 }

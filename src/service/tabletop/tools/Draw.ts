@@ -1,5 +1,6 @@
-import { addObjectToScene, tabletopObjects, TabletopObjectType, TabletopStrokeObject } from "../scene";
+import { addObjectToScene, tabletopMouse, tabletopObjects, TabletopObjectType, TabletopStrokeObject } from "../scene";
 import { TabletopTool } from "./base";
+import { mouseToScreenSpace } from "../utils";
 
 export class DrawTool extends TabletopTool {
     public name: string = 'Draw';
@@ -17,12 +18,12 @@ export class DrawTool extends TabletopTool {
         this.drawingObjectIndex = -1;
     }
 
-    public onMouseMove(event: MouseEvent): void {
+    public onMouseMove(_: MouseEvent): void {
         if (!this.drawingObjectId) return;
         if (this.drawingObjectIndex === -1) return;
         const strokeObject = tabletopObjects.value[this.drawingObjectIndex] as TabletopStrokeObject;
         if (!strokeObject) return;
-        strokeObject.strokes.push([event.clientX, event.clientY]);
+        strokeObject.strokes.push(tabletopMouse.value.position);
         tabletopObjects.value[this.drawingObjectIndex].isDirty = true;
     }
 }

@@ -1,5 +1,4 @@
 import {
-    screenPositionToWorldPosition,
     tabletopCamera,
     tabletopMouse,
     tabletopObjects,
@@ -34,7 +33,6 @@ export class GrabTool extends TabletopTool {
     }
 
     private selectObject(): number {
-        const mouseWorldPosition = screenPositionToWorldPosition(tabletopMouse.value.position);
-        return getObjectAtPosition(mouseWorldPosition);
+        return getObjectAtPosition(tabletopMouse.value.position);
     }
 }

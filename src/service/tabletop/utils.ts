@@ -1,29 +1,51 @@
-import { tabletopCamera, TabletopImageObject, tabletopObjects, TabletopObjectType, TabletopStrokeObject } from ".";
+import { 
+    canvasRef,
+    tabletopCamera,
+    TabletopImageObject,
+    tabletopObjects,
+    TabletopObjectType,
+    TabletopStrokeObject
+} from ".";
 
-export function screenPositionToWorldPosition(pos: [number, number]): [number, number] {
-    const [posX, posY] = pos;
-    const [cameraX, cameraY] = tabletopCamera.value.position;
-    return [posX - cameraX, posY - cameraY];
+export function mouseToScreenSpace(pos: [number, number]): [number, number] {
+    const canvasRect = canvasRef.value!.getBoundingClientRect();
+    const canvasSizeHalf = [canvasRef.value!.width / 2, canvasRef.value!.height / 2];
+    return [
+        ((pos[0] - canvasRect.left - canvasSizeHalf[0]) / tabletopCamera.value.zoom),
+        ((pos[1] - canvasRect.top - canvasSizeHalf[1]) / tabletopCamera.value.zoom)
+    ];
+}
+
+export function screenToWorldSpace(pos: [number, number]): [number, number] {
+    return [
+        pos[0] - tabletopCamera.value.position[0],
+        pos[1] - tabletopCamera.value.position[1]
+    ]
+}
+
+export function worldToScreenSpace(pos: [number, number]): [number, number] {
+    return [
+        pos[0] + tabletopCamera.value.position[0],
+        pos[1] + tabletopCamera.value.position[1]
+    ]
 }
 
 export function objectCollider(
     point: [number, number],
     objectPosition: [number, number],
-    objectSize: [number, number],
-    cameraZoom: number
+    objectSize: [number, number]
 ) {
-    const mouseX = point[0];
-    const mouseY = point[1];
-    const posX = objectPosition[0] * cameraZoom;
-    const posY = objectPosition[1] * cameraZoom;
-    const width = objectSize[0] * cameraZoom;
-    const height = objectSize[1] * cameraZoom;
+    let [pointX, pointY] = point;
+    let [objX, objY] = objectPosition;
+    let [width, height] = objectSize;
 
+    width = width / 2;
+    height = height / 2;
     return (
-        mouseX >= posX &&
-        mouseX <= posX + width &&
-        mouseY >= posY &&
-        mouseY <= posY + height
+        pointX >= objX - width &&
+        pointX <= objX + width &&
+        pointY >= objY - height &&
+        pointY <= objY + height
     )
 }
 
@@ -41,6 +63,7 @@ export function getStrokeBounds(strokes: [number, number][]) {
 }
 
 export function getObjectAtPosition(targetPosition: [number, number], ignoreLocked: boolean = false): number {
+    targetPosition = screenToWorldSpace(targetPosition);
     for (let i = tabletopObjects.value.length - 1; i >= 0; i--) {
         const object = tabletopObjects.value[i];
         if (!ignoreLocked && object.locked) continue;
@@ -55,8 +78,7 @@ export function getObjectAtPosition(targetPosition: [number, number], ignoreLock
             const collision = objectCollider(
                 targetPosition,
                 position,
-                [bounds.maxX - bounds.minX, bounds.maxY - bounds.minY],
-                tabletopCamera.value.zoom
+                [bounds.maxX - bounds.minX, bounds.maxY - bounds.minY]
             );
             if (!collision) continue;
             return i;
@@ -64,8 +86,7 @@ export function getObjectAtPosition(targetPosition: [number, number], ignoreLock
             const collision = objectCollider(
                 targetPosition,
                 object.position,
-                getImageSize((object as TabletopImageObject).image),
-                tabletopCamera.value.zoom
+                getImageSize((object as TabletopImageObject).image)
             );
             if (!collision) continue;
                 return i;
