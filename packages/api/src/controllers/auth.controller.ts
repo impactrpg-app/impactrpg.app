@@ -4,7 +4,7 @@ import { Model } from "mongoose";
 import { User } from "src/schema/user";
 import { hash, compare } from "bcrypt";
 import { IsEmail, IsString, MinLength } from "class-validator";
-import { JwtService } from "src/services/jwt";
+import { JwtService } from "src/services/jwt.service";
 import { ApiOkResponse, ApiOperation, ApiProperty, getSchemaPath } from "@nestjs/swagger";
 
 export class LoginDto {
