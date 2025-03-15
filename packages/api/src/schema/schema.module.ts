@@ -2,12 +2,13 @@ import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { User, UserSchema } from "./user";
 import { Character, CharacterSchema } from "./character";
+import { config } from "src/config";
 
 @Module({
     imports: [
         MongooseModule.forRoot(
-            process.env.MONGO_URI ?? 
-            'mongodb://admin:password@127.0.0.1:27017/?directConnection=true', {
+            config.mongoUri,
+            {
                 dbName: 'impact'
             }
         ),

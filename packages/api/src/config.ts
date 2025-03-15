@@ -1,5 +1,6 @@
 export const config = {
-    port: process.env.PORT ?? 3000,
+    port: parseInt(process.env.PORT ?? '3000'),
+    webSocketPort: parseInt(process.env.WEBSOCKET_PORT ?? '3001'),
     jwtSecret: process.env.JWT_SECRET ?? 'secret',
-    mongoUri: process.env.MONGO_URI ?? 'mongodb://localhost:27017/impact',
+    mongoUri: process.env.MONGO_URI ?? 'mongodb://admin:password@127.0.0.1:27017/?directConnection=true',
 };

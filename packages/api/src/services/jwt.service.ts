@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import * as jwt from "jsonwebtoken";
+import { config } from "src/config";
 
 @Injectable()
 export class JwtService {
     private readonly secretKey: string;
 
     constructor() {
-        this.secretKey = process.env.JWT_SECRET ?? 'secret';
+        this.secretKey = config.jwtSecret;
     }
 
     async sign(payload: any) {
