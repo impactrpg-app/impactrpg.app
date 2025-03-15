@@ -1,0 +1,30 @@
+{
+  "name": "impact.app",
+  "private": true,
+  "version": "0.0.3",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "gen:schema": "npx supabase gen types typescript --project-id \"xjtnojqcyhztaamvjagn\" --schema public > src/database.types.ts"
+  },
+  "dependencies": {
+    "@3d-dice/dice-box": "^1.1.4",
+    "@primevue/themes": "^4.2.4",
+    "@supabase/supabase-js": "^2.48.1",
+    "primeicons": "^7.0.0",
+    "primevue": "^4.2.4",
+    "uuid": "^11.0.5",
+    "vite-plugin-node-polyfills": "^0.23.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "@types/uuid": "^10.0.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}
