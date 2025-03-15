@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Put, Req, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { ApiBody, ApiOkResponse, ApiOperation, OmitType } from "@nestjs/swagger";
+import { ApiOkResponse, ApiOperation, OmitType } from "@nestjs/swagger";
 import { Model } from "mongoose";
 import { AuthGuard } from "src/middleware/auth.guard";
 import { Character } from "src/schema/character";

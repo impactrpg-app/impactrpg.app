@@ -8,11 +8,14 @@
         "packages/*"
     ],
     "scripts": {
-        "build:api": "cd packages/api && bun run build",
-        "build:client": "cd packages/client && bun run build",
-        "build": "bun run build:api && bun run build:client",
+        "build:api": "cd packages/api && npm run build",
+        "build:client": "cd packages/client && npm run build",
+        "build": "npm run build:api && npm run build:client",
 
-        "dev:api": "cd packages/api && bun run start:dev",
-        "dev:client": "cd packages/client && bun run dev"
+        "dev:api": "cd packages/api && npm run start:dev",
+        "dev:client": "cd packages/client && npm run dev",
+
+
+        "prod:api": "cd packages/api && npm run start:prod"
     }
 }

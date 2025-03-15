@@ -3,7 +3,6 @@ import * as jwt from "jsonwebtoken";
 
 @Injectable()
 export class JwtService {
-
     private readonly secretKey: string;
 
     constructor() {
