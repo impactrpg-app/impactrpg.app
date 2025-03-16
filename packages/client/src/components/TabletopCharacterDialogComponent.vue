@@ -2,11 +2,12 @@
 import { Character, NewCharacter } from '../data/character';
 import { onMounted, ref, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue/useconfirm';
 import { Button, Dialog, Textarea } from 'primevue';
 import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue';
 import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
-
+import { API_URL, getHeaders } from '../service/api';
 const props = defineProps<{
     isOpen: boolean;
 }>();
@@ -17,18 +18,14 @@ const emits = defineEmits<{
 }>();
 
 const toast = useToast();
-console.log(toast);
+const confirm = useConfirm();
 const selectedCharacter = ref<Character | null>(null);
-const selectedCharacterId = ref<number>(-1);
+const selectedCharacterId = ref<string | null>(null);
 const showNotesEditor = ref(false);
 
-const characters = ref<{id: number, name: string, image: string | null}[]>([]);
+const characters = ref<{id: string, name: string, image: string | null}[]>([]);
 onMounted(async () => {
-    // const query = await supabaseClient.from('character').select('id,name,image');
-    // if (!query?.data)
-    //     return;
-
-    // characters.value = [...query.data];
+    fetchCharacters();
 });
 watch(selectedCharacter, (newVal) => {
     if (newVal?.info.name) {
@@ -37,82 +34,90 @@ watch(selectedCharacter, (newVal) => {
     }
 }, { deep: true });
 
-async function saveCharacter() {
-    // if (!selectedCharacter.value || selectedCharacterId.value === -1) return;
-    // const image = selectedCharacter.value.info.image;
-    // const character: Character = {
-    //     ...selectedCharacter.value,
-    //     info: {
-    //         ...selectedCharacter.value.info,
-    //         image: '',
-    //     }
-    // };
-    // const query = await supabaseClient.from('character').update({
-    //     image: image,
-    //     name: character.info.name,
-    //     data: character
-    // }).eq('id', selectedCharacterId.value);
-    // if (query.error !== null) {
-    //     toast.add({
-    //         severity: 'error',
-    //         summary: 'Failed to save character'
-    //     });
-    // } else {
-    //     console.log('Character saved');
-    // }
+async function fetchCharacters() {
+    const resp = await fetch(`${API_URL}/characters`, {
+        headers: getHeaders(),
+    });
+    const data = await resp.json();
+    characters.value = data;
 }
 
-async function selectCharacter(characterId: number) {
-    console.log('selectCharacter', characterId);
-    // const query = await supabaseClient.from('character')
-    //     .select('image,data').eq('id', characterId).single();
-    // if (query.data !== null) {
-    //     selectedCharacterId.value = characterId;
-    //     selectedCharacter.value = query.data.data as Character;
-    //     selectedCharacter.value.info.image = query.data.image ?? '';
-    // }
+async function saveCharacter() {
+    if (!selectedCharacter.value) return;
+    const resp = await fetch(`${API_URL}/character/${selectedCharacterId.value}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(selectedCharacter.value),
+    });
+    const data = await resp.json();
+    if (!data) {
+        toast.add({
+            severity: 'error',
+            summary: 'Failed to save character'
+        });
+    }
+}
+
+async function selectCharacter(characterId: string) {
+    const resp = await fetch(`${API_URL}/character/${characterId}`, {
+        method: 'GET',
+        headers: getHeaders(),
+    });
+    const data = await resp.json();
+    selectedCharacter.value = data;
+    selectedCharacterId.value = characterId;
 }
 async function deSelectCharacter() {
     await saveCharacter();
-    selectedCharacterId.value = -1;
+    await fetchCharacters();
+    selectedCharacterId.value = null;
     selectedCharacter.value = null;
+
 }
 async function createCharacter(character: Character) {
-    console.log('createCharacter', character);
-//   if (character.info.name === '') {
-//     character.info.name = 'New Character';
-//   }
-//   const query = await supabaseClient.from('character').insert({
-//     name: 'New Character',
-//     image: null,
-//     data: {
-//       ...character,
-//     }
-//   }).select().single();
-//   if (query.error) {
-//     toast.add({
-//         severity: 'error',
-//         summary: 'Failed to create character'
-//     });
-//     return;
-//   }
-//   selectCharacter(query.data.id);
-//   characters.value.push({
-//     id: query.data.id,
-//     name: query.data.name,
-//     image: query.data.image,
-//   });
+    if (!character.info.name) {
+        character.info.name = "New Character";
+    }
+    const resp = await fetch(`${API_URL}/character`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(character),
+    });
+    
+    const data = await resp.json();
+    characters.value = [
+        ...characters.value,
+        {
+            id: data.id,
+            name: data.name,
+            image: data.image,
+        }
+    ];
+    selectCharacter(data.id);
 }
-async function deleteCharacter(characterId: number) {
-    console.log('deleteCharacter', characterId);
-    // const query = await supabaseClient.from('character').delete().eq('id', characterId);
-    // if (query.error) {
-    //     toast.add({
-    //         severity: 'error',
-    //         summary: 'Failed to delete character'
-    //     });
-    // }
-    // characters.value = characters.value.filter(c => c.id !== characterId);
+async function deleteCharacter(characterId: string) {
+    confirm.require({
+        message: 'Are you sure you want to delete this character?',
+        acceptLabel: 'Delete',
+        rejectLabel: 'Cancel',
+        acceptClass: 'p-button-danger',
+        rejectProps: {
+            variant: 'text',
+        },
+        acceptIcon: 'pi pi-trash',
+        rejectIcon: 'pi pi-times',
+        header: 'Delete Character',
+        accept: async () => {
+            const resp = await fetch(`${API_URL}/character/${characterId}`, {
+                method: 'DELETE',
+                headers: getHeaders(),
+            });
+            const data = await resp.json();
+            if (data) {
+                characters.value = characters.value.filter(c => c.id !== characterId);
+            }
+        }
+    });
 }
 </script>
 

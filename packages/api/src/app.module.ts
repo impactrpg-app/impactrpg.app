@@ -16,6 +16,6 @@ import { HealthCheckController } from './controllers/healthCheck.controller';
   providers: [
     JwtService,
     EventsGateway
-  ],
+  ]
 })
 export class AppModule {}

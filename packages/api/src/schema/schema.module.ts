@@ -7,7 +7,7 @@ import { config } from "src/config";
 @Module({
     imports: [
         MongooseModule.forRoot(
-            config.mongoUri, { dbName: 'impact', ssl: true }
+            config.mongoUri, { dbName: 'impact', ssl: config.enableSSL }
         ),
         MongooseModule.forFeature([
             {

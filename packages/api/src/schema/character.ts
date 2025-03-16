@@ -215,7 +215,7 @@ export class Character {
         description: 'The notes of the character',
         example: 'A note'
     })
-    @Prop({ required: true })
+    @Prop({ required: false, default: '' })
     @IsString()
     notes: string;
 

@@ -47,6 +47,7 @@ export const NewSkill: CharacterSkill = {
 };
 
 export type Character = {
+  _id: string;
   info: CharacterInfo;
   abilities: CharacterAbilities;
   resources: CharacterResources;
@@ -57,6 +58,7 @@ export type Character = {
 };
 
 export const NewCharacter: Character = {
+  _id: "",
   info: {
     image: "",
     name: "",

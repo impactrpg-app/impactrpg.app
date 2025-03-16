@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import * as PackageJson from '../../package.json';
 import { FloatLabel, InputText, Button, Dialog } from 'primevue'
 import { ref } from 'vue';
 import { API_URL, login } from '../service/api';
@@ -10,25 +9,25 @@ const email = ref<string>('');
 const password = ref<string>('');
 const showErrorMessage = ref<string | null>(null);
 
-async function signIn() {
-  const resp = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
-    body: JSON.stringify({ email: email.value, password: password.value }),
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  });
+async function register() {
+    const resp = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        body: JSON.stringify({ email: email.value, password: password.value }),
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
 
-  if (resp.ok) {
-    const data = await resp.json();
-    login(data.accessToken);
-    router.push('/tabletop');
-  } else if (resp.status >= 400 && resp.status < 500) {
-    const data = await resp.json();
-    showErrorMessage.value = data.message;
-  } else {
-    showErrorMessage.value = 'An error occurred';
-  }
+    if (resp.ok) {
+        const data = await resp.json();
+        login(data.accessToken);
+        router.push('/tabletop');
+    } else if (resp.status >= 400 && resp.status < 500) {
+        const data = await resp.json();
+        showErrorMessage.value = data.message;
+    } else {
+        showErrorMessage.value = 'An error occurred';
+    }
 }
 </script>
 
@@ -37,9 +36,7 @@ async function signIn() {
     <p> {{ showErrorMessage }} </p>
   </Dialog>
   <div class="login">
-    <h1>impact</h1>
-    <div class="version">{{ PackageJson.version }}</div>
-    <p>A Free Tabletop Role Playing game.</p>
+    <h1>New Account</h1>
     <FloatLabel class="field">
       <InputText id="email" v-model="email" />
       <label for="email">Email</label>
@@ -49,8 +46,8 @@ async function signIn() {
       <label for="password">Password</label>
     </FloatLabel>
     <div class="buttons">
-      <Button @click="signIn">Login</Button>
-      <Button variant="link" as="router-link" to="/register">Register</Button>
+      <Button @click="register">Create an Account</Button>
+      <Button variant="link" as="router-link" to="/login">Back to login</Button>
     </div>
   </div>
 </template>
