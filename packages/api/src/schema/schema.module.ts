@@ -9,7 +9,8 @@ import { config } from "src/config";
         MongooseModule.forRoot(
             config.mongoUri,
             {
-                dbName: 'impact'
+                dbName: 'impact',
+                ca: [config.caCert]
             }
         ),
         MongooseModule.forFeature([
