@@ -1,4 +1,27 @@
-import { tabletopCamera, TabletopImageObject, tabletopObjects, TabletopObjectType, TabletopStrokeObject } from ".";
+import { io } from 'socket.io-client';
+import { getSocketHeaders } from '../api';
+
+const socket = io('http://localhost:3001', {
+    transports: ['websocket'],
+    withCredentials: true,
+    auth: getSocketHeaders()
+});
+
+socket.on('connect', () => {
+    console.log('Connected to server');
+    socket.emit('event', {
+        type: 'connection',
+        data: {
+            message: 'Hello from client'
+        }
+    });
+});
+
+socket.on('disconnect', () => {
+    console.log('Disconnected from server');
+});
+
+
 // import { PayloadTypeEnum, sendMessage, getRoomId } from "../room";
 
 // function addNetworkObject(id: string, type: TabletopObjectType) {

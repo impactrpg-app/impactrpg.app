@@ -26,3 +26,9 @@ export function getHeaders(): HeadersInit {
         'Content-Type': 'application/json',
     }
 }
+
+export function getSocketHeaders(): Record<string, string> {
+    return {
+        'Authorization': `Bearer ${accessToken.value}`
+    }
+}
