@@ -2,7 +2,7 @@
 import * as PackageJson from '../../package.json';
 import { FloatLabel, InputText, Button, Dialog } from 'primevue'
 import { ref } from 'vue';
-import { API_URL, login } from '../service/api';
+import { API_URL, getHeaders, login } from '../service/api';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -14,9 +14,7 @@ async function signIn() {
   const resp = await fetch(`${API_URL}/auth/login`, {
     method: 'POST',
     body: JSON.stringify({ email: email.value, password: password.value }),
-    headers: {
-      'Content-Type': 'application/json',
-    }
+    headers: getHeaders(),
   });
 
   if (resp.ok) {

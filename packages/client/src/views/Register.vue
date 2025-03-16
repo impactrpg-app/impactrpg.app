@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { FloatLabel, InputText, Button, Dialog } from 'primevue'
 import { ref } from 'vue';
-import { API_URL, login } from '../service/api';
+import { API_URL, getHeaders, login } from '../service/api';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
@@ -13,9 +13,7 @@ async function register() {
     const resp = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         body: JSON.stringify({ email: email.value, password: password.value }),
-        headers: {
-            'Content-Type': 'application/json',
-        }
+        headers: getHeaders(),
     });
 
     if (resp.ok) {

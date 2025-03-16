@@ -188,7 +188,11 @@ export class Character {
         description: 'The owner of the character',
         example: '123'
     })
-    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+    @Prop({
+        required: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    })
     owner: mongoose.Schema.Types.ObjectId;
 
     @ApiProperty()
