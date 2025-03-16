@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { getRoomId } from "../service/room";
 import * as TabletopService from '../service/tabletop';
 import { Button, Divider } from 'primevue';
 const props = defineProps<{
@@ -57,7 +56,7 @@ const emits = defineEmits<{
             v-tooltip.top="'Rulebook'"
             @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
         />
-        <Button
+        <!-- <Button
             v-if="!getRoomId()"
             :variant="!props.isJoinRoomOpen ? 'outlined' : undefined"
             class="upload-button"
@@ -72,7 +71,7 @@ const emits = defineEmits<{
             icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
             v-tooltip.top="'Leave Room'"
             @click="emits('update:isJoinRoomOpen', !props.isJoinRoomOpen)"
-        />
+        /> -->
         <Divider layout="vertical" />
         <Button
             variant="outlined"

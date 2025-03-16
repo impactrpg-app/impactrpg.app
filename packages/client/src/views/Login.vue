@@ -2,29 +2,36 @@
 import * as PackageJson from '../../package.json';
 import { FloatLabel, InputText, Button, Dialog } from 'primevue'
 import { ref } from 'vue';
-import { supabaseClient } from '../service/supabase';
+import { API_URL } from '../service/api';
 
 const email = ref<string>('');
-const showSignInDialog = ref<boolean>(false);
+const password = ref<string>('');
+const showErrorMessage = ref<string | null>(null);
 
 async function signIn() {
-  localStorage.setItem('login:email', email.value);
-
-  await supabaseClient.auth.signInWithOtp({
-    email: email.value,
-    options: {
-      emailRedirectTo: `${window.location.origin}`
+  const resp = await fetch(`${API_URL}/auth/login`, {
+    method: 'POST',
+    body: JSON.stringify({ email: email.value, password: password.value }),
+    headers: {
+      'Content-Type': 'application/json',
     }
   });
-  showSignInDialog.value = true;
+
+  if (resp.ok) {
+    const data = await resp.json();
+    console.log(data);
+    // window.location.href = data.url;
+  } else if (resp.status === 401) {
+    showErrorMessage.value = 'Invalid credentials';
+  } else {
+    showErrorMessage.value = 'An error occurred';
+  }
 }
 </script>
 
 <template>
-  <Dialog modal v-model:visible="showSignInDialog">
-    <p>
-      Please check your email for a link. You can close this page.
-    </p>
+  <Dialog modal :visible="showErrorMessage !== null" @update:visible="showErrorMessage = null">
+    <p> {{ showErrorMessage }} </p>
   </Dialog>
   <div class="login">
     <h1>impact</h1>
@@ -33,6 +40,10 @@ async function signIn() {
     <FloatLabel class="field">
       <InputText id="email" v-model="email" />
       <label for="email">Email</label>
+    </FloatLabel>
+    <FloatLabel class="field">
+      <InputText id="password" v-model="password" />
+      <label for="password">Password</label>
     </FloatLabel>
     <div class="buttons">
     <Button @click="signIn">Continue</Button>

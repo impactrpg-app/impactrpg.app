@@ -1,6 +1,5 @@
 import { ref } from "vue";
 import * as UUID from 'uuid';
-import { addObjectToSceneNetwork, removeObjectFromSceneNetwork } from "./sync";
 
 export enum TabletopObjectType {
     None,
@@ -71,10 +70,6 @@ export function addObjectToScene(type: TabletopObjectType, image?: HTMLImageElem
             image: image,
             isDirty: true,
         } as TabletopImageObject);
-        addObjectToSceneNetwork(
-            id,
-            type
-        );
     } else if (type === TabletopObjectType.Stroke) {
         tabletopObjects.value.push({
             id: id,
@@ -87,10 +82,6 @@ export function addObjectToScene(type: TabletopObjectType, image?: HTMLImageElem
             strokeColor: '#000000',
             strokeWidth: 5
         } as TabletopStrokeObject);
-        addObjectToSceneNetwork(
-            id,
-            type
-        );
     } else {
         throw new Error('Invalid object type');
     }
@@ -99,5 +90,4 @@ export function addObjectToScene(type: TabletopObjectType, image?: HTMLImageElem
 
 export function removeObjectFromScene(id: string) {
     tabletopObjects.value = tabletopObjects.value.filter(obj => obj.id !== id);
-    removeObjectFromSceneNetwork(id);
 }

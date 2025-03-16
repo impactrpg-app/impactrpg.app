@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import * as uuid from "uuid";
-import { Button, ContextMenu, Dialog, InputText } from 'primevue';
+import { ContextMenu, Dialog } from 'primevue';
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from 'vue';
 import { loadFromFile } from '../service/io';
-import { getRoomId, joinRoom, leaveRoom } from '../service/room';
 import * as TabletopService from '../service/tabletop';
 import TabletopCharacterDialogComponent from './TabletopCharacterDialogComponent.vue';
 import DiceRollerComponent from './DiceRollerComponent.vue';
@@ -11,7 +9,6 @@ import RulebookComponent from './RulebookComponent.vue';
 import TabletopToolsComponent from './TabletopToolsComponent.vue';
 import { TabletopObjectType } from "../service/tabletop";
 
-const roomId = ref('');
 const isCharactersOpen = ref(false);
 const isDiceTrayOpen = ref(false);
 const isEncountersOpen = ref(false);
@@ -69,10 +66,6 @@ function handleContextMenu(event: MouseEvent) {
     if (TabletopService.selectedObject.value === -1) return;
     contextMenuRef.value?.show(event);
 }
-
-function generateRoomId() {
-    roomId.value = uuid.v7();
-}
 </script>
 
 <template>
@@ -110,7 +103,7 @@ function generateRoomId() {
                 <RulebookComponent :container="rulebookContainer" />
             </div>
         </Dialog>
-        <Dialog
+        <!-- <Dialog
             :modal="false"
             position="top"
             :header="getRoomId() ? 'Leave Room' : 'Join Room'"
@@ -134,7 +127,7 @@ function generateRoomId() {
                     <Button label="Leave" @click="leaveRoom" />
                 </template>
             </div>
-        </Dialog>
+        </Dialog> -->
         <ContextMenu ref="contextMenuRef" :model="TabletopService.contextMenuItems.value" />
         <canvas class="tabletop-canvas" ref="canvas" @contextmenu="handleContextMenu" />
         <TabletopToolsComponent

@@ -3,12 +3,10 @@ import { selectedObject,
     TabletopImageObject,
     tabletopObjects,
     TabletopObjectType,
-    TabletopStrokeObject,
-    updateObjectsOnSceneNetwork
+    TabletopStrokeObject
 } from ".";
 
 export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-    updateObjectsOnSceneNetwork();
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
 

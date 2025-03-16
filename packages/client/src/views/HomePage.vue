@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import PackageJson from "../../package.json";
 import { Button } from "primevue";
-import { supabaseClient } from "../service/supabase";
 
 function signOut() {
-  supabaseClient.auth.signOut();
+  // supabaseClient.auth.signOut();
 }
 </script>
 
@@ -16,9 +15,6 @@ function signOut() {
     <div class="spacer"></div>
     <p>A Free Tabletop Role Playing game.</p>
     <Button as="router-link" label="Play" icon="pi pi-play" to="/tabletop" />
-    <Button as="router-link" label="Encounters" icon="pi pi-users" to="/encounters" />
-    <Button as="router-link" label="Monsters" icon="pi pi-eye" to="/monsters" />
-    <Button as="router-link" label="World" icon="pi pi-globe" to="/world" />
     <Button as="a" label="Donate" icon="pi pi-dollar" href="https://github.com/sponsors/zeeshan595" target="_blank" />
     <Button label="Sign Out" icon="pi pi-sign-out" @click="signOut" />
   </div>

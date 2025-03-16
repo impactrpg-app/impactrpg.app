@@ -1,4 +1,4 @@
-import { PayloadTypeEnum, sendMessage } from "../../room";
+// import { PayloadTypeEnum, sendMessage } from "../../room";
 import { addObjectToScene, tabletopMouse, tabletopObjects, TabletopObjectType, TabletopStrokeObject } from "../scene";
 import { TabletopTool } from "./base";
 
@@ -15,10 +15,10 @@ export class DrawTool extends TabletopTool {
 
     public onMouseUp(_: MouseEvent): void {
         if (this.drawingObjectId) {
-            sendMessage({
-                type: PayloadTypeEnum.AddTabletopChunkEnd,
-                payload: { id: this.drawingObjectId }
-            });
+            // sendMessage({
+            //     type: PayloadTypeEnum.AddTabletopChunkEnd,
+            //     payload: { id: this.drawingObjectId }
+            // });
         }
         this.drawingObjectId = null;
         this.drawingObjectIndex = -1;
@@ -34,14 +34,14 @@ export class DrawTool extends TabletopTool {
         tabletopObjects.value[this.drawingObjectIndex].isDirty = true;
 
         if (this.drawingObjectId) {
-            sendMessage({
-                type: PayloadTypeEnum.AddTabletopChunk,
-                payload: {
-                    id: this.drawingObjectId,
-                    chunk: tabletopMouse.value.position,
-                    order: this.drawingOrder
-                }
-            });
+            // sendMessage({
+            //     type: PayloadTypeEnum.AddTabletopChunk,
+            //     payload: {
+            //         id: this.drawingObjectId,
+            //         chunk: tabletopMouse.value.position,
+            //         order: this.drawingOrder
+            //     }
+            // });
             this.drawingOrder++;
         }
     }

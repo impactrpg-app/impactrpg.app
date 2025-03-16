@@ -4,7 +4,6 @@ import { Dialog, InputNumber, Button, ToggleSwitch, InputText } from 'primevue';
 import { $dt } from '@primevue/themes';
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
-import { getRoomId, PayloadTypeEnum, sendMessage, userId } from '../service/room';
 
 let diceBox: any = null;
 const announceRolls = ref<boolean>(true);
@@ -57,35 +56,36 @@ watch(isOpen, (newValue) => {
   initDiceBox();
 });
 
-function getRollAuthor() {
-  if (author.value !== '') return author.value;
-  if (props.rollAuthor && props.rollAuthor !== '') return props.rollAuthor;
-  return 'Someone';
-}
+// function getRollAuthor() {
+//   if (author.value !== '') return author.value;
+//   if (props.rollAuthor && props.rollAuthor !== '') return props.rollAuthor;
+//   return 'Someone';
+// }
 
 function announceRoll(numberOfDice: number, result: number) {
-  if (getRoomId() === null) return;
-  const rollAuthor = getRollAuthor();
+  console.log('announceRoll', numberOfDice, result);
+  // if (getRoomId() === null) return;
+  // const rollAuthor = getRollAuthor();
   
-  const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
-  if (canvas) {
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const buffer = await blob.arrayBuffer();
-      const bytes = new Uint8Array(buffer);
-      const base64String = btoa(bytes.reduce(
-          (data, byte) => data + String.fromCharCode(byte), ''
-      ));
+  // const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
+  // if (canvas) {
+  //   canvas.toBlob(async (blob) => {
+  //     if (!blob) return;
+  //     const buffer = await blob.arrayBuffer();
+  //     const bytes = new Uint8Array(buffer);
+  //     const base64String = btoa(bytes.reduce(
+  //         (data, byte) => data + String.fromCharCode(byte), ''
+  //     ));
 
-      // send notification
-      sendMessage({
-        type: PayloadTypeEnum.DiceRoll,
-        message: `${rollAuthor} Rolled ${numberOfDice} dice and got ${result} success.`,
-        image: `data:image/png;base64,${base64String}`,
-        author: userId.value
-      });
-    }, 'image/png');
-  }
+  //     // send notification
+  //     sendMessage({
+  //       type: PayloadTypeEnum.DiceRoll,
+  //       message: `${rollAuthor} Rolled ${numberOfDice} dice and got ${result} success.`,
+  //       image: `data:image/png;base64,${base64String}`,
+  //       author: userId.value
+  //     });
+  //   }, 'image/png');
+  // }
 }
 
 async function rollDice() {
