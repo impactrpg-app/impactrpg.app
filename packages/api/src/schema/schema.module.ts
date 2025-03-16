@@ -4,7 +4,6 @@ import { User, UserSchema } from "./user";
 import { Character, CharacterSchema } from "./character";
 import { config } from "src/config";
 
-console.log(config.mongoUri);
 @Module({
     imports: [
         MongooseModule.forRoot(
