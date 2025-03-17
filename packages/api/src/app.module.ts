@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SchemaModule } from './schema/schema.module';
+import { DatabaseModule } from './db.module';
 import { AuthController } from './controllers/auth.controller';
 import { JwtService } from './services/jwt.service';
 import { CharacterController } from './controllers/character.controller';
@@ -7,7 +7,7 @@ import { EventsGateway } from './events/events.gateway';
 import { HealthCheckController } from './controllers/healthCheck.controller';
 
 @Module({
-  imports: [ SchemaModule ],
+  imports: [ DatabaseModule ],
   controllers: [
     AuthController,
     CharacterController,

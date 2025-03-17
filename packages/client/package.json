@@ -1,5 +1,5 @@
 {
-  "name": "impact.app",
+  "name": "@impact/client",
   "private": true,
   "version": "0.0.3",
   "type": "module",
@@ -10,6 +10,7 @@
     "gen:schema": "npx supabase gen types typescript --project-id \"xjtnojqcyhztaamvjagn\" --schema public > src/database.types.ts"
   },
   "dependencies": {
+    "@impact/shared": "^0.0.1",
     "@3d-dice/dice-box": "^1.1.4",
     "@primevue/themes": "^4.2.4",
     "primeicons": "^7.0.0",

@@ -1,8 +1,14 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
-import { User, UserSchema } from "./user";
-import { Character, CharacterSchema } from "./character";
 import { config } from "src/config";
+import { 
+    User,
+    UserSchema,
+    Character,
+    CharacterSchema,
+    Room,
+    RoomSchema
+} from "@impact/shared";
 
 @Module({
     imports: [
@@ -17,6 +23,10 @@ import { config } from "src/config";
             {
                 name: Character.name,
                 schema: CharacterSchema
+            },
+            {
+                name: Room.name,
+                schema: RoomSchema
             }
         ])
     ],
@@ -24,4 +34,4 @@ import { config } from "src/config";
         MongooseModule
     ]
 })
-export class SchemaModule {}
+export class DatabaseModule {}

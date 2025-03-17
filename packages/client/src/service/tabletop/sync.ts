@@ -9,17 +9,15 @@ const socket = io('http://localhost:3001', {
 
 socket.on('connect', () => {
     console.log('Connected to server');
-    socket.emit('event', {
-        type: 'connection',
-        data: {
-            message: 'Hello from client'
-        }
-    });
 });
 
 socket.on('disconnect', () => {
     console.log('Disconnected from server');
 });
+
+function joinRoom(roomId: string) {
+    socket.emit('joinRoom', roomId);
+}
 
 
 // import { PayloadTypeEnum, sendMessage, getRoomId } from "../room";

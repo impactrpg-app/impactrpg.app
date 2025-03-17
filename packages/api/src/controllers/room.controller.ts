@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ApiOkResponse, ApiOperation, ApiProperty } from "@nestjs/swagger";
 import { IsString } from "class-validator";
 import { AuthGuard, AuthRequest } from "src/middleware/auth.guard";
-import { Room } from "src/schema/room";
+import { Room } from "@impact/shared";
 import mongoose, { Model } from "mongoose";
 
 export class RoomDto {

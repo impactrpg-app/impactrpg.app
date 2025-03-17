@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ApiOkResponse, ApiOperation, ApiProperty, OmitType } from "@nestjs/swagger";
 import mongoose, { Model } from "mongoose";
 import { AuthGuard, AuthRequest } from "src/middleware/auth.guard";
-import { Character } from "src/schema/character";
+import { Character } from "@impact/shared";
 
 export class CharacterDto extends OmitType(Character, ['owner']) {}
 
@@ -26,7 +26,7 @@ export class CharacterController {
     @ApiOkResponse({ type: [CharacterDto] })
     @Get('characters')
     @UseGuards(AuthGuard)
-    async Characters(@Req() req: AuthRequest): Promise<CharacterListDto[]> {
+    async characters(@Req() req: AuthRequest): Promise<CharacterListDto[]> {
         const userId = req.user.id;
 
         const characters = await this.characterService.aggregate([
@@ -56,7 +56,7 @@ export class CharacterController {
     @ApiOkResponse({ type: CharacterDto })
     @Get('character/:id')
     @UseGuards(AuthGuard)
-    async Character(@Req() req: AuthRequest, @Param('id') id: string): Promise<CharacterDto> {
+    async character(@Req() req: AuthRequest, @Param('id') id: string): Promise<CharacterDto> {
         const userId = req.user.id;
 
         const character = await this.characterService.findOne({
@@ -77,7 +77,7 @@ export class CharacterController {
     @ApiOkResponse({ type: CharacterListDto })
     @Post('character')
     @UseGuards(AuthGuard)
-    async CreateCharacter(@Req() req: AuthRequest, @Body() body: CharacterDto) {
+    async createCharacter(@Req() req: AuthRequest, @Body() body: CharacterDto) {
         const userId = req.user.id;
 
         delete body['_id'];
@@ -101,7 +101,7 @@ export class CharacterController {
     @ApiOkResponse({ type: Character })
     @Put('character/:id')
     @UseGuards(AuthGuard)
-    async UpdateCharacter(
+    async updateCharacter(
         @Req() req: AuthRequest,
         @Param('id') id: string,
         @Body() body: CharacterDto
@@ -128,7 +128,7 @@ export class CharacterController {
     @ApiOkResponse({ type: Boolean })
     @Delete('character/:id')
     @UseGuards(AuthGuard)
-    async DeleteCharacter(@Req() req: AuthRequest, @Param('id') id: string) {
+    async deleteCharacter(@Req() req: AuthRequest, @Param('id') id: string) {
         const userId = req.user.id;
 
         const character = await this.characterService.findOneAndDelete({

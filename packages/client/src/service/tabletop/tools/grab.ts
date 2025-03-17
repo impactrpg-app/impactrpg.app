@@ -22,9 +22,8 @@ export class GrabTool extends TabletopTool {
         if (!tabletopMouse.value.pressed) return;
 
         if (selectedObject.value !== -1) {
-            tabletopObjects.value[selectedObject.value].position[0] += tabletopMouse.value.delta[0];
-            tabletopObjects.value[selectedObject.value].position[1] += tabletopMouse.value.delta[1];
-            tabletopObjects.value[selectedObject.value].isDirty = true;
+            // todo: update the object position
+            
         }
         else {
             tabletopCamera.value.position[0] += tabletopMouse.value.delta[0];
