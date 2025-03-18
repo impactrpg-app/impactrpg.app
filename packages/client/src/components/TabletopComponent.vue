@@ -8,7 +8,7 @@ import TabletopCharacterDialogComponent from "./TabletopCharacterDialogComponent
 import RulebookComponent from "./RulebookComponent.vue";
 import TabletopToolsComponent from "./TabletopToolsComponent.vue";
 import { API_URL, getHeaders } from "../service/api";
-import { RoomDto } from "@impact/shared";
+import type { RoomDto } from "@impact/shared";
 
 const isCharactersOpen = ref(false);
 const isDiceTrayOpen = ref(false);
@@ -86,6 +86,7 @@ async function createRoom() {
 
   const data = await resp.json();
   rooms.value.push(data);
+  TabletopService.joinRoom(data.id);
 }
 
 async function deleteRoom(id: string) {

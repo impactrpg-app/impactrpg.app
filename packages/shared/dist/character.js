@@ -8,17 +8,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterSchema = exports.Character = exports.CharacterSkill = exports.CharacterGearItem = exports.GoodsType = exports.CharacterResources = exports.CharacterAbilities = exports.CharacterInfo = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-const mongoose_2 = require("mongoose");
+const mongoose_2 = __importDefault(require("mongoose"));
 class CharacterInfo {
-    image;
-    name;
-    age;
-    personality;
 }
 exports.CharacterInfo = CharacterInfo;
 __decorate([
@@ -57,9 +56,6 @@ __decorate([
     __metadata("design:type", String)
 ], CharacterInfo.prototype, "personality", void 0);
 class CharacterAbilities {
-    strength;
-    agility;
-    intelligence;
 }
 exports.CharacterAbilities = CharacterAbilities;
 __decorate([
@@ -90,11 +86,6 @@ __decorate([
     __metadata("design:type", Number)
 ], CharacterAbilities.prototype, "intelligence", void 0);
 class CharacterResources {
-    endurance;
-    mana;
-    corruption;
-    wounds;
-    injury;
 }
 exports.CharacterResources = CharacterResources;
 __decorate([
@@ -148,12 +139,6 @@ var GoodsType;
     GoodsType["Large"] = "large";
 })(GoodsType || (exports.GoodsType = GoodsType = {}));
 class CharacterGearItem {
-    name;
-    type;
-    attack;
-    armor;
-    description;
-    isAutomaton;
 }
 exports.CharacterGearItem = CharacterGearItem;
 __decorate([
@@ -214,8 +199,6 @@ __decorate([
     __metadata("design:type", Boolean)
 ], CharacterGearItem.prototype, "isAutomaton", void 0);
 class CharacterSkill {
-    name;
-    description;
 }
 exports.CharacterSkill = CharacterSkill;
 __decorate([
@@ -237,14 +220,6 @@ __decorate([
     __metadata("design:type", String)
 ], CharacterSkill.prototype, "description", void 0);
 let Character = class Character {
-    owner;
-    info;
-    abilities;
-    resources;
-    skills;
-    gear;
-    notes;
-    progression;
 };
 exports.Character = Character;
 __decorate([

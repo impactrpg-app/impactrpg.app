@@ -13,8 +13,6 @@ exports.RoomUpdateDto = exports.RoomDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class RoomDto {
-    id;
-    name;
 }
 exports.RoomDto = RoomDto;
 __decorate([
@@ -34,7 +32,6 @@ __decorate([
     __metadata("design:type", String)
 ], RoomDto.prototype, "name", void 0);
 class RoomUpdateDto {
-    name;
 }
 exports.RoomUpdateDto = RoomUpdateDto;
 __decorate([

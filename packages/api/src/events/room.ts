@@ -37,10 +37,16 @@ export function joinRoom(client: Socket, roomId: string) {
   }
 
   if (!rooms.has(roomId)) {
+    //todo: fetch room from db
     return;
   }
 
+  console.log('joinRoom', roomId);
   rooms.get(roomId)!.users.add({ client, userId });
+  client.emitWithAck('event', {
+    type: MessageType.JoinRoom,
+    roomId: roomId,
+  });
 }
 
 export function leaveRoom(client: Socket, roomId: string) {

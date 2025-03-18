@@ -1,37 +1,37 @@
 import { TabletopObject } from './room';
 
-export enum MessageType {
-    JoinRoom = 'joinRoom',
-    LeaveRoom = 'leaveRoom',
-    AddObject = 'addObject',
-    RemoveObject = 'removeObject',
-    UpdateObject = 'updateObject',
-}
+export const MessageType = {
+    JoinRoom: 'joinRoom',
+    LeaveRoom: 'leaveRoom',
+    AddObject: 'addObject',
+    RemoveObject: 'removeObject',
+    UpdateObject: 'updateObject',
+} as const;
 
 export class JoinRoomMessage {
-    type: MessageType.JoinRoom;
+    type: typeof MessageType.JoinRoom;
     roomId: string;
 }
 
 export class LeaveRoomMessage {
-    type: MessageType.LeaveRoom;
+    type: typeof MessageType.LeaveRoom;
     roomId: string;
 }
 
 export class AddObjectMessage {
-    type: MessageType.AddObject;
+    type: typeof MessageType.AddObject;
     roomId: string;
     object: TabletopObject;
 }
 
 export class RemoveObjectMessage {
-    type: MessageType.RemoveObject;
+    type: typeof MessageType.RemoveObject;
     roomId: string;
     objectId: string;
 }
 
 export class UpdateObjectMessage {
-    type: MessageType.UpdateObject;
+    type: typeof MessageType.UpdateObject;
     roomId: string;
     object: TabletopObject;
 }
@@ -44,4 +44,10 @@ export const AllMessages = [
     UpdateObjectMessage
 ];
 
-export type AllMessages = typeof AllMessages[number];
+export type AllMessageTypes = (
+    JoinRoomMessage |
+    LeaveRoomMessage |
+    AddObjectMessage |
+    RemoveObjectMessage |
+    UpdateObjectMessage
+)

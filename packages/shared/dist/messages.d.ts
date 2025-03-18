@@ -1,36 +1,33 @@
 import { TabletopObject } from './room';
-export declare enum MessageType {
-    JoinRoom = "joinRoom",
-    LeaveRoom = "leaveRoom",
-    AddObject = "addObject",
-    RemoveObject = "removeObject",
-    UpdateObject = "updateObject"
-}
+export declare const MessageType: {
+    readonly JoinRoom: "joinRoom";
+    readonly LeaveRoom: "leaveRoom";
+    readonly AddObject: "addObject";
+    readonly RemoveObject: "removeObject";
+    readonly UpdateObject: "updateObject";
+};
 export declare class JoinRoomMessage {
-    type: MessageType.JoinRoom;
+    type: typeof MessageType.JoinRoom;
     roomId: string;
 }
 export declare class LeaveRoomMessage {
-    type: MessageType.LeaveRoom;
+    type: typeof MessageType.LeaveRoom;
     roomId: string;
 }
 export declare class AddObjectMessage {
-    type: MessageType.AddObject;
+    type: typeof MessageType.AddObject;
     roomId: string;
     object: TabletopObject;
 }
 export declare class RemoveObjectMessage {
-    type: MessageType.RemoveObject;
+    type: typeof MessageType.RemoveObject;
     roomId: string;
     objectId: string;
 }
 export declare class UpdateObjectMessage {
-    type: MessageType.UpdateObject;
+    type: typeof MessageType.UpdateObject;
     roomId: string;
     object: TabletopObject;
 }
-export type AllMessageTypes = JoinRoomMessage | 
-    LeaveRoomMessage | 
-    AddObjectMessage |
-    RemoveObjectMessage |
-    UpdateObjectMessage;
+export declare const AllMessages: (typeof JoinRoomMessage | typeof LeaveRoomMessage | typeof AddObjectMessage | typeof RemoveObjectMessage | typeof UpdateObjectMessage)[];
+export type AllMessageTypes = (JoinRoomMessage | LeaveRoomMessage | AddObjectMessage | RemoveObjectMessage | UpdateObjectMessage);

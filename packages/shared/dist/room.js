@@ -8,9 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RoomSchema = exports.Room = exports.TabletopObject = exports.Vector2 = exports.TabletopObjectType = void 0;
-const mongoose_1 = require("mongoose");
+const mongoose_1 = __importDefault(require("mongoose"));
 const mongoose_2 = require("@nestjs/mongoose");
 var TabletopObjectType;
 (function (TabletopObjectType) {
@@ -19,21 +22,9 @@ var TabletopObjectType;
     TabletopObjectType[TabletopObjectType["Stroke"] = 2] = "Stroke";
 })(TabletopObjectType || (exports.TabletopObjectType = TabletopObjectType = {}));
 class Vector2 {
-    x;
-    y;
 }
 exports.Vector2 = Vector2;
 class TabletopObject {
-    uuid;
-    type;
-    position;
-    rotation;
-    scale;
-    locked;
-    image;
-    stroke;
-    strokeWidth;
-    strokeColor;
 }
 exports.TabletopObject = TabletopObject;
 __decorate([
@@ -77,9 +68,6 @@ __decorate([
     __metadata("design:type", String)
 ], TabletopObject.prototype, "strokeColor", void 0);
 let Room = class Room {
-    name;
-    owner;
-    objects;
 };
 exports.Room = Room;
 __decorate([

@@ -22,7 +22,7 @@ import { AllMessageTypes, MessageType } from '@impact/shared';
   transports: ['websocket'],
   cors: {
     origin: ['http://localhost:5173'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST'],
     credentials: true,
   },
 })
@@ -31,6 +31,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('event')
   handleEvent(client: Socket, payload: AllMessageTypes) {
+    console.log('handleEvent', payload);
+
     if (payload.type === MessageType.JoinRoom) {
       joinRoom(client, payload.roomId);
     } else if (payload.type === MessageType.LeaveRoom) {

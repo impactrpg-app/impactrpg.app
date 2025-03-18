@@ -3,7 +3,7 @@ import { TabletopTool } from "./tools/base";
 import { io, Socket } from 'socket.io-client';
 import { ref } from "vue";
 import { SOCKET_URL, getSocketHeaders } from "../api";
-import { JoinRoomMessage } from "@impact/shared";
+import type { JoinRoomMessage } from "@impact/shared";
 
 export const contextMenuItems = ref<MenuItem[]>([
     {
@@ -71,7 +71,8 @@ export function joinRoom(roomId: string) {
         throw new Error('Not connected to server');
     }
 
-    const event = new JoinRoomMessage();
-    event.roomId = roomId;
-    socket.value.emit(event.type, event);
+    socket.value.emit('event', {
+        type: 'joinRoom',
+        roomId
+    } as JoinRoomMessage);
 }
