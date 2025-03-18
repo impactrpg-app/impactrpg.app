@@ -196,6 +196,9 @@ async function deleteCharacter(characterId: string) {
                             @click="selectCharacter(character.id)"
                         />
                         <Button
+                            style="border-radius: 50%; min-width: 50px; min-height: 45px;"
+                            variant="outlined"
+                            severity="danger"
                             icon="pi pi-trash"
                             v-tooltip.top="'Delete Character'"
                             @click="deleteCharacter(character.id)"

@@ -86,7 +86,7 @@ async function createRoom() {
 
   const data = await resp.json();
   rooms.value.push(data);
-  TabletopService.joinRoom(data.id);
+  TabletopService.joinRoomRequest(data.id);
 }
 
 async function deleteRoom(id: string) {
@@ -104,7 +104,7 @@ async function deleteRoom(id: string) {
 </script>
 
 <template>
-  <template v-if="TabletopService.joinedRoom === null">
+  <template v-if="TabletopService.isInRoom()">
     <div class="tabletop">
       <DiceRollerComponent
         :modal="false"
@@ -185,7 +185,7 @@ async function deleteRoom(id: string) {
           <Button
             variant="outlined"
             label="Join"
-            @click="TabletopService.joinRoom(joinRoomCode)"
+            @click="TabletopService.joinRoomRequest(joinRoomCode)"
             style="border-radius: 40px"
           />
         </div>
@@ -197,6 +197,7 @@ async function deleteRoom(id: string) {
               severity="secondary"
               :label="room.name"
               style="flex-grow: 1; border-radius: 40px"
+              @click="TabletopService.joinRoomRequest(room.id)"
             />
             <Button
               variant="outlined"

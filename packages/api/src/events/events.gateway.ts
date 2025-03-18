@@ -8,14 +8,7 @@ import { Socket } from 'socket.io';
 import { config } from 'src/config';
 import { JwtService } from 'src/services/jwt.service';
 import { connectedUsers } from './users';
-import {
-  addObject,
-  joinRoom,
-  leaveRoom,
-  removeObject,
-  rooms,
-  updateObject,
-} from './room';
+import { RoomService } from './room';
 import { AllMessageTypes, MessageType } from '@impact/shared';
 
 @WebSocketGateway(config.webSocketPort, {
@@ -27,22 +20,25 @@ import { AllMessageTypes, MessageType } from '@impact/shared';
   },
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly roomService: RoomService,
+  ) {}
 
   @SubscribeMessage('event')
   handleEvent(client: Socket, payload: AllMessageTypes) {
     console.log('handleEvent', payload);
 
     if (payload.type === MessageType.JoinRoom) {
-      joinRoom(client, payload.roomId);
+      this.roomService.joinRoom(client, payload.roomId);
     } else if (payload.type === MessageType.LeaveRoom) {
-      leaveRoom(client, payload.roomId);
+      this.roomService.leaveRoom(client, payload.roomId);
     } else if (payload.type === MessageType.AddObject) {
-      addObject(client, payload.roomId, payload.object);
+      // addObject(client, payload.roomId, payload.object);
     } else if (payload.type === MessageType.RemoveObject) {
-      removeObject(client, payload.roomId, payload.objectId);
+      // removeObject(client, payload.roomId, payload.objectId);
     } else if (payload.type === MessageType.UpdateObject) {
-      updateObject(client, payload.roomId, payload.object);
+      // updateObject(client, payload.roomId, payload.object);
     } else {
       console.error(`Unknown event: ${JSON.stringify(payload)}`);
     }
@@ -61,7 +57,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.disconnect();
         return;
       }
-      connectedUsers.set(client, decoded['id']);
+      const userId = decoded['id'];
+      connectedUsers.set(client, userId);
+      const roomId = this.roomService.findUsersRoom(userId);
+      if (roomId) {
+        this.roomService.joinRoom(client, roomId);
+      }
     } catch (error) {
       client.disconnect();
       return;
@@ -70,8 +71,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     connectedUsers.delete(client);
-    for (const [roomId, _] of rooms) {
-      leaveRoom(client, roomId);
-    }
+    this.roomService.leaveAllRooms(client);
   }
 }

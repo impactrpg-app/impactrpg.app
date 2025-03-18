@@ -51,6 +51,13 @@ const emits = defineEmits<{
             v-tooltip.top="'Rulebook'"
             @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
         />
+        <Button
+            variant="outlined"
+            class="upload-button"
+            icon="pi pi-sign-out"
+            v-tooltip.top="'Leave Room'"
+            @click="TabletopService.leaveRoomRequest()"
+        />
         <Divider layout="vertical" />
         <Button
             variant="outlined"

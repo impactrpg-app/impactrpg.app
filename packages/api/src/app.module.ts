@@ -6,6 +6,7 @@ import { CharacterController } from './controllers/character.controller';
 import { EventsGateway } from './events/events.gateway';
 import { HealthCheckController } from './controllers/healthCheck.controller';
 import { RoomController } from './controllers/room.controller';
+import { RoomService } from './events/room';
 
 @Module({
   imports: [ DatabaseModule ],
@@ -17,7 +18,8 @@ import { RoomController } from './controllers/room.controller';
   ],
   providers: [
     JwtService,
-    EventsGateway
+    EventsGateway,
+    RoomService
   ]
 })
 export class AppModule {}
