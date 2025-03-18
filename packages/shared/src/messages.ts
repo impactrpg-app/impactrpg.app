@@ -59,7 +59,9 @@ export const AllMessages = [
     LeaveRoomMessage,
     AddObjectMessage,
     RemoveObjectMessage,
-    UpdateObjectMessage
+    UpdateObjectMessage,
+    ImageChunkMessage,
+    ImageChunkMessageEnd
 ];
 
 export type AllMessageTypes = (
@@ -68,5 +70,7 @@ export type AllMessageTypes = (
     LeaveRoomMessage |
     AddObjectMessage |
     RemoveObjectMessage |
-    UpdateObjectMessage
+    UpdateObjectMessage |
+    ImageChunkMessage |
+    ImageChunkMessageEnd
 )
