@@ -27,14 +27,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('event')
   handleEvent(client: Socket, payload: AllMessageTypes) {
-    console.log('handleEvent', payload);
+    console.log(`handleEvent ${payload.type} by ${client.id}`);
 
     if (payload.type === MessageType.JoinRoom) {
       this.roomService.joinRoom(client, payload.roomId);
     } else if (payload.type === MessageType.LeaveRoom) {
       this.roomService.leaveRoom(client, payload.roomId);
     } else if (payload.type === MessageType.AddObject) {
-      // addObject(client, payload.roomId, payload.object);
+      this.roomService.addObject(client, payload.object);
     } else if (payload.type === MessageType.RemoveObject) {
       // removeObject(client, payload.roomId, payload.objectId);
     } else if (payload.type === MessageType.UpdateObject) {

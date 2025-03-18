@@ -3,11 +3,13 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type RoomDocument = HydratedDocument<Room>;
 
-export enum TabletopObjectType {
-    None,
-    Image,
-    Stroke
-}
+export const TabletopObjectType = {
+    None: 'none',
+    Image: 'image',
+    Stroke: 'stroke'
+} as const;
+
+export type TabletopObjectType = (typeof TabletopObjectType)[keyof typeof TabletopObjectType];
 
 export class Vector2 {
     x: number;
@@ -18,7 +20,7 @@ export class TabletopObject {
     @Prop({required: true})
     uuid: string;
 
-    @Prop({required: true})
+    @Prop({ required: true, type: TabletopObjectType })
     type: TabletopObjectType;
 
     @Prop({required: true})

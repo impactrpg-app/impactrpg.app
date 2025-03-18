@@ -1,4 +1,4 @@
-import { Room as RoomSchema, TabletopObject } from '@impact/shared';
+import { AddObjectMessage, ErrorMessage, JoinRoomMessage, LeaveRoomMessage, Room as RoomSchema, TabletopObject } from '@impact/shared';
 import { connectedUsers } from './users';
 import { Socket } from 'socket.io';
 import { MessageType } from '@impact/shared';
@@ -36,8 +36,11 @@ export class RoomService {
       callback(user);
     }
   }
-  findUsersRoom(userId: string): string | null {
+  findUsersRoom(userId: string, excludedRoomIds: string[] = []): string | null {
     for (const room of this.rooms.values()) {
+      if (excludedRoomIds.includes(room.id)) {
+        continue;
+      }
       for (const user of room.users) {
         if (user.userId === userId) {
           return room.id;
@@ -50,10 +53,11 @@ export class RoomService {
   async joinRoom(client: Socket, roomId: string) {
     const userId = connectedUsers.get(client);
     if (!userId) {
+      client.disconnect();
       return;
     }
 
-    const foundRoomId = this.findUsersRoom(userId);
+    const foundRoomId = this.findUsersRoom(userId, [roomId]);
     if (foundRoomId) {
       await this.leaveRoom(client, foundRoomId);
     }
@@ -61,10 +65,10 @@ export class RoomService {
     if (!this.rooms.has(roomId)) {
       const query = await this.roomModel.findById(roomId);
       if (!query) {
-        return;
-      }
-      const userId = connectedUsers.get(client);
-      if (!userId) {
+        client.emit('event', {
+          type: MessageType.Error,
+          message: 'Room not found',
+        } as ErrorMessage);
         return;
       }
       this.rooms.set(roomId, {
@@ -76,31 +80,94 @@ export class RoomService {
     }
   
     this.rooms.get(roomId)!.users.add({ client, userId });
-    client.emitWithAck('event', {
+    client.emit('event', {
       type: MessageType.JoinRoom,
       roomId: roomId,
-    });
+    } as JoinRoomMessage);
+    await this.syncAllObjectsToClient(client);
   }
   async leaveRoom(client: Socket, roomId: string) {
     const userId = connectedUsers.get(client);
     if (!userId) {
+      client.disconnect();
       return;
     }
   
     if (!this.rooms.has(roomId)) {
+      client.emit('event', {
+        type: MessageType.Error,
+        message: 'Room not found',
+      } as ErrorMessage);
       return;
     }
   
     this.rooms.get(roomId)!.users.delete({ client, userId });
-    client.emitWithAck('event', {
+    client.emit('event', {
       type: MessageType.LeaveRoom,
       roomId: roomId,
-    });
+    } as LeaveRoomMessage);
   }
   async leaveAllRooms(client: Socket) {
-    for (const room of this.rooms.values()) {
-      this.leaveRoom(client, room.id);
+    const userId = connectedUsers.get(client);
+    if (!userId) {
+      client.disconnect();
+      return;
     }
+
+    let roomId = this.findUsersRoom(userId);
+    while(roomId) {
+      this.leaveRoom(client, roomId);
+      roomId = this.findUsersRoom(userId);
+    }
+  }
+
+  async syncAllObjectsToClient(client: Socket) {
+    const userId = connectedUsers.get(client);
+    if (!userId) {
+      client.disconnect();
+      return;
+    }
+
+    const roomId = this.findUsersRoom(userId);
+    if (!roomId) {
+      client.emit('event', {
+        type: MessageType.Error,
+        message: 'Room not found',
+      } as ErrorMessage);
+      return;
+    }
+    
+    for (const object of this.rooms.get(roomId)!.tabletopObjects) {
+      client.emit('event', {
+        type: MessageType.AddObject,
+        object: object,
+      } as AddObjectMessage);
+    }
+  }
+
+  async addObject(client: Socket, object: TabletopObject) {
+    const userId = connectedUsers.get(client);
+    if (!userId) {
+      client.disconnect();
+      return;
+    }
+
+    const roomId = this.findUsersRoom(userId);
+    if (!roomId) {
+      client.emit('event', {
+        type: MessageType.Error,
+        message: 'Room not found',
+      } as ErrorMessage);
+      return;
+    }
+
+    this.rooms.get(roomId)!.tabletopObjects.push(object);
+    this.triggerForAllUsersInRoom(roomId, (user) =>
+      user.client.emit('event', {
+        type: MessageType.AddObject,
+        object: object,
+      } as AddObjectMessage),
+    );
   }
 }
 

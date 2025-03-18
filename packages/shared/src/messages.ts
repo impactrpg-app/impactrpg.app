@@ -1,6 +1,7 @@
 import { TabletopObject } from './room';
 
 export const MessageType = {
+    Error: 'error',
     JoinRoom: 'joinRoom',
     LeaveRoom: 'leaveRoom',
     AddObject: 'addObject',
@@ -8,40 +9,38 @@ export const MessageType = {
     UpdateObject: 'updateObject',
 } as const;
 
-export class NetworkMessage {
-    status: 'success' | 'error' = 'success';
-    message?: string;
+export class ErrorMessage {
+    type: typeof MessageType.Error;
+    message: string;
 }
-
-export class JoinRoomMessage extends NetworkMessage {
+export class JoinRoomMessage {
     type: typeof MessageType.JoinRoom;
     roomId: string;
 }
 
-export class LeaveRoomMessage extends NetworkMessage {
+export class LeaveRoomMessage {
     type: typeof MessageType.LeaveRoom;
     roomId: string;
 }
 
-export class AddObjectMessage extends NetworkMessage {
+export class AddObjectMessage {
     type: typeof MessageType.AddObject;
-    roomId: string;
     object: TabletopObject;
 }
 
-export class RemoveObjectMessage extends NetworkMessage {
+export class RemoveObjectMessage {
     type: typeof MessageType.RemoveObject;
-    roomId: string;
     objectId: string;
 }
 
-export class UpdateObjectMessage extends NetworkMessage {
+export class UpdateObjectMessage {
     type: typeof MessageType.UpdateObject;
-    roomId: string;
-    object: TabletopObject;
+    objectId: string;
+    object: Partial<TabletopObject>;
 }
 
 export const AllMessages = [
+    ErrorMessage,
     JoinRoomMessage,
     LeaveRoomMessage,
     AddObjectMessage,
@@ -50,6 +49,7 @@ export const AllMessages = [
 ];
 
 export type AllMessageTypes = (
+    ErrorMessage |
     JoinRoomMessage |
     LeaveRoomMessage |
     AddObjectMessage |

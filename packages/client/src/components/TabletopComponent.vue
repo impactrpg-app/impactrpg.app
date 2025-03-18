@@ -9,7 +9,7 @@ import RulebookComponent from "./RulebookComponent.vue";
 import TabletopToolsComponent from "./TabletopToolsComponent.vue";
 import { API_URL, getHeaders } from "../service/api";
 import type { RoomDto } from "@impact/shared";
-
+import { v4 as uuidv4 } from 'uuid';
 const isCharactersOpen = ref(false);
 const isDiceTrayOpen = ref(false);
 const isEncountersOpen = ref(false);
@@ -27,8 +27,21 @@ const rooms = ref<RoomDto[]>([]);
 async function uploadImage() {
   const image = await loadFromFile("image/*");
   if (!image) return;
+  TabletopService.addObjectRequest({
+    uuid: uuidv4(),
+    type: "image",
+    image: image,
+    position: { x: 0, y: 0 },
+    rotation: 0,
+    scale: 1,
+    locked: false,
+  });
 }
 async function generateImage() {}
+function onContextMenu(event: MouseEvent) {
+  event.preventDefault();
+  TabletopService.onContextMenu(event, contextMenuRef.value);
+}
 
 onMounted(async () => {
   TabletopService.init(canvas.value);
@@ -104,6 +117,11 @@ async function deleteRoom(id: string) {
 </script>
 
 <template>
+  <canvas
+    class="tabletop-canvas"
+    ref="canvas"
+    @contextmenu="onContextMenu"
+  />
   <template v-if="TabletopService.isInRoom()">
     <div class="tabletop">
       <DiceRollerComponent
@@ -139,11 +157,6 @@ async function deleteRoom(id: string) {
       <ContextMenu
         ref="contextMenuRef"
         :model="TabletopService.contextMenuItems.value"
-      />
-      <canvas
-        class="tabletop-canvas"
-        ref="canvas"
-        @contextmenu="TabletopService.onContextMenu"
       />
       <TabletopToolsComponent
         :is-characters-open="isCharactersOpen"
