@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
-export const API_URL = 'http://localhost:3000'; //'https://api.dev.impactrpg.app';
-export const SOCKET_URL = 'http://localhost:3001'; //'https://socket.dev.impactrpg.app';
+export const API_URL = import.meta.env.API_URL ?? 'http://localhost:3000';
+export const SOCKET_URL = import.meta.env.SOCKET_URL ?? 'http://localhost:3001';
 export const accessToken = ref<string | null>(
     localStorage.getItem('accessToken')
 );
