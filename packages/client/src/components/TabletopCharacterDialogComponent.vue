@@ -190,8 +190,9 @@ async function deleteCharacter(characterId: string) {
                 <div class="column gap20">
                     <div class="row gap20" v-for="character in characters">
                         <Button
-                            style="flex-basis: 100%;"
+                            style="flex-basis: 100%; border-radius: 40px;"
                             variant="outlined"
+                            severity="secondary"
                             :label="character.name"
                             @click="selectCharacter(character.id)"
                         />

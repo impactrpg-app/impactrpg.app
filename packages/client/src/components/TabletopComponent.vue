@@ -25,12 +25,12 @@ const joinRoomCode = ref("");
 const rooms = ref<RoomDto[]>([]);
 
 async function uploadImage() {
-  const image = await loadFromFile("image/*");
-  if (!image) return;
+  const imageSource = await loadFromFile("image/*");
+  if (!imageSource) return;
   TabletopService.addObjectRequest({
     uuid: uuidv4(),
     type: "image",
-    image: image,
+    image: `data:image/png;base64,${btoa(imageSource)}`,
     position: { x: 0, y: 0 },
     rotation: 0,
     scale: 1,
@@ -42,17 +42,22 @@ function onContextMenu(event: MouseEvent) {
   event.preventDefault();
   TabletopService.onContextMenu(event, contextMenuRef.value);
 }
+function onResize(_: UIEvent) {
+  if (!canvas.value) return;
+  TabletopService.onResize(canvas.value);
+}
 
 onMounted(async () => {
-  TabletopService.init(canvas.value);
-  TabletopService.onResize(new UIEvent("resize"));
-  window.addEventListener("resize", TabletopService.onResize);
+  if (!canvas.value) return;
+  TabletopService.onResize(canvas.value);
+  window.addEventListener("resize", onResize);
   window.addEventListener("mousemove", TabletopService.onMousemove);
   window.addEventListener("mouseup", TabletopService.onMouseUp);
   window.addEventListener("mousedown", TabletopService.onMouseDown);
   window.addEventListener("mouseover", TabletopService.onMouseOver);
   window.addEventListener("wheel", TabletopService.onScroll);
   window.addEventListener("keydown", TabletopService.onKeyDown);
+  window.addEventListener("mouseover", TabletopService.onMouseOver);
   updateInterval.value = setInterval(() => {
     if (!canvas.value || !context.value) return;
     TabletopService.onUpdate(canvas.value, context.value);
@@ -62,12 +67,14 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (updateInterval.value) clearInterval(updateInterval.value);
-  window.removeEventListener("resize", TabletopService.onResize);
+  window.removeEventListener("resize", onResize);
   window.removeEventListener("mousemove", TabletopService.onMousemove);
   window.removeEventListener("mouseup", TabletopService.onMouseUp);
   window.removeEventListener("mousedown", TabletopService.onMouseDown);
   window.removeEventListener("mouseover", TabletopService.onMouseOver);
   window.removeEventListener("wheel", TabletopService.onScroll);
+  window.removeEventListener("keydown", TabletopService.onKeyDown);
+  window.removeEventListener("mouseover", TabletopService.onMouseOver);
 });
 
 async function fetchRooms() {
@@ -191,6 +198,7 @@ async function deleteRoom(id: string) {
             @click="createRoom"
           />
           <InputText
+            id="join-room-code"
             v-model="joinRoomCode"
             placeholder="Enter a room code"
             style="border-radius: 40px"

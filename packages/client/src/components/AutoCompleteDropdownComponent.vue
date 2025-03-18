@@ -6,6 +6,7 @@ import {
 import { computed, ref } from 'vue';
 
 const props = defineProps<{
+  id?: string;
   modelValue: any;
   suggestions: unknown[]
   optionLabel?: string;
@@ -31,6 +32,7 @@ function onComplete(_: AutoCompleteCompleteEvent) {
 
 <template>
   <AutoComplete
+    :input-id="props.id"
     v-model="value"
     :suggestions="internalSuggestions"
     :option-label="props.optionLabel"

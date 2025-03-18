@@ -39,7 +39,7 @@ export class TabletopObject {
     image?: string;
 
     @Prop({ required: false })
-    stroke?: string;
+    strokes?: Vector2[];
 
     @Prop({ required: false })
     strokeWidth?: number;

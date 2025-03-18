@@ -2,7 +2,6 @@ import type { Vector2, TabletopObject, AddObjectMessage, RemoveObjectMessage, Up
 import { ref } from "vue";
 import { socket } from "./sync";
 
-export const canvasRef = ref<HTMLCanvasElement | null>(null);
 export const camera = ref<{
     position: Vector2;
     zoom: number;
@@ -10,6 +9,7 @@ export const camera = ref<{
     position: { x: 0, y: 0 },
     zoom: 1
 });
+export const selectedObject = ref<string | null>(null);
 export const scene = ref<Map<string, TabletopObject>>(new Map());
 const imagesCache = ref<Map<string, HTMLImageElement>>(new Map());
 
@@ -30,7 +30,7 @@ export function addObjectRequest(object: TabletopObject) {
 
     if (object.type === 'image' && !object.image) {
         throw new Error('Image is required');
-    } else if (object.type === 'stroke' && !object.stroke) {
+    } else if (object.type === 'stroke' && !object.strokes) {
         throw new Error('Strokes are required');
     }
 

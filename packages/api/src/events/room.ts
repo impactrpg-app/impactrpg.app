@@ -1,4 +1,4 @@
-import { AddObjectMessage, ErrorMessage, JoinRoomMessage, LeaveRoomMessage, Room as RoomSchema, TabletopObject } from '@impact/shared';
+import { AddObjectMessage, ErrorMessage, JoinRoomMessage, LeaveRoomMessage, Room as RoomSchema, TabletopObject, User } from '@impact/shared';
 import { connectedUsers } from './users';
 import { Socket } from 'socket.io';
 import { MessageType } from '@impact/shared';
@@ -6,14 +6,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 
-export type User = {
-  client: Socket;
-  userId: string;
-};
-
 export type Room = {
   id: string;
-  users: Set<User>;
+  users: Map<string, Socket>; // userId -> Socket
   owner: string;
   tabletopObjects: TabletopObject[];
 };
@@ -27,13 +22,13 @@ export class RoomService {
     private readonly roomModel: Model<RoomSchema>,
   ){}
 
-  private triggerForAllUsersInRoom(roomId: string, callback: (user: User) => void) {
+  private triggerForAllUsersInRoom(roomId: string, callback: (userId: string, socket: Socket) => void) {
     const room = this.rooms.get(roomId);
     if (!room) {
       return;
     }
-    for (const user of room.users) {
-      callback(user);
+    for (const [userId, socket] of room.users) {
+      callback(userId, socket);
     }
   }
   findUsersRoom(userId: string, excludedRoomIds: string[] = []): string | null {
@@ -42,7 +37,7 @@ export class RoomService {
         continue;
       }
       for (const user of room.users) {
-        if (user.userId === userId) {
+        if (user[0] === userId) {
           return room.id;
         }
       }
@@ -73,13 +68,13 @@ export class RoomService {
       }
       this.rooms.set(roomId, {
         id: roomId,
-        users: new Set([{ client, userId }]),
+        users: new Map([[userId, client]]),
         owner: userId,
         tabletopObjects: query.objects,
       });
     }
   
-    this.rooms.get(roomId)!.users.add({ client, userId });
+    this.rooms.get(roomId)!.users.set(userId, client);
     client.emit('event', {
       type: MessageType.JoinRoom,
       roomId: roomId,
@@ -101,7 +96,8 @@ export class RoomService {
       return;
     }
   
-    this.rooms.get(roomId)!.users.delete({ client, userId });
+    const room = this.rooms.get(roomId)!;
+    room.users.delete(userId);
     client.emit('event', {
       type: MessageType.LeaveRoom,
       roomId: roomId,
@@ -162,8 +158,8 @@ export class RoomService {
     }
 
     this.rooms.get(roomId)!.tabletopObjects.push(object);
-    this.triggerForAllUsersInRoom(roomId, (user) =>
-      user.client.emit('event', {
+    this.triggerForAllUsersInRoom(roomId, (userId, socket) =>
+      socket.emit('event', {
         type: MessageType.AddObject,
         object: object,
       } as AddObjectMessage),
