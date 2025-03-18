@@ -33,7 +33,7 @@ export class AddObjectMessage {
 export class ImageChunkMessage {
     type: typeof MessageType.ImageChunk;
     objectId: string;
-    chunk: string;
+    chunk: number[];
     count: number;
 }
 export class ImageChunkMessageEnd {
