@@ -1,7 +1,7 @@
 import { TabletopObject } from '@impact/shared';
 import { connectedUsers } from './users';
 import { Socket } from 'socket.io';
-import { EventType } from '@impact/shared';
+import { MessageType } from '@impact/shared';
 
 export type User = {
   client: Socket;
@@ -78,7 +78,7 @@ export function addObject(
 
   room.tabletopObjects.push(object);
   triggerForAllUsersInRoom(roomId, (user) =>
-    user.client.emit(EventType.AddObject, object),
+    user.client.emit(MessageType.AddObject, object),
   );
 }
 
@@ -102,7 +102,7 @@ export function removeObject(client: Socket, roomId: string, objectId: string) {
     (object) => object.uuid !== objectId,
   );
   triggerForAllUsersInRoom(roomId, (user) =>
-    user.client.emit(EventType.RemoveObject, objectId),
+    user.client.emit(MessageType.RemoveObject, objectId),
   );
 }
 
@@ -135,6 +135,6 @@ export function updateObject(
 
   room.tabletopObjects[objectIndex] = object;
   triggerForAllUsersInRoom(roomId, (user) =>
-    user.client.emit(EventType.UpdateObject, object),
+    user.client.emit(MessageType.UpdateObject, object),
   );
 }

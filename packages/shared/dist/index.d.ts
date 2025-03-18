@@ -1,4 +1,5 @@
 export * from './room';
 export * from './character';
-export * from './events';
+export * from './messages';
 export * from './user';
+export * from './dtos';

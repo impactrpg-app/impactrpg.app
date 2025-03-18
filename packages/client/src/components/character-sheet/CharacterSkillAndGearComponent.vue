@@ -1,9 +1,23 @@
 <script lang=ts setup>
 import { computed, ref } from 'vue';
-import { Character, CharacterGearItem, CharacterSkill, NewGearItem, NewSkill } from '../../data/character';
+import { Character } from '../../data/character';
 import { useConfirm, Button, InputText, FloatLabel, Select, InputNumber, Textarea, Dialog, Card } from 'primevue';
 import { Skill, skills } from '../../data/skills';
 import { GoodsType } from '../../data/goods';
+import { CharacterGearItem, CharacterSkill } from '@impact/shared';
+
+const NewGearItem: CharacterGearItem = {
+  name: '',
+  type: GoodsType.Small,
+  attack: 0,
+  armor: 0,
+  description: '',
+}
+
+const NewSkill: CharacterSkill = {
+  name: '',
+  description: '',
+}
 
 const props = defineProps<{
   modelValue: Character

@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import PackageJson from "../../package.json";
 import { Button } from "primevue";
+import { logout } from '../service/api';
 
 function signOut() {
-  // supabaseClient.auth.signOut();
+  logout();
 }
 </script>
 

@@ -6,7 +6,6 @@ const props = defineProps<{
     isDiceTrayOpen: boolean;
     isEncountersOpen: boolean;
     isRulebookOpen: boolean;
-    isJoinRoomOpen: boolean;
 }>();
 
 const emits = defineEmits<{
@@ -14,13 +13,9 @@ const emits = defineEmits<{
     (e: "update:isDiceTrayOpen", value: boolean): void;
     (e: "update:isEncountersOpen", value: boolean): void;
     (e: "update:isRulebookOpen", value: boolean): void;
-    (e: "update:isJoinRoomOpen", value: boolean): void;
     (e: "uploadImage"): void;
     (e: "generateImage"): void;
 }>();
-
-
-
 </script>
 
 <template>
@@ -56,22 +51,6 @@ const emits = defineEmits<{
             v-tooltip.top="'Rulebook'"
             @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
         />
-        <!-- <Button
-            v-if="!getRoomId()"
-            :variant="!props.isJoinRoomOpen ? 'outlined' : undefined"
-            class="upload-button"
-            icon="pi pi-globe"
-            v-tooltip.top="'Join Room'"
-            @click="emits('update:isJoinRoomOpen', !props.isJoinRoomOpen)"
-        />
-        <Button
-            v-if="getRoomId()"
-            :variant="!props.isJoinRoomOpen ? 'outlined' : undefined"
-            class="upload-button"
-            icon="pi pi-arrow-up-right-and-arrow-down-left-from-center"
-            v-tooltip.top="'Leave Room'"
-            @click="emits('update:isJoinRoomOpen', !props.isJoinRoomOpen)"
-        /> -->
         <Divider layout="vertical" />
         <Button
             variant="outlined"

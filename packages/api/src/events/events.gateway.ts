@@ -16,25 +16,30 @@ import {
   rooms,
   updateObject,
 } from './room';
-import { AllEvents, EventType } from '@impact/shared';
+import { AllMessageTypes, MessageType } from '@impact/shared';
 
 @WebSocketGateway(config.webSocketPort, {
   transports: ['websocket'],
+  cors: {
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  },
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly jwtService: JwtService) {}
 
   @SubscribeMessage('event')
-  handleEvent(client: Socket, payload: AllEvents) {
-    if (payload.type === EventType.JoinRoom) {
+  handleEvent(client: Socket, payload: AllMessageTypes) {
+    if (payload.type === MessageType.JoinRoom) {
       joinRoom(client, payload.roomId);
-    } else if (payload.type === EventType.LeaveRoom) {
+    } else if (payload.type === MessageType.LeaveRoom) {
       leaveRoom(client, payload.roomId);
-    } else if (payload.type === EventType.AddObject) {
+    } else if (payload.type === MessageType.AddObject) {
       addObject(client, payload.roomId, payload.object);
-    } else if (payload.type === EventType.RemoveObject) {
+    } else if (payload.type === MessageType.RemoveObject) {
       removeObject(client, payload.roomId, payload.objectId);
-    } else if (payload.type === EventType.UpdateObject) {
+    } else if (payload.type === MessageType.UpdateObject) {
       updateObject(client, payload.roomId, payload.object);
     } else {
       console.error(`Unknown event: ${JSON.stringify(payload)}`);

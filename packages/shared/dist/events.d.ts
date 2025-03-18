@@ -6,27 +6,27 @@ export declare enum EventType {
     RemoveObject = "removeObject",
     UpdateObject = "updateObject"
 }
-export type JoinRoomEvent = {
+export declare class JoinRoomEvent {
     type: EventType.JoinRoom;
     roomId: string;
-};
-export type LeaveRoomEvent = {
+}
+export declare class LeaveRoomEvent {
     type: EventType.LeaveRoom;
     roomId: string;
-};
-export type AddObjectEvent = {
+}
+export declare class AddObjectEvent {
     type: EventType.AddObject;
     roomId: string;
     object: TabletopObject;
-};
-export type RemoveObjectEvent = {
+}
+export declare class RemoveObjectEvent {
     type: EventType.RemoveObject;
     roomId: string;
     objectId: string;
-};
-export type UpdateObjectEvent = {
+}
+export declare class UpdateObjectEvent {
     type: EventType.UpdateObject;
     roomId: string;
     object: TabletopObject;
-};
-export type AllEvents = JoinRoomEvent | LeaveRoomEvent | AddObjectEvent | RemoveObjectEvent | UpdateObjectEvent;
+}
+export declare const AllEvents: (typeof JoinRoomEvent | typeof LeaveRoomEvent | typeof AddObjectEvent | typeof RemoveObjectEvent | typeof UpdateObjectEvent)[];

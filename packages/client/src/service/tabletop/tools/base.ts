@@ -1,6 +1,6 @@
 export class TabletopTool {
-    public name: string = '';
-    public icon: string = '';
+    public name: string = 'Unknown Tool';
+    public icon: string = 'pi pi-exclamation-triangle';
 
     public onMouseDown(event: MouseEvent): void {
         console.log('onMouseDown', event);
