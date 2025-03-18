@@ -49,6 +49,7 @@ function onResize(_: UIEvent) {
 
 onMounted(async () => {
   if (!canvas.value) return;
+  TabletopService.init();
   TabletopService.onResize(canvas.value);
   window.addEventListener("resize", onResize);
   window.addEventListener("mousemove", TabletopService.onMousemove);

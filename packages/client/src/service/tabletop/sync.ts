@@ -7,41 +7,43 @@ import { addObjectResponse, imagesCache, removeObjectResponse, scene, updateObje
 
 export const socket = ref<Socket | null>(null);
 
-socket.value = io(API_URL, {
-    auth: getSocketHeaders(),
-    withCredentials: true,
-    transports: ['websocket']
-});
-
-socket.value.on('event', (data: AllMessageTypes) => {
-    switch (data.type) {
-        case 'error':
-            break;
-        case 'joinRoom':
-            joinRoomResponse(data);
-            break;
-        case 'leaveRoom':
-            leaveRoomResponse(data);
-            break;
-        case 'addObject':
-            addObjectResponse(data);
-            break;
-        case 'removeObject':
-            removeObjectResponse(data);
-            break;
-        case 'updateObject':
-            updateObjectResponse(data);
-            break;
-        case 'imageChunk':
-            imageChunkResponse(data);
-            break;
-        case 'imageChunkEnd':
-            imageChunkEndResponse(data);
-            break;
-        default:
-            console.error(`Unknown event: ${data}`);
-    }
-});
+export function init() {
+    socket.value = io(API_URL, {
+        auth: getSocketHeaders(),
+        withCredentials: true,
+        transports: ['websocket']
+    });
+    
+    socket.value.on('event', (data: AllMessageTypes) => {
+        switch (data.type) {
+            case 'error':
+                break;
+            case 'joinRoom':
+                joinRoomResponse(data);
+                break;
+            case 'leaveRoom':
+                leaveRoomResponse(data);
+                break;
+            case 'addObject':
+                addObjectResponse(data);
+                break;
+            case 'removeObject':
+                removeObjectResponse(data);
+                break;
+            case 'updateObject':
+                updateObjectResponse(data);
+                break;
+            case 'imageChunk':
+                imageChunkResponse(data);
+                break;
+            case 'imageChunkEnd':
+                imageChunkEndResponse(data);
+                break;
+            default:
+                console.error(`Unknown event: ${data}`);
+        }
+    });
+}
 
 type ImageChunk = {
     data: number[];
