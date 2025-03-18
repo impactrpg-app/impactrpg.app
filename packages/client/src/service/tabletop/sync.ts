@@ -1,13 +1,13 @@
 import { io, Socket } from "socket.io-client";
 import { ref } from "vue";
-import { getSocketHeaders, SOCKET_URL } from "../api";
+import { API_URL, getSocketHeaders } from "../api";
 import type { AllMessageTypes, ImageChunkMessage, ImageChunkMessageEnd } from "@impact/shared";
 import { joinRoomResponse, leaveRoomResponse } from "./room";
 import { addObjectResponse, imagesCache, removeObjectResponse, scene, updateObjectResponse } from "./scene";
 
 export const socket = ref<Socket | null>(null);
 
-socket.value = io(SOCKET_URL, {
+socket.value = io(API_URL, {
     auth: getSocketHeaders(),
     withCredentials: true,
     transports: ['websocket']

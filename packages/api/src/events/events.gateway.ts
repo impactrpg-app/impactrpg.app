@@ -5,13 +5,12 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { config } from 'src/config';
 import { JwtService } from 'src/services/jwt.service';
 import { connectedUsers } from './users';
 import { RoomService } from './room';
 import { AllMessageTypes, MessageType } from '@impact/shared';
 
-@WebSocketGateway(config.webSocketPort, {
+@WebSocketGateway({
   transports: ['websocket'],
   cors: {
     origin: ['http://localhost:5173'],
