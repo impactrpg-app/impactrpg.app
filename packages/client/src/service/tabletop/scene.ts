@@ -1,4 +1,4 @@
-import type { Vector2, TabletopObject, AddObjectMessage, RemoveObjectMessage, UpdateObjectMessage } from "@impact/shared";
+import type { Vector2, TabletopObject, AddObjectMessage, RemoveObjectMessage, UpdateObjectMessage, ImageChunkMessage, ImageChunkMessageEnd } from "@impact/shared";
 import { ref } from "vue";
 import { socket } from "./sync";
 
@@ -11,14 +11,14 @@ export const camera = ref<{
 });
 export const selectedObject = ref<string | null>(null);
 export const scene = ref<Map<string, TabletopObject>>(new Map());
-const imagesCache = ref<Map<string, HTMLImageElement>>(new Map());
+export const imagesCache = ref<Map<string, HTMLImageElement>>(new Map());
 
-export function getImageElement(uuid: string, url: string) {
+export function getImageElement(uuid: string, imageSrc: string) {
     if (imagesCache.value.has(uuid)) {
         return imagesCache.value.get(uuid);
     }
     const image = new Image();
-    image.src = url;
+    image.src = imageSrc;
     imagesCache.value.set(uuid, image);
     return image;
 }
@@ -34,10 +34,36 @@ export function addObjectRequest(object: TabletopObject) {
         throw new Error('Strokes are required');
     }
 
+    let chunks: number[] = [];
+    if (object.type === 'image' && object.image) {
+        const encoder = new TextEncoder();
+        const arr = encoder.encode(object.image);
+        chunks = Array.from(arr);
+        object.image = 'undefined';
+    }
+
     socket.value.emit('event', {
         type: 'addObject',
         object: object,
     } as AddObjectMessage);
+
+    if (chunks.length > 0) {
+        let count = 0;
+        while (chunks.length > 0) {
+            const chunk = chunks.splice(0, 100_000);
+            socket.value.emit('event', {
+                type: 'imageChunk',
+                objectId: object.uuid,
+                count: count++,
+                chunk: chunk,
+            } as ImageChunkMessage);
+        }
+        socket.value.emit('event', {
+            type: 'imageChunkEnd',
+            objectId: object.uuid,
+            totalChunks: count,
+        } as ImageChunkMessageEnd);
+    }
 }
 
 export function addObjectResponse(message: AddObjectMessage) {

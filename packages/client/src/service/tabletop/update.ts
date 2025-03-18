@@ -15,7 +15,10 @@ export function drawImageObject(object: TabletopObject, context: CanvasRendering
     if (!object.image) {
         console.warn(`Image object ${object.uuid} has no image`);
         return;
-    }    
+    }
+    if (object.image === 'undefined') {
+        return;
+    }
     const image = getImageElement(object.uuid, object.image!);
     if (!image) {
         console.warn(`Image object ${object.uuid} has no image`);

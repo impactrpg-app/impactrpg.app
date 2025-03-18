@@ -29,18 +29,30 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleEvent(client: Socket, payload: AllMessageTypes) {
     console.log(`handleEvent ${payload.type} by ${client.id}`);
 
-    if (payload.type === MessageType.JoinRoom) {
-      this.roomService.joinRoom(client, payload.roomId);
-    } else if (payload.type === MessageType.LeaveRoom) {
-      this.roomService.leaveRoom(client, payload.roomId);
-    } else if (payload.type === MessageType.AddObject) {
-      this.roomService.addObject(client, payload.object);
-    } else if (payload.type === MessageType.RemoveObject) {
-      // removeObject(client, payload.roomId, payload.objectId);
-    } else if (payload.type === MessageType.UpdateObject) {
-      // updateObject(client, payload.roomId, payload.object);
-    } else {
-      console.error(`Unknown event: ${JSON.stringify(payload)}`);
+    switch (payload.type) {
+      case MessageType.JoinRoom:
+        this.roomService.joinRoom(client, payload.roomId);
+        break;
+      case MessageType.LeaveRoom:
+        this.roomService.leaveRoom(client, payload.roomId);
+        break;
+      case MessageType.AddObject:
+        this.roomService.addObject(client, payload.object);
+        break;
+      case MessageType.RemoveObject:
+        this.roomService.removeObject(client, payload.objectId);
+        break;
+      case MessageType.UpdateObject:
+        this.roomService.updateObject(client, payload.objectId, payload.object);
+        break;
+      case MessageType.ImageChunk:
+        this.roomService.imageChunk(client, payload.objectId, payload.chunk, payload.count);
+        break;
+      case MessageType.ImageChunkEnd:
+        this.roomService.imageChunkEnd(client, payload.objectId, payload.totalChunks);
+        break;
+      default:
+        console.error(`Unknown event: ${JSON.stringify(payload)}`);
     }
   }
 

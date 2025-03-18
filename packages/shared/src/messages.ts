@@ -7,6 +7,8 @@ export const MessageType = {
     AddObject: 'addObject',
     RemoveObject: 'removeObject',
     UpdateObject: 'updateObject',
+    ImageChunk: 'imageChunk',
+    ImageChunkEnd: 'imageChunkEnd',
 } as const;
 
 export class ErrorMessage {
@@ -26,6 +28,18 @@ export class LeaveRoomMessage {
 export class AddObjectMessage {
     type: typeof MessageType.AddObject;
     object: TabletopObject;
+}
+
+export class ImageChunkMessage {
+    type: typeof MessageType.ImageChunk;
+    objectId: string;
+    chunk: string;
+    count: number;
+}
+export class ImageChunkMessageEnd {
+    type: typeof MessageType.ImageChunkEnd;
+    objectId: string;
+    totalChunks: number;
 }
 
 export class RemoveObjectMessage {

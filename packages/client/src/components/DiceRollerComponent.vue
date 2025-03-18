@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue';
-import { Dialog, InputNumber, Button, ToggleSwitch, InputText } from 'primevue';
-import { $dt } from '@primevue/themes';
+import { computed, ref, watch } from "vue";
+import { Dialog, InputNumber, Button, ToggleSwitch, InputText } from "primevue";
+import { $dt } from "@primevue/themes";
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
 
 let diceBox: any = null;
 const announceRolls = ref<boolean>(true);
-const author = ref<string>('');
+const author = ref<string>("");
 
 const props = defineProps<{
   modal?: boolean;
@@ -15,7 +15,7 @@ const props = defineProps<{
   rollAuthor?: string;
 }>();
 const emits = defineEmits<{
-  (e: 'update:isOpen', value: boolean): void
+  (e: "update:isOpen", value: boolean): void;
 }>();
 
 const isOpen = computed({
@@ -23,8 +23,8 @@ const isOpen = computed({
     return props.isOpen;
   },
   set(value: boolean) {
-    emits('update:isOpen', value);
-  }
+    emits("update:isOpen", value);
+  },
 });
 const diceToRoll = ref<number>(2);
 const successes = ref<number | null>(null);
@@ -33,21 +33,21 @@ function initDiceBox() {
   successes.value = null;
   return new Promise((resolve) => {
     setTimeout(() => {
-    diceBox = new DiceBox({
-      assetPath: '/assets/',
-      theme: 'theme-rock',
-      themeColor: $dt('stone.600').value,
-      id: 'dice-canvas',
-      container: '#dice-box-container',
-      scale: 6,
-      linearDamping: 0.3,
-      spinForce: 2,
-      throwForce: 15,
-      restitution: 0.3,
-      lightIntensity: 0.8,
-    });
-    diceBox.init().then(resolve);
-    }, 0)
+      diceBox = new DiceBox({
+        assetPath: "/assets/",
+        theme: "theme-rock",
+        themeColor: $dt("stone.600").value,
+        id: "dice-canvas",
+        container: "#dice-box-container",
+        scale: 6,
+        linearDamping: 0.3,
+        spinForce: 2,
+        throwForce: 15,
+        restitution: 0.3,
+        lightIntensity: 0.8,
+      });
+      diceBox.init().then(resolve);
+    }, 0);
   });
 }
 
@@ -63,10 +63,10 @@ watch(isOpen, (newValue) => {
 // }
 
 function announceRoll(numberOfDice: number, result: number) {
-  console.log('announceRoll', numberOfDice, result);
+  console.log("announceRoll", numberOfDice, result);
   // if (getRoomId() === null) return;
   // const rollAuthor = getRollAuthor();
-  
+
   // const canvas = document.getElementById('dice-canvas') as HTMLCanvasElement;
   // if (canvas) {
   //   canvas.toBlob(async (blob) => {
@@ -91,17 +91,16 @@ function announceRoll(numberOfDice: number, result: number) {
 async function rollDice() {
   successes.value = null;
   const numberOfDice = diceToRoll.value;
-  const audio = new Audio('/dice-roll.mp3');
+  const audio = new Audio("/dice-roll.mp3");
   audio.play();
-  if (diceBox === null)
-    await initDiceBox();
+  if (diceBox === null) await initDiceBox();
   const result = await diceBox.roll(`${numberOfDice}d6`);
   let total = 0;
   for (const dice of result) {
     if (dice.value === 6) {
       total += 2;
     } else if (dice.value >= 4) {
-      total ++;
+      total++;
     }
   }
   successes.value = total;
@@ -113,41 +112,62 @@ async function rollDice() {
 </script>
 
 <template>
-  <Dialog :modal="props.modal" v-model:visible="isOpen" header="Dice Roller" position="top" style="width: 400px;">
+  <Dialog
+    :modal="props.modal"
+    v-model:visible="isOpen"
+    header="Dice Roller"
+    position="top"
+    style="width: 400px"
+  >
     <div class="dialog-content">
       <div class="field no-margin column">
-        <label class="field-label">
+        <label class="field-label column gap10">
           Who is rolling?
+          <InputText
+            id="roll-author"
+            v-model="author"
+            :placeholder="props.rollAuthor"
+          />
         </label>
-        <InputText v-model="author" :placeholder="props.rollAuthor" />
       </div>
       <div class="field no-margin row">
-        <label class="field-label">
+        <label class="field-label row gap20">
           Announce Rolls
+          <ToggleSwitch v-model="announceRolls" input-id="announce-rolls" />
         </label>
-        <ToggleSwitch v-model="announceRolls" />
       </div>
-      <div class="field no-margin">
-        <label class="field-label">
+      <div class="field no-margin row gap20 align-items-center">
+        <label class="field-label column gap10">
           Dice to Roll
-        </label>
-        <InputNumber
-          show-buttons
-          button-layout="horizontal"
-          placeholder="# of dice"
-          v-model="diceToRoll"
-          :min="0"
-          class="input-number-align-text-center"
+          <InputNumber
+            input-id="number-of-dice"
+            show-buttons
+            button-layout="horizontal"
+            placeholder="# of dice"
+            v-model="diceToRoll"
+            :min="0"
+            class="input-number-align-text-center"
           >
-          <template #incrementicon>
+            <template #incrementicon>
               <span class="pi pi-plus" />
-          </template>
-          <template #decrementicon>
+            </template>
+            <template #decrementicon>
               <span class="pi pi-minus" />
-          </template>
-        </InputNumber>
+            </template>
+          </InputNumber>
+        </label>
+        <Button
+          style="
+            min-width: 50px;
+            min-height: 50px;
+            border-radius: 50%;
+            margin-top: 20px;
+          "
+          icon="pi pi-sync"
+          v-tooltip.top="'Roll the dice'"
+          @click="rollDice"
+        />
       </div>
-      <Button @click="rollDice">Roll</Button>
       <div id="dice-box-container">
         <div class="result">{{ successes }}</div>
       </div>
@@ -192,8 +212,9 @@ async function rollDice() {
   height: 400px;
   background: var(--p-stone-500);
   border-radius: 20px;
-  box-shadow: inset 10px 10px 20px var(--p-stone-700),
-              inset -10px -10px 20px rgba(168, 162, 158, 0.5);
+  box-shadow:
+    inset 10px 10px 20px var(--p-stone-700),
+    inset -10px -10px 20px rgba(168, 162, 158, 0.5);
 
   #dice-canvas {
     display: block;
