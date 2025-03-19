@@ -1,16 +1,19 @@
+import { MouseType } from "../mouse";
+
 export class TabletopTool {
     public name: string = 'Unknown Tool';
     public icon: string = 'pi pi-exclamation-triangle';
+    public disableContextMenu: boolean = false;
 
-    public onMouseDown(event: MouseEvent): void {
-        console.log('onMouseDown', event);
+    public onMouseDown(mouse: MouseType): void {
+        console.log('onMouseDown', mouse);
     }
 
-    public onMouseUp(event: MouseEvent): void {
-        console.log('onMouseUp', event);
+    public onMouseUp(mouse: MouseType): void {
+        console.log('onMouseUp', mouse);
     }
 
-    public onMouseMove(event: MouseEvent): void {
-        console.log('onMouseMove', event);
+    public onMouseMove(mouse: MouseType ): void {
+        console.log('onMouseMove', mouse);
     }
 }

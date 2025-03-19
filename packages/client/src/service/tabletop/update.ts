@@ -1,4 +1,4 @@
-import { getImageElement, scene } from "./scene";
+import { getImageElement, scene, selectedObject } from "./scene";
 
 import type { TabletopObject, Vector2 } from "@impact/shared";
 import { camera } from "./scene";
@@ -36,6 +36,17 @@ export function drawImageObject(object: TabletopObject, context: CanvasRendering
         object.position.y - imageSize.y / 2
     );
     context.drawImage(image, 0, 0, imageSize.x, imageSize.y);
+
+    if (selectedObject.value === object.uuid) {
+        context.strokeStyle = '#58c9af';
+        context.lineWidth = 5 / camera.value.zoom;
+        context.strokeRect(
+            0,
+            0,
+            imageSize.x,
+            imageSize.y
+        );
+    }
 }
 
 export function drawStrokeObject(object: TabletopObject, context: CanvasRenderingContext2D) {

@@ -12,6 +12,7 @@ export const camera = ref<{
 export const selectedObject = ref<string | null>(null);
 export const scene = ref<Map<string, TabletopObject>>(new Map());
 export const imagesCache = ref<Map<string, HTMLImageElement>>(new Map());
+const updateThrottle = ref<Map<string, number>>(new Map());
 
 export function getImageElement(uuid: string, imageSrc: string) {
     if (imagesCache.value.has(uuid)) {
@@ -90,9 +91,16 @@ export function removeObjectResponse(message: RemoveObjectMessage) {
     scene.value.delete(message.objectId);
 }
 
-export function updateObjectRequest(uuid: string, object: Partial<TabletopObject>) {
+export function updateObjectRequest(uuid: string, object: Partial<TabletopObject>, disableThrottle: boolean = false) {
     if (!socket.value) {
         throw new Error('Not connected to server');
+    }
+
+    if (!disableThrottle) {
+        if (updateThrottle.value.has(uuid) && updateThrottle.value.get(uuid)! > Date.now()) {
+            return;
+        }
+        updateThrottle.value.set(uuid, Date.now() + 100);
     }
 
     socket.value.emit('event', {
