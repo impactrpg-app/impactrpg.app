@@ -43,12 +43,16 @@ export class RoomService {
   private triggerForAllUsersInRoom(
     roomId: string,
     callback: (userId: string, socket: Socket) => void,
+    excludeUserId: string[] = []
   ) {
     const room = this.rooms.get(roomId);
     if (!room) {
       return;
     }
     for (const [userId, socket] of room.users) {
+      if (excludeUserId.includes(userId)) {
+        continue;
+      }
       callback(userId, socket);
     }
   }
@@ -284,6 +288,7 @@ export class RoomService {
         objectId: objectId,
         object: object,
       } as UpdateObjectMessage),
+      [userId],
     );
   }
 
