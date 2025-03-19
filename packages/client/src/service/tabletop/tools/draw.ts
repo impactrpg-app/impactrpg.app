@@ -1,4 +1,4 @@
-import { MouseType } from "../mouse";
+import { MouseType } from "../input";
 import { addObjectRequest, scene, updateObjectRequest } from "../scene";
 import { screenToWorldSpace } from "../utils";
 import { TabletopTool } from "./base";

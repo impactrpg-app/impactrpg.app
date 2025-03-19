@@ -59,7 +59,7 @@ onMounted(async () => {
   window.addEventListener("mouseover", TabletopService.onMouseOver);
   window.addEventListener("wheel", TabletopService.onScroll);
   window.addEventListener("keydown", TabletopService.onKeyDown);
-  window.addEventListener("mouseover", TabletopService.onMouseOver);
+  window.addEventListener("keyup", TabletopService.onKeyUp);
   updateInterval.value = setInterval(() => {
     if (!canvas.value || !context.value) return;
     TabletopService.onUpdate(canvas.value, context.value);
@@ -76,7 +76,7 @@ onUnmounted(() => {
   window.removeEventListener("mouseover", TabletopService.onMouseOver);
   window.removeEventListener("wheel", TabletopService.onScroll);
   window.removeEventListener("keydown", TabletopService.onKeyDown);
-  window.removeEventListener("mouseover", TabletopService.onMouseOver);
+  window.removeEventListener("keyup", TabletopService.onKeyUp);
 });
 
 async function fetchRooms() {
