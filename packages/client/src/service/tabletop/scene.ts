@@ -100,7 +100,7 @@ export function updateObjectRequest(uuid: string, object: Partial<TabletopObject
         if (updateThrottle.value.has(uuid) && updateThrottle.value.get(uuid)! > Date.now()) {
             return;
         }
-        updateThrottle.value.set(uuid, Date.now() + 100);
+        updateThrottle.value.set(uuid, Date.now() + 10);
     }
 
     socket.value.emit('event', {
