@@ -9,7 +9,6 @@ import {
   Room as RoomSchema,
   TabletopObject,
   UpdateObjectMessage,
-  User,
 } from '@impact/shared';
 import { connectedUsers } from './users';
 import { Socket } from 'socket.io';
@@ -39,6 +38,16 @@ export class RoomService {
     @InjectModel(RoomSchema.name)
     private readonly roomModel: Model<RoomSchema>,
   ) {}
+
+  private async saveRoom(roomId: string) {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return;
+    }
+    await this.roomModel.findByIdAndUpdate(roomId, {
+      objects: room.tabletopObjects,
+    });
+  }
 
   private triggerForAllUsersInRoom(
     roomId: string,
@@ -181,6 +190,7 @@ export class RoomService {
       roomId: roomId,
     } as LeaveRoomMessage);
     if (room.users.size === 0) {
+      await this.saveRoom(roomId);
       this.rooms.delete(roomId);
     }
   }
@@ -215,6 +225,7 @@ export class RoomService {
     }
 
     this.rooms.get(roomId)!.tabletopObjects.push(object);
+    // todo: replace image content with url
     this.triggerForAllUsersInRoom(roomId, (_userId, socket) =>
       socket.emit('event', {
         type: MessageType.AddObject,
