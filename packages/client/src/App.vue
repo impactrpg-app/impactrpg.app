@@ -3,7 +3,6 @@ import { Toast, ConfirmDialog } from "primevue";
 import DiceNotification from './components/DiceNotification.vue';
 import ProgressSpinner from 'primevue/progressspinner';
 import { isLoading } from './service/loading';
-
 </script>
 
 <template>

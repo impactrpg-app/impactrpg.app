@@ -180,6 +180,9 @@ export class RoomService {
       type: MessageType.LeaveRoom,
       roomId: roomId,
     } as LeaveRoomMessage);
+    if (room.users.size === 0) {
+      this.rooms.delete(roomId);
+    }
   }
   async leaveAllRooms(client: Socket) {
     const userId = connectedUsers.get(client);

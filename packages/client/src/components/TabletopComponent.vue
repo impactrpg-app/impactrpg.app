@@ -10,6 +10,7 @@ import TabletopToolsComponent from "./TabletopToolsComponent.vue";
 import { API_URL, getHeaders } from "../service/api";
 import type { RoomDto } from "@impact/shared";
 import { v4 as uuidv4 } from 'uuid';
+
 const isCharactersOpen = ref(false);
 const isDiceTrayOpen = ref(false);
 const isEncountersOpen = ref(false);
@@ -183,13 +184,25 @@ async function deleteRoom(id: string) {
   <template v-else>
     <Dialog
       position="center"
-      header="Choose a room"
       :visible="true"
       :draggable="false"
       :close-button-props="{
         style: { display: 'none' },
       }"
     >
+      <template #header>
+        <div class="row gap20 align-items-center">
+          <Button
+            as="router-link"
+            to="/"
+            style="border-radius: 50%"
+            variant="outlined"
+            icon="pi pi-chevron-left"
+          />
+          <div style="flex-grow: 1">Choose a room</div>
+        </div>
+      </template>
+
       <div class="column gap20">
         <div class="row gap20">
           <Button

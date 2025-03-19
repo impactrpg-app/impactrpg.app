@@ -50,7 +50,51 @@ export function drawImageObject(object: TabletopObject, context: CanvasRendering
 }
 
 export function drawStrokeObject(object: TabletopObject, context: CanvasRenderingContext2D) {
+    if (!object.strokes) {
+        console.warn(`Stroke object ${object.uuid} has no strokes`);
+        return;
+    }
+    // translate to object position
+    context.translate(
+        object.position.x,
+        object.position.y
+    );
+    // rotate object
+    context.rotate(object.rotation);
+    // scale object
+    context.scale(
+        object.scale,
+        object.scale
+    );
+    // draw strokes
+    context.strokeStyle = object.strokeColor ?? 'black';
+    context.lineWidth = object.strokeWidth ?? 5;
+    context.beginPath();
+    if (object.strokes.length > 1) {
+        context.moveTo(object.strokes[0].x, object.strokes[0].y);
+        let max: [number, number] = [-Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
+        let min: [number, number] = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
+        for (let j = 1; j < object.strokes.length; j++) {
+            context.lineTo(object.strokes[j].x, object.strokes[j].y);
+            // get bounds
+            if (object.strokes[j].x > max[0]) max[0] = object.strokes[j].x;
+            if (object.strokes[j].y > max[1]) max[1] = object.strokes[j].y;
+            if (object.strokes[j].x < min[0]) min[0] = object.strokes[j].x;
+            if (object.strokes[j].y < min[1]) min[1] = object.strokes[j].y;
+        }
+        context.stroke();
 
+        if (selectedObject.value === object.uuid) {
+            context.strokeStyle = '#58c9af';
+            context.lineWidth = 5 / camera.value.zoom;
+            context.strokeRect(
+                min[0],
+                min[1],
+                max[0] - min[0],
+                max[1] - min[1]
+            );
+        }
+    }
 }
 
 export function drawObject(object: TabletopObject, context: CanvasRenderingContext2D) {

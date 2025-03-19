@@ -4,7 +4,7 @@ import { getObjectAtPosition, screenToWorldSpace } from "../utils";
 import { TabletopTool } from "./base";
 
 export class MoveTool extends TabletopTool {
-  public name: string = "Move";
+  public name: string = "Move Tool";
   public icon: string = "pi pi-arrows-alt";
   public disableContextMenu: boolean = false;
   private draggingObjectId: string | null = null;
