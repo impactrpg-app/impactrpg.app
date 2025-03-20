@@ -141,9 +141,11 @@ export function onKeyDown(event: KeyboardEvent) {
       }
       break;
     case "Q":
+    case "q":
       tool.value = ALL_TOOLS[0];
       break;
     case "W":
+    case "w":
       tool.value = ALL_TOOLS[1];
       break;
   }
