@@ -5,7 +5,7 @@ import { TabletopTool } from "./base";
 import { v4 as uuidv4 } from 'uuid';
 
 export class DrawTool extends TabletopTool {
-  public name: string = "Draw Tool";
+  public name: string = "Draw Tool (W)";
   public icon: string = "pi pi-pencil";
   public disableContextMenu: boolean = false;
   private strokeId: string | null = null;

@@ -1,7 +1,7 @@
 import { Vector2 } from "@impact/shared";
 import { ref } from "vue";
-import { camera, selectedObject } from "./scene";
-import { tool } from "./tools";
+import { camera, removeObjectRequest, scene, selectedObject } from "./scene";
+import { ALL_TOOLS, tool } from "./tools";
 import { mouseToScreenSpace } from "./utils";
 
 export type MouseType = {
@@ -131,6 +131,20 @@ export function onKeyDown(event: KeyboardEvent) {
       break;
     case " ":
       keyboard.value.space = true;
+      break;
+    case "Delete":
+      if (selectedObject.value !== null) {
+        const object = scene.value.get(selectedObject.value);
+        if (object) {
+          removeObjectRequest(object);
+        }
+      }
+      break;
+    case "Q":
+      tool.value = ALL_TOOLS[0];
+      break;
+    case "W":
+      tool.value = ALL_TOOLS[1];
       break;
   }
 
