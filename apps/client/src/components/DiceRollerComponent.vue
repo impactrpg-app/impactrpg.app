@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { Dialog, InputNumber, Button, ToggleSwitch, InputText } from "primevue";
-import { $dt } from "@primevue/themes";
+import { $dt } from "@primeuix/themes";
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
 

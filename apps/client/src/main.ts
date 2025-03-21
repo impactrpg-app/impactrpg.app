@@ -1,6 +1,6 @@
 import App from "./App.vue";
 import router from "./router";
-import Material from "@primevue/themes/material";
+import Material from "@primeuix/themes/material";
 import "primeicons/primeicons.css";
 
 import { createApp } from "vue";
