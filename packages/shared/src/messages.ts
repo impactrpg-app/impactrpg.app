@@ -9,6 +9,7 @@ export enum MessageType {
   UpdateObject = "updateObject",
   ImageChunk = "imageChunk",
   ImageChunkEnd = "imageChunkEnd",
+  SendNotification = "sendNotification",
 }
 
 export class ErrorMessage {
@@ -97,6 +98,18 @@ export class UpdateObjectMessage {
   }
 }
 
+export class SendNotificationMessage {
+  type: MessageType.SendNotification;
+  message: string;
+  image?: string;
+
+  constructor(message: string, image?: string) {
+    this.type = MessageType.SendNotification;
+    this.message = message;
+    this.image = image;
+  }
+}
+
 export const AllMessages = [
   ErrorMessage,
   JoinRoomMessage,
@@ -106,6 +119,7 @@ export const AllMessages = [
   UpdateObjectMessage,
   ImageChunkMessage,
   ImageChunkMessageEnd,
+  SendNotificationMessage,
 ];
 
 export type AllMessageTypes =
@@ -116,4 +130,5 @@ export type AllMessageTypes =
   | RemoveObjectMessage
   | UpdateObjectMessage
   | ImageChunkMessage
-  | ImageChunkMessageEnd;
+  | ImageChunkMessageEnd
+  | SendNotificationMessage;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ContextMenu, Dialog, InputText, Button, Divider } from "primevue";
+import { ContextMenu, Dialog, InputText, Button, Divider, useToast } from "primevue";
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from "vue";
 import { loadFromFile } from "../service/io";
 import * as TabletopService from "../service/tabletop";
@@ -16,6 +16,7 @@ const isDiceTrayOpen = ref(false);
 const isEncountersOpen = ref(false);
 const isRulebookOpen = ref(false);
 
+const toast = useToast();
 const contextMenuRef = ref();
 const rulebookContainer = useTemplateRef<HTMLDivElement>("rulebookContainer");
 const updateInterval = ref<NodeJS.Timeout | null>(null);
@@ -48,6 +49,15 @@ function onResize(_: UIEvent) {
   TabletopService.onResize(canvas.value);
 }
 
+function onNotification(message: string, image?: string) {
+  toast.add({
+    severity: "info",
+    summary: message,
+    detail: image,
+    group: "dice-roll",
+  });
+}
+
 onMounted(async () => {
   if (!canvas.value) return;
   TabletopService.init();
@@ -60,6 +70,7 @@ onMounted(async () => {
   window.addEventListener("wheel", TabletopService.onScroll);
   window.addEventListener("keydown", TabletopService.onKeyDown);
   window.addEventListener("keyup", TabletopService.onKeyUp);
+  TabletopService.notificationListeners.add(onNotification);
   updateInterval.value = setInterval(() => {
     if (!canvas.value || !context.value) return;
     TabletopService.onUpdate(canvas.value, context.value);
@@ -77,6 +88,7 @@ onUnmounted(() => {
   window.removeEventListener("wheel", TabletopService.onScroll);
   window.removeEventListener("keydown", TabletopService.onKeyDown);
   window.removeEventListener("keyup", TabletopService.onKeyUp);
+  TabletopService.notificationListeners.delete(onNotification);
 });
 
 async function fetchRooms() {

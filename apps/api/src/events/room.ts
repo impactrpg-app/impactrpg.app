@@ -6,6 +6,7 @@ import {
   JoinRoomMessage,
   LeaveRoomMessage,
   RemoveObjectMessage,
+  SendNotificationMessage,
   UpdateObjectMessage,
 } from '@impact/shared';
 import { connectedUsers } from './users';
@@ -47,23 +48,6 @@ export class RoomService {
     await this.roomModel.findByIdAndUpdate(roomId, {
       objects: room.tabletopObjects,
     });
-  }
-
-  private triggerForAllUsersInRoom(
-    roomId: string,
-    callback: (userId: string, socket: Socket) => void,
-    excludeUserId: string[] = []
-  ) {
-    const room = this.rooms.get(roomId);
-    if (!room) {
-      return;
-    }
-    for (const [userId, socket] of room.users) {
-      if (excludeUserId.includes(userId)) {
-        continue;
-      }
-      callback(userId, socket);
-    }
   }
 
   private async syncAllObjectsToClient(client: Socket) {
@@ -115,6 +99,23 @@ export class RoomService {
           totalChunks: count,
         } as ImageChunkMessageEnd);
       }
+    }
+  }
+
+  triggerForAllUsersInRoom(
+    roomId: string,
+    callback: (userId: string, socket: Socket) => void,
+    excludeUserId: string[] = []
+  ) {
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      return;
+    }
+    for (const [userId, socket] of room.users) {
+      if (excludeUserId.includes(userId)) {
+        continue;
+      }
+      callback(userId, socket);
     }
   }
 
@@ -424,6 +425,31 @@ export class RoomService {
         objectId: objectId,
         totalChunks: totalChunks,
       } as ImageChunkMessageEnd),
+    );
+  }
+
+  async sendNotification(client: Socket, message: string, image?: string) {
+    const userId = connectedUsers.get(client);
+    if (!userId) {
+      client.disconnect();
+      return;
+    }
+    
+    const roomId = this.findUsersRoom(userId);
+    if (!roomId) {
+      client.emit('event', {
+        type: MessageType.Error,
+        message: 'Room not found',
+      } as ErrorMessage);
+      return;
+    }
+
+    this.triggerForAllUsersInRoom(roomId, (_userId, socket) =>
+      socket.emit('event', {
+        type: MessageType.SendNotification,
+        message: message,
+        image: image,
+      } as SendNotificationMessage),
     );
   }
 }

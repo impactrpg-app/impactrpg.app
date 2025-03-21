@@ -67,7 +67,7 @@ div {
   z-index: 9000 !important;
 }
 
-.p-dialog {
+.p-dialog, .p-toast-message {
   background-color: rgba(0, 0, 0, 0.7) !important;
   backdrop-filter: blur(5px) !important;
   border: 0 !important;

@@ -2,6 +2,7 @@ import { io, type Socket } from "socket.io-client";
 import { API_URL, getSocketHeaders } from "../api";
 import {
   MessageType,
+  SendNotificationMessage,
   type AllMessageTypes,
   type ImageChunkMessage,
   type ImageChunkMessageEnd,
@@ -15,6 +16,8 @@ import {
   updateObjectResponse,
 } from "./scene";
 
+export type NotificationListener = (message: string, image?: string) => void;
+export const notificationListeners: Set<NotificationListener> = new Set();
 export let socket: Socket | null = null;
 
 export function init() {
@@ -48,6 +51,11 @@ export function init() {
         break;
       case MessageType.ImageChunkEnd:
         imageChunkEndResponse(data);
+        break;
+      case MessageType.SendNotification:
+        for (const listener of notificationListeners) {
+          listener(data.message, data.image);
+        }
         break;
       default:
         console.error(`Unknown event: ${data}`);
@@ -114,4 +122,12 @@ async function imageChunkEndResponse(data: ImageChunkMessageEnd) {
   object.image = image;
   imageChunks.delete(object.uuid);
   imagesCache.value.delete(object.uuid);
+}
+
+export function sendNotificationRequest(message: string, image?: string) {
+  if (!socket) {
+    return;
+  }
+
+  socket.emit("event", new SendNotificationMessage(message, image));
 }

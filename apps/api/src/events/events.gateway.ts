@@ -50,6 +50,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       case MessageType.ImageChunkEnd:
         this.roomService.imageChunkEnd(client, payload.objectId, payload.totalChunks);
         break;
+      case MessageType.SendNotification:
+        this.roomService.sendNotification(client, payload.message, payload.image);
+        break;
       default:
         console.error(`Unknown event: ${JSON.stringify(payload)}`);
     }
