@@ -1,18 +1,24 @@
 {
-    "name": "impact",
-    "version": "0.0.1",
-    "description": "Impact",
-    "author": "Impact",
-    "private": true,
-    "workspaces": [
-        "packages/*"
-    ],
-    "scripts": {
-        "build:api": "cd packages/api && npm run build",
-        "build:client": "cd packages/client && npm run build",
-        "build": "npm run build:api && npm run build:client",
-        "dev:api": "cd packages/api && npm run start:dev",
-        "dev:client": "cd packages/client && npm run dev",
-        "prod:api": "cd packages/api && npm run start:prod"
-    }
+  "name": "impact",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.4.4",
+    "typescript": "5.8.2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "npm@11.2.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }
