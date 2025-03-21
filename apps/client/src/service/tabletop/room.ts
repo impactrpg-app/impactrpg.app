@@ -9,13 +9,13 @@ export function isInRoom() {
 }
 
 export function leaveRoomRequest() {
-    if (!socket.value) {
+    if (!socket) {
         throw new Error('Not connected to server');
     }
     if (!joinedRoom.value) {
         throw new Error('Not in a room');
     }
-    socket.value.emit('event', new LeaveRoomMessage(joinedRoom.value));
+    socket.emit('event', new LeaveRoomMessage(joinedRoom.value));
 }
 
 export function leaveRoomResponse(message: LeaveRoomMessage) {
@@ -26,11 +26,11 @@ export function leaveRoomResponse(message: LeaveRoomMessage) {
 }
 
 export function joinRoomRequest(roomId: string) {
-    if (!socket.value) {
+    if (!socket) {
         throw new Error('Not connected to server');
     }
 
-    socket.value.emit('event', new JoinRoomMessage(roomId));
+    socket.emit('event', new JoinRoomMessage(roomId));
 }
 
 export function joinRoomResponse(message: JoinRoomMessage) {

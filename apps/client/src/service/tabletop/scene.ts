@@ -33,7 +33,7 @@ export function getImageElement(uuid: string, imageSrc: string) {
 }
 
 export function addObjectRequest(object: TabletopObject) {
-  if (!socket.value) {
+  if (!socket) {
     throw new Error("Not connected to server");
   }
 
@@ -51,20 +51,20 @@ export function addObjectRequest(object: TabletopObject) {
     object.image = "undefined";
   }
 
-  socket.value.emit("event", new AddObjectMessage(object));
+  socket.emit("event", new AddObjectMessage(object));
 
   if (chunks.length > 0) {
     let count = 0;
     while (chunks.length > 0) {
       const chunk = chunks.splice(0, 100_000);
-      socket.value.emit("event", {
+      socket.emit("event", {
         type: "imageChunk",
         objectId: object.uuid,
         count: count++,
         chunk: chunk,
       } as ImageChunkMessage);
     }
-    socket.value.emit("event", {
+    socket.emit("event", {
       type: "imageChunkEnd",
       objectId: object.uuid,
       totalChunks: count,
@@ -77,7 +77,7 @@ export function addObjectResponse(message: AddObjectMessage) {
 }
 
 export function removeObjectRequest(object: TabletopObject) {
-  if (!socket.value) {
+  if (!socket) {
     throw new Error("Not connected to server");
   }
 
@@ -85,7 +85,7 @@ export function removeObjectRequest(object: TabletopObject) {
     imagesCache.value.delete(object.uuid);
   }
 
-  socket.value.emit("event", {
+  socket.emit("event", {
     type: "removeObject",
     objectId: object.uuid,
   } as RemoveObjectMessage);
@@ -101,7 +101,7 @@ export function updateObjectRequest(
   object: Partial<TabletopObject>,
   disableThrottle: boolean = false
 ) {
-  if (!socket.value) {
+  if (!socket) {
     throw new Error("Not connected to server");
   }
 
@@ -115,7 +115,7 @@ export function updateObjectRequest(
     updateThrottle.value.set(uuid, Date.now() + 10);
   }
 
-  socket.value.emit("event", new UpdateObjectMessage(uuid, object));
+  socket.emit("event", new UpdateObjectMessage(uuid, object));
 }
 
 export function updateObjectResponse(message: UpdateObjectMessage) {
