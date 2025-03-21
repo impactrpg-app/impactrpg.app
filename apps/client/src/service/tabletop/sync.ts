@@ -1,5 +1,4 @@
 import { io, type Socket } from "socket.io-client";
-import { ref } from "vue";
 import { API_URL, getSocketHeaders } from "../api";
 import {
   MessageType,
