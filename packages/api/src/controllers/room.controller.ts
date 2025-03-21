@@ -1,10 +1,35 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { ApiOkResponse, ApiOperation } from "@nestjs/swagger";
+import { ApiOkResponse, ApiOperation, ApiProperty } from "@nestjs/swagger";
 import { AuthGuard, AuthRequest } from "src/middleware/auth.guard";
-import { Room } from "@impact/shared";
+import { Room } from "src/db/room";
 import mongoose, { Model } from "mongoose";
-import { RoomDto, RoomUpdateDto } from "@impact/shared";
+import { IsString } from "class-validator";
+
+export class RoomDto {
+    @ApiProperty({
+        description: 'The id of the room',
+        example: '123'
+    })
+    @IsString()
+    id: string;
+
+    @ApiProperty({
+        description: 'The name of the room',
+        example: 'My Room'
+    })
+    @IsString()
+    name: string;
+}
+
+export class RoomUpdateDto {
+    @ApiProperty({
+        description: 'The name of the room',
+        example: 'My Room'
+    })
+    @IsString()
+    name: string;
+}
 
 @Controller()
 export class RoomController {

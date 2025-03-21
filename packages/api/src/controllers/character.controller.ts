@@ -3,7 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { ApiOkResponse, ApiOperation, ApiProperty, OmitType } from "@nestjs/swagger";
 import mongoose, { Model } from "mongoose";
 import { AuthGuard, AuthRequest } from "src/middleware/auth.guard";
-import { Character } from "@impact/shared";
+import { Character } from "src/db/character";
 
 export class CharacterDto extends OmitType(Character, ['owner']) {}
 

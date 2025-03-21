@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { Character } from '../../data/character';
+import { CharacterDto } from '@impact/shared';
 import { loadFromFile } from '../../service/io';
 import { Age, ages } from '../../data/age';
 import { personalities } from "../../data/personality";
@@ -12,17 +12,17 @@ import {
 } from "primevue";
 
 const props = defineProps<{
-  modelValue: Character
+  modelValue: CharacterDto
 }>();
 const emits = defineEmits<{
-  (e: 'update:modelValue', data: Character): void;
+  (e: 'update:modelValue', data: CharacterDto): void;
 }>();
 
 const value = computed({
   get() {
     return props.modelValue;
   },
-  set(val: Character) {
+  set(val: CharacterDto) {
     emits('update:modelValue', val);
   }
 });

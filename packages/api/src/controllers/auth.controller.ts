@@ -1,7 +1,7 @@
 import { Post, Body, Controller, UnauthorizedException, BadRequestException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { User } from "@impact/shared";
+import { User } from "src/db/user";
 import { hash, compare } from "bcrypt";
 import { IsEmail, IsString, MinLength } from "class-validator";
 import { JwtService } from "src/services/jwt.service";

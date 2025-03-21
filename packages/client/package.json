@@ -2,15 +2,15 @@
   "name": "@impact/client",
   "private": true,
   "version": "0.0.3",
-    "scripts": {
+  "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "gen:schema": "npx supabase gen types typescript --project-id \"xjtnojqcyhztaamvjagn\" --schema public > src/database.types.ts"
   },
   "dependencies": {
-    "@impact/shared": "^0.0.1",
     "@3d-dice/dice-box": "^1.1.4",
+    "@impact/shared": "^0.0.1",
     "@primevue/themes": "^4.2.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",
@@ -25,6 +25,7 @@
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "typescript": "^5.7.2",
-    "vite": "^6.0.3"
+    "vite": "^6.0.3",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

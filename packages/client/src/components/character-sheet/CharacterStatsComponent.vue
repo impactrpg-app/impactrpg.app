@@ -1,21 +1,21 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { Character } from '../../data/character';
+import { CharacterDto } from '@impact/shared';
 import CustomRatingComponent from '../CustomRatingComponent.vue';
 import CustomResourceComponent from '../CustomResourceComponent.vue';
 
 const props = defineProps<{
-  modelValue: Character
+  modelValue: CharacterDto
 }>();
 const emits = defineEmits<{
-  (e: 'update:modelValue', data: Character): void;
+  (e: 'update:modelValue', data: CharacterDto): void;
 }>();
 
 const value = computed({
   get() {
     return props.modelValue;
   },
-  set(val: Character) {
+  set(val: CharacterDto) {
     emits('update:modelValue', val);
   }
 });

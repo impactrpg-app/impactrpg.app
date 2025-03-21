@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { socket } from "./sync";
-import type { JoinRoomMessage, LeaveRoomMessage } from "@impact/shared";
+import { JoinRoomMessage, LeaveRoomMessage } from "@impact/shared";
 import { scene } from "./scene";
 
 export const joinedRoom = ref<string | null>(null);
@@ -12,11 +12,10 @@ export function leaveRoomRequest() {
     if (!socket.value) {
         throw new Error('Not connected to server');
     }
-
-    socket.value.emit('event', {
-        type: 'leaveRoom',
-        roomId: joinedRoom.value
-    } as LeaveRoomMessage);
+    if (!joinedRoom.value) {
+        throw new Error('Not in a room');
+    }
+    socket.value.emit('event', new LeaveRoomMessage(joinedRoom.value));
 }
 
 export function leaveRoomResponse(message: LeaveRoomMessage) {
@@ -31,10 +30,7 @@ export function joinRoomRequest(roomId: string) {
         throw new Error('Not connected to server');
     }
 
-    socket.value.emit('event', {
-        type: 'joinRoom',
-        roomId
-    } as JoinRoomMessage);
+    socket.value.emit('event', new JoinRoomMessage(roomId));
 }
 
 export function joinRoomResponse(message: JoinRoomMessage) {

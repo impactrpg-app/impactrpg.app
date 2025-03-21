@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from './db.module';
+import { DatabaseModule } from './db/db.module';
 import { AuthController } from './controllers/auth.controller';
 import { JwtService } from './services/jwt.service';
 import { CharacterController } from './controllers/character.controller';

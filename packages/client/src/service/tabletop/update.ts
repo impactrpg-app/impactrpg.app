@@ -1,6 +1,6 @@
-import { getImageElement, scene, selectedObject } from "./scene";
+import { getImageElement, scene, selectedObjects } from "./scene";
 
-import type { TabletopObject, Vector2 } from "@impact/shared";
+import { TabletopObject, Vector2 } from "@impact/shared";
 import { camera } from "./scene";
 import { ref } from "vue";
 
@@ -24,10 +24,7 @@ export function drawImageObject(object: TabletopObject, context: CanvasRendering
         console.warn(`Image object ${object.uuid} has no image`);
         return;
     }
-    const imageSize = {
-        x: image.width,
-        y: image.height
-    } as Vector2;
+    const imageSize = new Vector2(image.width, image.height);
 
     context.scale(object.scale, object.scale);
     context.rotate(object.rotation);
@@ -37,7 +34,7 @@ export function drawImageObject(object: TabletopObject, context: CanvasRendering
     );
     context.drawImage(image, 0, 0, imageSize.x, imageSize.y);
 
-    if (selectedObject.value === object.uuid) {
+    if (selectedObjects.value.has(object.uuid)) {
         context.strokeStyle = '#58c9af';
         context.lineWidth = 5 / camera.value.zoom;
         context.strokeRect(
@@ -84,7 +81,7 @@ export function drawStrokeObject(object: TabletopObject, context: CanvasRenderin
         }
         context.stroke();
 
-        if (selectedObject.value === object.uuid) {
+        if (selectedObjects.value.has(object.uuid)) {
             context.strokeStyle = '#58c9af';
             context.lineWidth = 5 / camera.value.zoom;
             context.strokeRect(

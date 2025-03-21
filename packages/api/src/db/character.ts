@@ -1,7 +1,7 @@
-import { SchemaFactory, Schema, Prop } from "@nestjs/mongoose";
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNumber, IsEnum, IsOptional, IsBoolean } from "class-validator";
 import mongoose, { HydratedDocument } from "mongoose";
+import { IsString, IsNumber, IsEnum, IsOptional, IsBoolean } from "class-validator";
 
 export type CharacterDocument = HydratedDocument<Character>;
 

@@ -1,14 +1,18 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { config } from "src/config";
-import { 
-    User,
-    UserSchema,
-    Character,
-    CharacterSchema,
+import {
     Room,
     RoomSchema
-} from "@impact/shared";
+} from "src/db/room";
+import {
+    User,
+    UserSchema
+} from "src/db/user";
+import {
+    Character,
+    CharacterSchema
+} from "src/db/character";
 
 @Module({
     imports: [

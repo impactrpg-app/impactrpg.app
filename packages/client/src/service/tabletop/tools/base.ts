@@ -5,13 +5,13 @@ export class TabletopTool {
     public icon: string = 'pi pi-exclamation-triangle';
     public disableContextMenu: boolean = false;
 
-    public onMouseDown(mouse: MouseType): void {}
+    public onMouseDown(_mouse: MouseType): void {}
 
-    public onMouseUp(mouse: MouseType): void {}
+    public onMouseUp(_mouse: MouseType): void {}
 
-    public onMouseMove(mouse: MouseType ): void {}
+    public onMouseMove(_mouse: MouseType ): void {}
 
-    public onKeyDown(keyboard: KeyboardType): void {}
+    public onKeyDown(_keyboard: KeyboardType): void {}
 
-    public onKeyUp(keyboard: KeyboardType): void {}
+    public onKeyUp(_keyboard: KeyboardType): void {}
 }

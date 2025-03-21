@@ -8,7 +8,7 @@ import TabletopCharacterDialogComponent from "./TabletopCharacterDialogComponent
 import RulebookComponent from "./RulebookComponent.vue";
 import TabletopToolsComponent from "./TabletopToolsComponent.vue";
 import { API_URL, getHeaders } from "../service/api";
-import type { RoomDto } from "@impact/shared";
+import { RoomDto, TabletopObjectType } from "@impact/shared";
 import { v4 as uuidv4 } from 'uuid';
 
 const isCharactersOpen = ref(false);
@@ -30,7 +30,7 @@ async function uploadImage() {
   if (!imageSource) return;
   TabletopService.addObjectRequest({
     uuid: uuidv4(),
-    type: "image",
+    type: TabletopObjectType.Image,
     image: `data:image/png;base64,${btoa(imageSource)}`,
     position: { x: 0, y: 0 },
     rotation: 0,

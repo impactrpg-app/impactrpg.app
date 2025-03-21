@@ -1,5 +1,5 @@
 import { MouseType } from "../input";
-import { scene, selectedObject, updateObjectRequest } from "../scene";
+import { scene, selectedObjects, updateObjectRequest } from "../scene";
 import { getObjectAtPosition, screenToWorldSpace } from "../utils";
 import { TabletopTool } from "./base";
 
@@ -11,10 +11,17 @@ export class MoveTool extends TabletopTool {
 
   public onMouseDown(mouse: MouseType): void {
     if (mouse.leftClickDown) {
-      selectedObject.value = getObjectAtPosition(screenToWorldSpace(mouse.position));
-      this.draggingObjectId = selectedObject.value;
+      const object = getObjectAtPosition(screenToWorldSpace(mouse.position));
+      if (object) {
+        selectedObjects.value.add(object);
+        this.draggingObjectId = object;
+      }
     } else if (mouse.rightClickDown) {
-      selectedObject.value = getObjectAtPosition(screenToWorldSpace(mouse.position), true);
+      const object = getObjectAtPosition(screenToWorldSpace(mouse.position), true);
+      if (object) {
+        selectedObjects.value.add(object);
+        this.draggingObjectId = object;
+      }
     }
   }
 

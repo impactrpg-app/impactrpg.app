@@ -6,8 +6,6 @@ import {
   JoinRoomMessage,
   LeaveRoomMessage,
   RemoveObjectMessage,
-  Room as RoomSchema,
-  TabletopObject,
   UpdateObjectMessage,
 } from '@impact/shared';
 import { connectedUsers } from './users';
@@ -16,6 +14,8 @@ import { MessageType } from '@impact/shared';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { Room as RoomSchema } from 'src/db/room';
+import { TabletopObject } from 'src/db/room';
 
 export type Room = {
   id: string;

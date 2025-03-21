@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { Character, NewCharacter } from '../data/character';
 import { onMounted, ref, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
@@ -8,6 +7,8 @@ import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue
 import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
 import { API_URL, getHeaders } from '../service/api';
+import { CharacterDto } from '@impact/shared';
+
 const props = defineProps<{
     isOpen: boolean;
 }>();
@@ -19,7 +20,7 @@ const emits = defineEmits<{
 
 const toast = useToast();
 const confirm = useConfirm();
-const selectedCharacter = ref<Character | null>(null);
+const selectedCharacter = ref<CharacterDto | null>(null);
 const selectedCharacterId = ref<string | null>(null);
 const showNotesEditor = ref(false);
 
@@ -74,7 +75,7 @@ async function deSelectCharacter() {
     selectedCharacter.value = null;
 
 }
-async function createCharacter(character: Character) {
+async function createCharacter(character: CharacterDto) {
     if (!character.info.name) {
         character.info.name = "New Character";
     }
@@ -160,7 +161,7 @@ async function deleteCharacter(characterId: string) {
                     icon="pi pi-plus"
                     style="border-radius: 100%; height: 40px; width: 40px;"
                     v-tooltip.top="'Create Character'"
-                    @click="createCharacter({...NewCharacter})"
+                    @click="createCharacter(new CharacterDto())"
                 />
                 <Button
                     v-if="selectedCharacter"

@@ -1,5 +1,6 @@
+import { TabletopObjectType } from "@impact/shared";
 import { MouseType } from "../input";
-import { addObjectRequest, scene, updateObjectRequest } from "../scene";
+import { addObjectRequest, removeObjectRequest, scene, updateObjectRequest } from "../scene";
 import { screenToWorldSpace } from "../utils";
 import { TabletopTool } from "./base";
 import { v4 as uuidv4 } from 'uuid';
@@ -16,7 +17,7 @@ export class DrawTool extends TabletopTool {
         this.strokeId = uuidv4();
         addObjectRequest({
             uuid: this.strokeId,
-            type: "stroke",
+            type: TabletopObjectType.Stroke,
             position: { x: 0, y: 0 },
             rotation: 0,
             scale: 1,
@@ -30,6 +31,12 @@ export class DrawTool extends TabletopTool {
 
   public onMouseUp(mouse: MouseType): void {
     if (!mouse.leftClickDown) {
+      if (!this.strokeId) return;
+      const stroke = scene.value.get(this.strokeId);
+      if (!stroke) return;
+      if (stroke.strokes!.length <= 10) {
+        removeObjectRequest(stroke);
+      }
       this.strokeId = null;
     }
   }

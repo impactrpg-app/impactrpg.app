@@ -1,6 +1,6 @@
 import { Vector2 } from "@impact/shared";
 import { ref } from "vue";
-import { camera, removeObjectRequest, scene, selectedObject } from "./scene";
+import { camera, removeObjectRequest, scene, selectedObjects } from "./scene";
 import { ALL_TOOLS, tool } from "./tools";
 import { mouseToScreenSpace } from "./utils";
 
@@ -91,10 +91,10 @@ export function onMousemove(event: MouseEvent) {
     mouse.value.middleClickDown ||
     (keyboard.value.space && mouse.value.leftClickDown)
   ) {
-    camera.value.position = {
-      x: camera.value.position.x + mouse.value.delta.x,
-      y: camera.value.position.y + mouse.value.delta.y,
-    } as Vector2;
+    camera.value.position = new Vector2(
+      camera.value.position.x + mouse.value.delta.x,
+      camera.value.position.y + mouse.value.delta.y,
+    );
   } else {
     // update tool
     tool.value.onMouseMove(mouse.value);
@@ -114,7 +114,7 @@ export function onMouseOver(event: MouseEvent) {
 export function onContextMenu(event: MouseEvent, contextMenuRef: any) {
   if (!mouse.value.overCanvas) return;
   if (tool.value.disableContextMenu) return;
-  if (selectedObject.value === null) return;
+  if (selectedObjects.value.size === 0) return;
   contextMenuRef.show(event);
 }
 
@@ -133,11 +133,14 @@ export function onKeyDown(event: KeyboardEvent) {
       keyboard.value.space = true;
       break;
     case "Delete":
-      if (selectedObject.value !== null) {
-        const object = scene.value.get(selectedObject.value);
-        if (object) {
-          removeObjectRequest(object);
+      if (selectedObjects.value.size > 0) {
+        for (const object of selectedObjects.value) {
+          const obj = scene.value.get(object);
+          if (obj) {
+            removeObjectRequest(obj);
+          }
         }
+        selectedObjects.value.clear();
       }
       break;
     case "Q":

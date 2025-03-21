@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { ref } from "vue";
 import { API_URL, getSocketHeaders } from "../api";
-import type { AllMessageTypes, ImageChunkMessage, ImageChunkMessageEnd } from "@impact/shared";
+import { MessageType, type AllMessageTypes, type ImageChunkMessage, type ImageChunkMessageEnd } from "@impact/shared";
 import { joinRoomResponse, leaveRoomResponse } from "./room";
 import { addObjectResponse, imagesCache, removeObjectResponse, scene, updateObjectResponse } from "./scene";
 
@@ -16,27 +16,27 @@ export function init() {
     
     socket.value.on('event', (data: AllMessageTypes) => {
         switch (data.type) {
-            case 'error':
+            case MessageType.Error:
                 break;
-            case 'joinRoom':
+            case MessageType.JoinRoom:
                 joinRoomResponse(data);
                 break;
-            case 'leaveRoom':
+            case MessageType.LeaveRoom:
                 leaveRoomResponse(data);
                 break;
-            case 'addObject':
+            case MessageType.AddObject:
                 addObjectResponse(data);
                 break;
-            case 'removeObject':
+            case MessageType.RemoveObject:
                 removeObjectResponse(data);
                 break;
-            case 'updateObject':
+            case MessageType.UpdateObject:
                 updateObjectResponse(data);
                 break;
-            case 'imageChunk':
+            case MessageType.ImageChunk:
                 imageChunkResponse(data);
                 break;
-            case 'imageChunkEnd':
+            case MessageType.ImageChunkEnd:
                 imageChunkEndResponse(data);
                 break;
             default:

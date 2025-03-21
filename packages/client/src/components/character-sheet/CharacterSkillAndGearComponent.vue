@@ -1,12 +1,11 @@
 <script lang=ts setup>
 import { computed, ref } from 'vue';
-import { Character } from '../../data/character';
 import { useConfirm, Button, InputText, FloatLabel, Select, InputNumber, Textarea, Dialog, Card } from 'primevue';
 import { Skill, skills } from '../../data/skills';
 import { GoodsType } from '../../data/goods';
-import { CharacterGearItem, CharacterSkill } from '@impact/shared';
+import { CharacterDto, CharacterGearItemDto, CharacterSkillDto } from '@impact/shared';
 
-const NewGearItem: CharacterGearItem = {
+const NewGearItem: CharacterGearItemDto = {
   name: '',
   type: GoodsType.Small,
   attack: 0,
@@ -14,23 +13,23 @@ const NewGearItem: CharacterGearItem = {
   description: '',
 }
 
-const NewSkill: CharacterSkill = {
+const NewSkill: CharacterSkillDto = {
   name: '',
   description: '',
 }
 
 const props = defineProps<{
-  modelValue: Character
+  modelValue: CharacterDto
 }>();
 const emits = defineEmits<{
-  (e: 'update:modelValue', data: Character): void;
+  (e: 'update:modelValue', data: CharacterDto): void;
 }>();
 
 const value = computed({
   get() {
     return props.modelValue;
   },
-  set(val: Character) {
+  set(val: CharacterDto) {
     emits('update:modelValue', val);
   }
 });
@@ -38,11 +37,11 @@ const value = computed({
 const confirm = useConfirm();
 
 // gear
-const editingGear = ref<CharacterGearItem>({ ...NewGearItem });
+const editingGear = ref<CharacterGearItemDto>({ ...NewGearItem });
 const showGearEditor = ref<boolean>(false);
 const existingGearIndex = ref<number>(-1);
 // skill
-const editingSkill = ref<CharacterSkill>({ ...NewSkill });
+const editingSkill = ref<CharacterSkillDto>({ ...NewSkill });
 const showSkillEditor = ref<boolean>(false);
 const existingSkillIndex = ref<number>(-1);
 
@@ -55,7 +54,7 @@ function createNewGearItem() {
   existingGearIndex.value = -1;
   showGearEditor.value = true;
 }
-function editExistingGearItem(item: CharacterGearItem, index: number) {
+function editExistingGearItem(item: CharacterGearItemDto, index: number) {
   editingGear.value = {
     ...item,
   };
@@ -115,7 +114,7 @@ function createSkill() {
   existingSkillIndex.value = -1;
   showSkillEditor.value = true;
 }
-function editExistingSkill(skill: CharacterSkill, index: number) {
+function editExistingSkill(skill: CharacterSkillDto, index: number) {
   editingSkill.value = {
     ...skill,
   };
