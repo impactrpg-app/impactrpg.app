@@ -7,7 +7,7 @@ import {
   SendNotificationMessage,
   UpdateObjectMessage,
 } from '@impact/shared';
-import { connectedUsers } from './users';
+import { connectedUsers } from '../events/users';
 import { Socket } from 'socket.io';
 import { MessageType } from '@impact/shared';
 import { InjectModel } from '@nestjs/mongoose';
@@ -16,7 +16,8 @@ import { Injectable } from '@nestjs/common';
 import { Room as RoomSchema } from 'src/db/room';
 import { TabletopObject } from 'src/db/room';
 import { StorageService } from 'src/services/storage.service';
-import * as uuid from 'uuid';
+import { CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 
 export type Room = {
   id: string;
@@ -281,5 +282,13 @@ export class RoomService {
         image: image,
       } as SendNotificationMessage),
     );
+  }
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async saveRooms() {
+    console.log('Saving rooms');
+    for (const room of this.rooms.values()) {
+      await this.saveRoom(room.id);
+    }
   }
 }

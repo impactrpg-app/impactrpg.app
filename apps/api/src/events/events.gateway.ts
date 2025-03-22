@@ -7,7 +7,7 @@ import {
 import { Socket } from 'socket.io';
 import { JwtService } from 'src/services/jwt.service';
 import { connectedUsers } from './users';
-import { RoomService } from './room';
+import { RoomService } from '../services/room.service';
 import { AllMessageTypes, MessageType } from '@impact/shared';
 
 @WebSocketGateway({
