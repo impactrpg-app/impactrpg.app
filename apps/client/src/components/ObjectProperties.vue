@@ -77,7 +77,7 @@ function onVisibleUpdate(visible: boolean) {
     <div class="column gap20">
       <label>
         <span>Rotation</span>
-        <CustomResourceComponent v-model="rotation" :min="0" :max="360" />
+        <CustomResourceComponent v-model="rotation" :min="-360" :max="360" />
       </label>
       <label>
         <span>Scale</span>
