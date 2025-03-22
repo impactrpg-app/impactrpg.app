@@ -40,9 +40,11 @@ const rooms = ref<RoomDto[]>([]);
 async function uploadImage() {
   const imageSource = await loadFromFile("image/*");
   if (!imageSource) return;
-
+  addImageObject(imageSource);
+}
+async function addImageObject(fileContents: Uint8Array<ArrayBuffer>) {
   const formData = new FormData();
-  formData.append("image", new Blob([imageSource]));
+  formData.append("image", new Blob([fileContents]));
   const resp = await fetch(API_URL + "/image", {
     method: "POST",
     body: formData,
@@ -64,7 +66,6 @@ async function uploadImage() {
     locked: false,
   });
 }
-async function generateImage() {}
 function onContextMenu(event: MouseEvent) {
   event.preventDefault();
   TabletopService.onContextMenu(event, contextMenuRef.value);
@@ -73,6 +74,8 @@ function onResize(_: UIEvent) {
   if (!canvas.value) return;
   TabletopService.onResize(canvas.value);
 }
+function generateImage() {}
+
 
 function onNotification(message: string, image?: string) {
   toast.add({
@@ -81,6 +84,17 @@ function onNotification(message: string, image?: string) {
     detail: image,
     group: "dice-roll",
   });
+}
+async function onDropFile(event: DragEvent) {
+  event.preventDefault();
+  for (const file of event.dataTransfer?.files ?? []) {
+    if (file.type.startsWith("image/") === false) continue;
+    const buffer = await file.arrayBuffer();
+    addImageObject(new Uint8Array(buffer));
+  }
+}
+function onDragOver(event: DragEvent) {
+  event.preventDefault();
 }
 
 onMounted(async () => {
@@ -163,7 +177,7 @@ async function deleteRoom(id: string) {
 </script>
 
 <template>
-  <canvas class="tabletop-canvas" ref="canvas" @contextmenu="onContextMenu" />
+  <canvas :ondrop="onDropFile" :ondragover="onDragOver" class="tabletop-canvas" ref="canvas" @contextmenu="onContextMenu" />
   <template v-if="TabletopService.isInRoom()">
     <div class="tabletop">
       <DiceRollerComponent

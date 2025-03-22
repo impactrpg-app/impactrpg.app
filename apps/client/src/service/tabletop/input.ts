@@ -20,7 +20,7 @@ export type KeyboardType = {
   space: boolean;
 };
 
-const mouse = ref<MouseType>({
+export const mouse = ref<MouseType>({
   position: { x: 0, y: 0 },
   delta: { x: 0, y: 0 },
   overCanvas: false,
@@ -29,7 +29,7 @@ const mouse = ref<MouseType>({
   middleClickDown: false,
 });
 
-const keyboard = ref<KeyboardType>({
+export const keyboard = ref<KeyboardType>({
   shift: false,
   alt: false,
   ctrl: false,
@@ -145,11 +145,11 @@ export function onKeyDown(event: KeyboardEvent) {
       break;
     case "Q":
     case "q":
-      tool.value = ALL_TOOLS[0];
+      tool.value = ALL_TOOLS[0]!;
       break;
     case "W":
     case "w":
-      tool.value = ALL_TOOLS[1];
+      tool.value = ALL_TOOLS[1]!;
       break;
   }
 
