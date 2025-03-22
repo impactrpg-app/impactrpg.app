@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ContextMenu, Dialog, InputText, Button, Divider, useToast } from "primevue";
+import {
+  ContextMenu,
+  Dialog,
+  InputText,
+  Button,
+  Divider,
+  useToast,
+} from "primevue";
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from "vue";
 import { loadFromFile } from "../service/io";
 import * as TabletopService from "../service/tabletop";
@@ -7,9 +14,13 @@ import DiceRollerComponent from "./DiceRollerComponent.vue";
 import TabletopCharacterDialogComponent from "./TabletopCharacterDialogComponent.vue";
 import RulebookComponent from "./RulebookComponent.vue";
 import TabletopToolsComponent from "./TabletopToolsComponent.vue";
-import { API_URL, getHeaders } from "../service/api";
-import { RoomDto, TabletopObjectType } from "@impact/shared";
-import { v4 as uuidv4 } from 'uuid';
+import { accessToken, API_URL, getHeaders } from "../service/api";
+import {
+  ImageUploadResponse,
+  RoomDto,
+  TabletopObjectType,
+} from "@impact/shared";
+import { v4 as uuidv4 } from "uuid";
 
 const isCharactersOpen = ref(false);
 const isDiceTrayOpen = ref(false);
@@ -29,10 +40,24 @@ const rooms = ref<RoomDto[]>([]);
 async function uploadImage() {
   const imageSource = await loadFromFile("image/*");
   if (!imageSource) return;
+
+  const formData = new FormData();
+  formData.append("image", new Blob([imageSource]));
+  const resp = await fetch(API_URL + "/image", {
+    method: "POST",
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${accessToken.value}`,
+    },
+  });
+  if (!resp.ok) {
+    return;
+  }
+  const data: ImageUploadResponse = await resp.json();
   TabletopService.addObjectRequest({
     uuid: uuidv4(),
     type: TabletopObjectType.Image,
-    image: `data:image/png;base64,${btoa(imageSource)}`,
+    image: `${API_URL}/image/${encodeURIComponent(data.path)}`,
     position: { x: 0, y: 0 },
     rotation: 0,
     scale: 1,
@@ -138,11 +163,7 @@ async function deleteRoom(id: string) {
 </script>
 
 <template>
-  <canvas
-    class="tabletop-canvas"
-    ref="canvas"
-    @contextmenu="onContextMenu"
-  />
+  <canvas class="tabletop-canvas" ref="canvas" @contextmenu="onContextMenu" />
   <template v-if="TabletopService.isInRoom()">
     <div class="tabletop">
       <DiceRollerComponent
@@ -237,7 +258,10 @@ async function deleteRoom(id: string) {
           />
         </div>
         <Divider v-if="rooms.length > 0" />
-        <div class="column gap20" style="max-height:350px; overflow-y: auto; padding-right: 20px;">
+        <div
+          class="column gap20"
+          style="max-height: 350px; overflow-y: auto; padding-right: 20px"
+        >
           <div class="row gap20" v-for="room in rooms" :key="room.id">
             <Button
               variant="text"

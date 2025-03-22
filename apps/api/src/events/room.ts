@@ -1,8 +1,6 @@
 import {
   AddObjectMessage,
   ErrorMessage,
-  ImageChunkMessage,
-  ImageChunkMessageEnd,
   JoinRoomMessage,
   LeaveRoomMessage,
   RemoveObjectMessage,
@@ -17,6 +15,8 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { Room as RoomSchema } from 'src/db/room';
 import { TabletopObject } from 'src/db/room';
+import { StorageService } from 'src/services/storage.service';
+import * as uuid from 'uuid';
 
 export type Room = {
   id: string;
@@ -25,19 +25,14 @@ export type Room = {
   tabletopObjects: TabletopObject[];
 };
 
-type ImageChunk = {
-  data: number[];
-  count: number;
-};
-
 @Injectable()
 export class RoomService {
   private rooms: Map<string, Room> = new Map();
-  private imageChunks: Map<string, ImageChunk[]> = new Map();
 
   constructor(
     @InjectModel(RoomSchema.name)
     private readonly roomModel: Model<RoomSchema>,
+    private readonly storageService: StorageService,
   ) {}
 
   private async saveRoom(roomId: string) {
@@ -67,38 +62,10 @@ export class RoomService {
     }
 
     for (const object of this.rooms.get(roomId)!.tabletopObjects) {
-      let chunks: number[] = [];
-      if (object.type === 'image' && object.image) {
-        const encoder = new TextEncoder();
-        const arr = encoder.encode(object.image);
-        chunks = Array.from(arr);
-      }
-
       client.emit('event', {
         type: MessageType.AddObject,
-        object: {
-          ...object,
-          image: 'undefined',
-        },
+        object
       } as AddObjectMessage);
-
-      if (chunks.length > 0) {
-        let count = 0;
-        while (chunks.length > 0) {
-          const chunk = chunks.splice(0, 100_000);
-          client.emit('event', {
-            type: MessageType.ImageChunk,
-            objectId: object.uuid,
-            count: count++,
-            chunk: chunk,
-          } as ImageChunkMessage);
-        }
-        client.emit('event', {
-          type: MessageType.ImageChunkEnd,
-          objectId: object.uuid,
-          totalChunks: count,
-        } as ImageChunkMessageEnd);
-      }
     }
   }
 
@@ -131,6 +98,36 @@ export class RoomService {
       }
     }
     return null;
+  }
+  private verifyUser(client: Socket): { userId: string, room: Room, error: boolean } {
+    const userId = connectedUsers.get(client);
+    if (!userId) {
+      console.error('User Id not found');
+      client.disconnect();
+      return { userId: null, room: null, error: true };
+    }
+
+    const roomId = this.findUsersRoom(userId);
+    if (!roomId) {
+      console.error('Room Id not found');
+      client.emit('event', {
+        type: MessageType.Error,
+        message: 'Room not found',
+      } as ErrorMessage);
+      return { userId, room: null, error: true };
+    }
+
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      console.error('Room not found');
+      client.emit('event', {
+        type: MessageType.Error,
+        message: 'Room not found',
+      } as ErrorMessage);
+      return { userId, room, error: true };
+    }
+
+    return { userId, room, error: false };
   }
 
   async joinRoom(client: Socket, roomId: string) {
@@ -170,21 +167,11 @@ export class RoomService {
     await this.syncAllObjectsToClient(client);
   }
   async leaveRoom(client: Socket, roomId: string) {
-    const userId = connectedUsers.get(client);
-    if (!userId) {
-      client.disconnect();
+    const { userId, room, error } = this.verifyUser(client);
+    if (error) {
       return;
     }
 
-    if (!this.rooms.has(roomId)) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Room not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    const room = this.rooms.get(roomId)!;
     room.users.delete(userId);
     client.emit('event', {
       type: MessageType.LeaveRoom,
@@ -208,83 +195,58 @@ export class RoomService {
       roomId = this.findUsersRoom(userId);
     }
   }
-
   async addObject(client: Socket, object: TabletopObject) {
-    const userId = connectedUsers.get(client);
-    if (!userId) {
-      client.disconnect();
+    const { room, error } = this.verifyUser(client);
+    if (error) {
       return;
     }
 
-    const roomId = this.findUsersRoom(userId);
-    if (!roomId) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Room not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    this.rooms.get(roomId)!.tabletopObjects.push(object);
+    this.rooms.get(room.id)!.tabletopObjects.push(object);
     // todo: replace image content with url
-    this.triggerForAllUsersInRoom(roomId, (_userId, socket) =>
+    this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
       socket.emit('event', {
         type: MessageType.AddObject,
         object: object,
       } as AddObjectMessage),
     );
   }
-
   async removeObject(client: Socket, objectId: string) {
-    const userId = connectedUsers.get(client);
-    if (!userId) {
-      client.disconnect();
+    const { userId, room, error } = this.verifyUser(client);
+    if (error) {
       return;
     }
 
-    const roomId = this.findUsersRoom(userId);
-    if (!roomId) {
+    const object = room.tabletopObjects.find((object) => object.uuid === objectId);
+    if (!object) {
       client.emit('event', {
         type: MessageType.Error,
-        message: 'Room not found',
+        message: 'Object not found',
       } as ErrorMessage);
       return;
     }
-
-    this.rooms.get(roomId)!.tabletopObjects = this.rooms
-      .get(roomId)!
-      .tabletopObjects.filter((object) => object.uuid !== objectId);
-    this.triggerForAllUsersInRoom(roomId, (userId, socket) =>
+    if (object.image) {
+      const imageId = object.image.replace(new RegExp('http[s]*://[a-zA-Z0-9\:\.]+/image/'), '');
+      await this.storageService.delete(decodeURIComponent(imageId));
+  }
+    room.tabletopObjects = room.tabletopObjects.filter((object) => object.uuid !== objectId);
+    this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
       socket.emit('event', {
         type: MessageType.RemoveObject,
         objectId: objectId,
       } as RemoveObjectMessage),
     );
   }
-
   async updateObject(
     client: Socket,
     objectId: string,
     object: Partial<TabletopObject>,
   ) {
-    const userId = connectedUsers.get(client);
-    if (!userId) {
-      client.disconnect();
+    const { userId, room, error } = this.verifyUser(client);
+    if (error) {
       return;
     }
 
-    const roomId = this.findUsersRoom(userId);
-    if (!roomId) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Room not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    const objectIndex = this.rooms
-      .get(roomId)!
-      .tabletopObjects.findIndex((object) => object.uuid === objectId);
+    const objectIndex = room.tabletopObjects.findIndex((object) => object.uuid === objectId);
     if (objectIndex === -1) {
       client.emit('event', {
         type: MessageType.Error,
@@ -293,11 +255,11 @@ export class RoomService {
       return;
     }
 
-    this.rooms.get(roomId)!.tabletopObjects[objectIndex] = {
-      ...this.rooms.get(roomId)!.tabletopObjects[objectIndex],
+    this.rooms.get(room.id)!.tabletopObjects[objectIndex] = {
+      ...this.rooms.get(room.id)!.tabletopObjects[objectIndex],
       ...object,
     };
-    this.triggerForAllUsersInRoom(roomId, (userId, socket) =>
+    this.triggerForAllUsersInRoom(room.id, (userId, socket) =>
       socket.emit('event', {
         type: MessageType.UpdateObject,
         objectId: objectId,
@@ -306,145 +268,13 @@ export class RoomService {
       [userId],
     );
   }
-
-  async imageChunk(
-    client: Socket,
-    objectId: string,
-    chunk: number[],
-    count: number,
-  ) {
-    const userId = connectedUsers.get(client);
-    if (!userId) {
-      client.disconnect();
-      return;
-    }
-
-    const roomId = this.findUsersRoom(userId);
-    if (!roomId) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Room not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    const objectIndex = this.rooms
-      .get(roomId)!
-      .tabletopObjects.findIndex((object) => object.uuid === objectId);
-    if (objectIndex === -1) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Object not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    this.imageChunks.set(objectId, [
-      ...(this.imageChunks.get(objectId) || []),
-      {
-        data: chunk,
-        count: count,
-      },
-    ]);
-    this.triggerForAllUsersInRoom(roomId, (_userId, socket) =>
-      socket.emit('event', {
-        type: MessageType.ImageChunk,
-        objectId: objectId,
-        chunk: chunk,
-        count: count,
-      } as ImageChunkMessage),
-    );
-  }
-
-  async imageChunkEnd(client: Socket, objectId: string, totalChunks: number) {
-    const userId = connectedUsers.get(client);
-    if (!userId) {
-      client.disconnect();
-      return;
-    }
-
-    const roomId = this.findUsersRoom(userId);
-    if (!roomId) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Room not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    const objectIndex = this.rooms
-      .get(roomId)!
-      .tabletopObjects.findIndex((object) => object.uuid === objectId);
-    if (objectIndex === -1) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Object not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    const imageChunks = this.imageChunks.get(objectId);
-    if (!imageChunks) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Object not found',
-      } as ErrorMessage);
-      return;
-    }
-
-    let timeout = 0;
-    while (imageChunks.length < totalChunks) {
-      await new Promise((resolve) =>
-        setTimeout(() => {
-          timeout++;
-          resolve(null);
-        }, 100),
-      );
-      if (timeout > 50) {
-        client.emit('event', {
-          type: MessageType.Error,
-          message: 'Object not found',
-        } as ErrorMessage);
-        this.imageChunks.delete(objectId);
-        return;
-      }
-    }
-
-    const data = imageChunks
-      .sort((a, b) => a.count - b.count)
-      .map((chunk) => chunk.data)
-      .flat();
-    const imageArray = new Uint8Array(data);
-    const imageString = Buffer.from(imageArray).toString();
-    this.rooms.get(roomId)!.tabletopObjects[objectIndex].image = imageString;
-    this.imageChunks.delete(objectId);
-
-    this.triggerForAllUsersInRoom(roomId, (_userId, socket) =>
-      socket.emit('event', {
-        type: MessageType.ImageChunkEnd,
-        objectId: objectId,
-        totalChunks: totalChunks,
-      } as ImageChunkMessageEnd),
-    );
-  }
-
   async sendNotification(client: Socket, message: string, image?: string) {
-    const userId = connectedUsers.get(client);
-    if (!userId) {
-      client.disconnect();
-      return;
-    }
-    
-    const roomId = this.findUsersRoom(userId);
-    if (!roomId) {
-      client.emit('event', {
-        type: MessageType.Error,
-        message: 'Room not found',
-      } as ErrorMessage);
+    const { room, error } = this.verifyUser(client);
+    if (error) {
       return;
     }
 
-    this.triggerForAllUsersInRoom(roomId, (_userId, socket) =>
+    this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
       socket.emit('event', {
         type: MessageType.SendNotification,
         message: message,

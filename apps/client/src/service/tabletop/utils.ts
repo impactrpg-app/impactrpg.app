@@ -109,13 +109,13 @@ export function getObjectAtPosition(
 ): string | null {
   const objectKeys = [...scene.value.keys()];
   for (let i = objectKeys.length - 1; i >= 0; i--) {
-    const object = scene.value.get(objectKeys[i]);
+    const object = scene.value.get(objectKeys[i]!);
     if (!object) continue;
     if (!ignoreLock && object.locked) continue;
     
     const bounds = getObjectBounds(object);
     if (collisionDetection(position, bounds.position, bounds.size)) {
-      return objectKeys[i];
+      return objectKeys[i]!;
     }
   }
   return null;

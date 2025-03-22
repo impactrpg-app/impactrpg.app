@@ -15,7 +15,7 @@ export function saveToFile(filename: string, data: string) {
 
 export function loadFromFile(
   fileTypes: string | null = null
-): Promise<string | null> {
+): Promise<Uint8Array<ArrayBuffer> | null> {
   return new Promise((resolve) => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
@@ -28,12 +28,10 @@ export function loadFromFile(
     input.onchange = async function () {
       if (!input.files) return;
       const file = input.files[0];
+      if (!file) return;
       const buffer = await file.arrayBuffer();
       const bytes = new Uint8Array(buffer);
-      const result = bytes.reduce(
-        (data, byte) => data + String.fromCharCode(byte), ''
-      )
-      resolve(result);
+      resolve(bytes);
     };
     input.onabort = function () {
       document.body.removeChild(input);

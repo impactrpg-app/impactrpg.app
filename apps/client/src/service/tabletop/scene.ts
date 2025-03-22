@@ -4,11 +4,10 @@ import {
   AddObjectMessage,
   RemoveObjectMessage,
   UpdateObjectMessage,
-  ImageChunkMessage,
-  ImageChunkMessageEnd,
 } from "@impact/shared";
 import { ref } from "vue";
 import { socket } from "./sync";
+import { API_URL } from "../api";
 
 export const camera = ref<{
   position: Vector2;
@@ -28,11 +27,12 @@ export function getImageElement(uuid: string, imageSrc: string) {
   }
   const image = new Image();
   image.src = imageSrc;
+  image.crossOrigin = "anonymous";
   imagesCache.value.set(uuid, image);
   return image;
 }
 
-export function addObjectRequest(object: TabletopObject) {
+export async function addObjectRequest(object: TabletopObject) {
   if (!socket) {
     throw new Error("Not connected to server");
   }
@@ -42,34 +42,10 @@ export function addObjectRequest(object: TabletopObject) {
   } else if (object.type === "stroke" && !object.strokes) {
     throw new Error("Strokes are required");
   }
-
-  let chunks: number[] = [];
-  if (object.type === "image" && object.image) {
-    const encoder = new TextEncoder();
-    const arr = encoder.encode(object.image);
-    chunks = Array.from(arr);
-    object.image = "undefined";
+  if (object.type === "image" && object.image && object.image.length > 1024) {
+    throw new Error('image is too large, please upload it first');
   }
-
   socket.emit("event", new AddObjectMessage(object));
-
-  if (chunks.length > 0) {
-    let count = 0;
-    while (chunks.length > 0) {
-      const chunk = chunks.splice(0, 100_000);
-      socket.emit("event", {
-        type: "imageChunk",
-        objectId: object.uuid,
-        count: count++,
-        chunk: chunk,
-      } as ImageChunkMessage);
-    }
-    socket.emit("event", {
-      type: "imageChunkEnd",
-      objectId: object.uuid,
-      totalChunks: count,
-    } as ImageChunkMessageEnd);
-  }
 }
 
 export function addObjectResponse(message: AddObjectMessage) {

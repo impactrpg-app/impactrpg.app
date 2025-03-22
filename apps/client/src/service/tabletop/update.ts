@@ -67,17 +67,21 @@ export function drawStrokeObject(object: TabletopObject, context: CanvasRenderin
     context.strokeStyle = object.strokeColor ?? 'black';
     context.lineWidth = object.strokeWidth ?? 5;
     context.beginPath();
-    if (object.strokes.length > 1) {
-        context.moveTo(object.strokes[0].x, object.strokes[0].y);
+    if (object.strokes && object.strokes.length > 1) {
+        context.moveTo(
+            object.strokes[0]!.x,
+            object.strokes[0]!.y
+        );
         let max: [number, number] = [-Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
         let min: [number, number] = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
         for (let j = 1; j < object.strokes.length; j++) {
-            context.lineTo(object.strokes[j].x, object.strokes[j].y);
+            const stroke = object.strokes[j]!;
+            context.lineTo(stroke.x, stroke.y);
             // get bounds
-            if (object.strokes[j].x > max[0]) max[0] = object.strokes[j].x;
-            if (object.strokes[j].y > max[1]) max[1] = object.strokes[j].y;
-            if (object.strokes[j].x < min[0]) min[0] = object.strokes[j].x;
-            if (object.strokes[j].y < min[1]) min[1] = object.strokes[j].y;
+            if (stroke.x > max[0]) max[0] = stroke.x;
+            if (stroke.y > max[1]) max[1] = stroke.y;
+            if (stroke.x < min[0]) min[0] = stroke.x;
+            if (stroke.y < min[1]) min[1] = stroke.y;
         }
         context.stroke();
 
@@ -108,16 +112,19 @@ export function drawObject(object: TabletopObject, context: CanvasRenderingConte
 }
 
 export function onUpdate(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+    context.imageSmoothingEnabled = false;
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     context.save();
 
     // move to canvas centre
-    const canvasSizeHalf = [canvas.width / 2, canvas.height / 2];
+    const canvasSizeHalf = new Vector2(
+        canvas.width / 2, canvas.height / 2
+    );
     context.translate(
-        canvasSizeHalf[0],
-        canvasSizeHalf[1],
+        canvasSizeHalf.x,
+        canvasSizeHalf.y,
     );
     context.scale(
         camera.value.zoom,

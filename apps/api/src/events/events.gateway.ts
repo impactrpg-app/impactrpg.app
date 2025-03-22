@@ -44,12 +44,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       case MessageType.UpdateObject:
         this.roomService.updateObject(client, payload.objectId, payload.object);
         break;
-      case MessageType.ImageChunk:
-        this.roomService.imageChunk(client, payload.objectId, payload.chunk, payload.count);
-        break;
-      case MessageType.ImageChunkEnd:
-        this.roomService.imageChunkEnd(client, payload.objectId, payload.totalChunks);
-        break;
       case MessageType.SendNotification:
         this.roomService.sendNotification(client, payload.message, payload.image);
         break;

@@ -51,31 +51,6 @@ export class AddObjectMessage {
   }
 }
 
-export class ImageChunkMessage {
-  type: MessageType.ImageChunk;
-  objectId: string;
-  chunk: number[];
-  count: number;
-
-  constructor(objectId: string, chunk: number[], count: number) {
-    this.type = MessageType.ImageChunk;
-    this.objectId = objectId;
-    this.chunk = chunk;
-    this.count = count;
-  }
-}
-export class ImageChunkMessageEnd {
-  type: MessageType.ImageChunkEnd;
-  objectId: string;
-  totalChunks: number;
-
-  constructor(objectId: string, totalChunks: number) {
-    this.type = MessageType.ImageChunkEnd;
-    this.objectId = objectId;
-    this.totalChunks = totalChunks;
-  }
-}
-
 export class RemoveObjectMessage {
   type: MessageType.RemoveObject;
   objectId: string;
@@ -117,8 +92,6 @@ export const AllMessages = [
   AddObjectMessage,
   RemoveObjectMessage,
   UpdateObjectMessage,
-  ImageChunkMessage,
-  ImageChunkMessageEnd,
   SendNotificationMessage,
 ];
 
@@ -129,6 +102,4 @@ export type AllMessageTypes =
   | AddObjectMessage
   | RemoveObjectMessage
   | UpdateObjectMessage
-  | ImageChunkMessage
-  | ImageChunkMessageEnd
   | SendNotificationMessage;
