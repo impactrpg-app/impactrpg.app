@@ -1,0 +1,11 @@
+{
+  "extends": "@repo/typescript-config/nestjs.json",
+  "compilerOptions": {
+    "preserveWatchOutput": true,
+    "baseUrl": "./",
+    "outDir": "./dist",
+    "paths": {
+      "@impact/shared": ["../../packages/shared/src"]
+    }
+  }
+}
