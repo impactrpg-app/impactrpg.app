@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import DiceRollerComponent from "./DiceRollerComponent.vue";
+import TabletopCharacterDialogComponent from "./TabletopCharacterDialogComponent.vue";
+import ObjectPropertiesComponent from "./ObjectProperties.vue";
+import RulebookComponent from "./RulebookComponent.vue";
+import TabletopToolsComponent from "./TabletopToolsComponent.vue";
 import {
   ContextMenu,
   Dialog,
@@ -10,10 +15,6 @@ import {
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from "vue";
 import { loadFromFile } from "../service/io";
 import * as TabletopService from "../service/tabletop";
-import DiceRollerComponent from "./DiceRollerComponent.vue";
-import TabletopCharacterDialogComponent from "./TabletopCharacterDialogComponent.vue";
-import RulebookComponent from "./RulebookComponent.vue";
-import TabletopToolsComponent from "./TabletopToolsComponent.vue";
 import { accessToken, API_URL, getHeaders } from "../service/api";
 import {
   ImageUploadResponse,
@@ -179,6 +180,7 @@ async function deleteRoom(id: string) {
 <template>
   <canvas :ondrop="onDropFile" :ondragover="onDragOver" class="tabletop-canvas" ref="canvas" @contextmenu="onContextMenu" />
   <template v-if="TabletopService.isInRoom()">
+    <ObjectPropertiesComponent />
     <div class="tabletop">
       <DiceRollerComponent
         :modal="false"

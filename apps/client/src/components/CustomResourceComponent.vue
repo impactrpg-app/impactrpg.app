@@ -44,7 +44,7 @@ const value = computed({
   height: 30px;
 
   input {
-    width: 40px;
+    width: 60px;
   }
 }
 </style>
