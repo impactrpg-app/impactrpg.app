@@ -26,11 +26,15 @@ export function drawImageObject(object: TabletopObject, context: CanvasRendering
     }
     const imageSize = new Vector2(image.width, image.height);
 
-    context.scale(object.scale, object.scale);
-    context.rotate(object.rotation);
     context.translate(
-        object.position.x - imageSize.x / 2,
-        object.position.y - imageSize.y / 2
+        object.position.x,
+        object.position.y
+    );
+    context.rotate(object.rotation);
+    context.scale(object.scale, object.scale);
+    context.translate(
+        -imageSize.x / 2,
+        -imageSize.y / 2
     );
     context.drawImage(image, 0, 0, imageSize.x, imageSize.y);
 
