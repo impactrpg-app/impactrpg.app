@@ -18,6 +18,7 @@ export class TabletopObject {
   strokeWidth?: number;
   strokeColor?: string;
   order?: number;
+  userToken?: string;
 
   static newImage(
     position: Vector2,

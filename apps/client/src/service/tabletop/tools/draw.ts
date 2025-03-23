@@ -1,7 +1,8 @@
-import { TabletopObjectType, Vector2 } from "@impact/shared";
+import { AddObjectMessage, RemoveObjectMessage, TabletopObjectType, Vector2 } from "@impact/shared";
 import { MouseType } from "../input";
 import {
   addObjectRequest,
+  pushToHistory,
   removeObjectRequest,
   scene,
   updateObjectRequest,
@@ -29,7 +30,7 @@ export class DrawTool extends TabletopTool {
         strokeColor: "black",
         strokeWidth: 5,
         strokes: [pos],
-      });
+      }, false);
     }
   }
 
@@ -39,7 +40,12 @@ export class DrawTool extends TabletopTool {
       const stroke = scene.value.get(this.strokeId);
       if (!stroke) return;
       if (stroke.strokes!.length <= 10) {
-        removeObjectRequest(stroke);
+        removeObjectRequest(stroke, false);
+      } else {
+        pushToHistory(
+          [new AddObjectMessage(stroke)],
+          [new RemoveObjectMessage(this.strokeId)]
+        );
       }
       this.strokeId = null;
     }
@@ -59,9 +65,11 @@ export class DrawTool extends TabletopTool {
     );
     if (distance <= 1) return;
 
-    stroke.strokes!.push(mouseToWorld);
     updateObjectRequest(this.strokeId, {
-      strokes: stroke.strokes,
-    });
+      strokes: [
+        ...(stroke.strokes ?? []),
+        mouseToWorld
+      ],
+    }, false);
   }
 }

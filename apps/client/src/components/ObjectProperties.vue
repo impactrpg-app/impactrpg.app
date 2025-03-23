@@ -4,6 +4,7 @@ import { Dialog, ToggleSwitch } from "primevue";
 import { computed } from "vue";
 import { objectPropertiesDialog } from "../service/tabletop/contextMenu";
 import { scene, sortScene, updateObjectRequest } from "../service/tabletop/scene";
+import { getUserClaims } from "@/service/api";
 
 const objects = computed(() => objectPropertiesDialog.value);
 const order = computed({
@@ -38,11 +39,8 @@ const rotation = computed({
   },
   set(val: number) {
     for (const object of objects.value) {
-      const obj = scene.value.get(object);
-      if (!obj) continue;
-      obj.rotation = val * (Math.PI / 180);
       updateObjectRequest(object, {
-        rotation: obj.rotation
+        rotation: val * (Math.PI / 180),
       });
     }
   },
@@ -58,10 +56,9 @@ const scale = computed({
   },
   set(val: number) {
     for (const object of objects.value) {
-      const obj = scene.value.get(object);
-      if (!obj) continue;
-      obj.scale = val / 100;
-      updateObjectRequest(object, obj);
+      updateObjectRequest(object, {
+        scale: val / 100,
+      });
     }
   },
 });
@@ -76,10 +73,40 @@ const lockObject = computed({
   },
   set(val: boolean) {
     for (const object of objects.value) {
+      updateObjectRequest(object, {
+        locked: val,
+      });
+    }
+  },
+});
+const useAsToken = computed({
+  get() {
+    const userClaims = getUserClaims();
+    if (!userClaims) return false;
+
+    for (const object of objects.value) {
       const obj = scene.value.get(object);
       if (!obj) continue;
-      obj.locked = val;
-      updateObjectRequest(object, obj);
+
+      return obj.userToken === userClaims['id'];
+    }
+    return false;
+  },
+  set(val: boolean) {
+    const userClaims = getUserClaims();
+    if (!userClaims) return;
+
+    for (const object of objects.value) {
+      const selectedObject = scene.value.get(object);
+      if (!selectedObject) continue;
+      if (val) {
+        selectedObject.userToken = userClaims['id'];
+      } else {
+        selectedObject.userToken = "";
+      }
+      updateObjectRequest(object, {
+        userToken: selectedObject.userToken,
+      });
     }
   },
 });
@@ -113,6 +140,10 @@ function onVisibleUpdate(visible: boolean) {
       <label>
         <span>Lock Object</span>
         <ToggleSwitch v-model="lockObject" input-id="lock-object" />
+      </label>
+      <label v-if="objects.size === 1">
+        <span>Use as Token</span>
+        <ToggleSwitch v-model="useAsToken" input-id="use-as-token" />
       </label>
     </div>
   </Dialog>

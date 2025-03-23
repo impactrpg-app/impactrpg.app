@@ -12,6 +12,7 @@
     "@3d-dice/dice-box": "^1.1.4",
     "@impact/shared": "*",
     "@primeuix/themes": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.2",
     "socket.io-client": "^4.8.1",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@repo/typescript-config": "*",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.11.24",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-vue": "^5.2.3",

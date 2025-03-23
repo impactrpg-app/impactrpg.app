@@ -115,6 +115,10 @@ onMounted(async () => {
   window.addEventListener("wheel", TabletopService.onScroll);
   window.addEventListener("keydown", TabletopService.onKeyDown);
   window.addEventListener("keyup", TabletopService.onKeyUp);
+  window.addEventListener("input", (ev) => {
+    ev.preventDefault();
+    console.log("input");
+  });
   TabletopService.notificationListeners.add(onNotification);
   updateInterval.value = setInterval(() => {
     if (!canvas.value || !context.value) return;

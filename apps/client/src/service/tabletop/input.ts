@@ -1,6 +1,13 @@
 import { Vector2 } from "@impact/shared";
 import { ref } from "vue";
-import { camera, removeObjectRequest, scene, selectedObjects } from "./scene";
+import {
+  camera,
+  redo,
+  removeObjectRequest,
+  scene,
+  selectedObjects,
+  undo,
+} from "./scene";
 import { ALL_TOOLS, tool } from "./tools";
 import { mouseToScreenSpace } from "./utils";
 
@@ -78,7 +85,9 @@ export function onMousemove(event: MouseEvent) {
   if (!mouse.value.overCanvas) return;
 
   // update mouse position
-  const newMousePosition = mouseToScreenSpace(new Vector2(event.clientX, event.clientY));
+  const newMousePosition = mouseToScreenSpace(
+    new Vector2(event.clientX, event.clientY)
+  );
   mouse.value.delta = newMousePosition.sub(mouse.value.position);
   mouse.value.position = newMousePosition;
   mouse.value.rawPosition = new Vector2(event.clientX, event.clientY);
@@ -90,7 +99,7 @@ export function onMousemove(event: MouseEvent) {
   ) {
     camera.value.position = new Vector2(
       camera.value.position.x + mouse.value.delta.x,
-      camera.value.position.y + mouse.value.delta.y,
+      camera.value.position.y + mouse.value.delta.y
     );
   } else {
     // update tool
@@ -143,6 +152,20 @@ export function onKeyDown(event: KeyboardEvent) {
     case "w":
       if (mouse.value.overCanvas) {
         tool.value = ALL_TOOLS[1]!;
+      }
+      break;
+    case "Z":
+    case "z":
+      if (keyboard.value.ctrl) {
+        event.preventDefault();
+        undo();
+      }
+      break;
+    case "Y":
+    case "y":
+      if (keyboard.value.ctrl) {
+        event.preventDefault();
+        redo();
       }
       break;
   }

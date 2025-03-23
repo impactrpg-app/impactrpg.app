@@ -1,9 +1,21 @@
 import { ref } from "vue";
+import { decode, JwtPayload } from 'jsonwebtoken';
 
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 export const accessToken = ref<string | null>(
     localStorage.getItem('accessToken')
 );
+
+export function getUserClaims(): JwtPayload | null {
+    if (!accessToken.value) {
+        return null;
+    }
+    const decoded = decode(accessToken.value);
+    if (!decoded || typeof decoded === 'string') {
+        return null;
+    }
+    return decoded;
+}
 
 export function login(token: string) {
     accessToken.value = token;
