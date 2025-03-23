@@ -17,6 +17,7 @@ export class TabletopObject {
   strokes?: Vector2[];
   strokeWidth?: number;
   strokeColor?: string;
+  order?: number;
 
   static newImage(
     position: Vector2,

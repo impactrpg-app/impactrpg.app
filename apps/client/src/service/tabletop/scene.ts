@@ -7,7 +7,6 @@ import {
 } from "@impact/shared";
 import { ref } from "vue";
 import { socket } from "./sync";
-import { API_URL } from "../api";
 
 export const camera = ref<{
   position: Vector2;
@@ -103,4 +102,14 @@ export function updateObjectResponse(message: UpdateObjectMessage) {
     ...scene.value.get(message.objectId)!,
     ...message.object,
   });
+  sortScene();
+}
+
+export function sortScene() {
+  const sortedScene = [...scene.value.values()].sort(
+    (a, b) => (a.order ?? 0) - (b.order ?? 0)
+  );
+  scene.value = new Map(
+    sortedScene.map((object) => [object.uuid, object])
+  );
 }

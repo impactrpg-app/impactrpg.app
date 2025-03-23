@@ -3,9 +3,30 @@ import CustomResourceComponent from "./CustomResourceComponent.vue";
 import { Dialog, ToggleSwitch } from "primevue";
 import { computed } from "vue";
 import { objectPropertiesDialog } from "../service/tabletop/contextMenu";
-import { scene, updateObjectRequest } from "../service/tabletop/scene";
+import { scene, sortScene, updateObjectRequest } from "../service/tabletop/scene";
 
 const objects = computed(() => objectPropertiesDialog.value);
+const order = computed({
+  get() {
+    for (const object of objects.value) {
+      const obj = scene.value.get(object);
+      if (!obj) continue;
+      return obj.order ?? 0;
+    }
+    return 0;
+  },
+  set(val: number) {
+    for (const object of objects.value) {
+      const obj = scene.value.get(object);
+      if (!obj) continue;
+      obj.order = val;
+      sortScene();
+      updateObjectRequest(object, {
+        order: obj.order
+      });
+    }
+  },
+});
 const rotation = computed({
   get() {
     for (const object of objects.value) {
@@ -20,7 +41,9 @@ const rotation = computed({
       const obj = scene.value.get(object);
       if (!obj) continue;
       obj.rotation = val * (Math.PI / 180);
-      updateObjectRequest(object, obj);
+      updateObjectRequest(object, {
+        rotation: obj.rotation
+      });
     }
   },
 });
@@ -75,6 +98,10 @@ function onVisibleUpdate(visible: boolean) {
     header="Object Properties"
   >
     <div class="column gap20">
+      <label>
+        <span>Order</span>
+        <CustomResourceComponent v-model="order" :min="-100" :max="100" />
+      </label>
       <label>
         <span>Rotation</span>
         <CustomResourceComponent v-model="rotation" :min="-360" :max="360" />
