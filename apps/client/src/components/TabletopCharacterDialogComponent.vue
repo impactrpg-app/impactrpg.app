@@ -6,8 +6,8 @@ import { Button, Dialog, Textarea } from 'primevue';
 import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue';
 import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
-import { API_URL, getHeaders } from '../service/api';
-import { CharacterDto } from '@impact/shared';
+import { API_URL, getHeaders, makeRequest } from '../service/api';
+import { CharacterDto, CharacterListDto } from '@impact/shared';
 
 const props = defineProps<{
     isOpen: boolean;
@@ -36,21 +36,15 @@ watch(selectedCharacter, (newVal) => {
 }, { deep: true });
 
 async function fetchCharacters() {
-    const resp = await fetch(`${API_URL}/characters`, {
-        headers: getHeaders(),
-    });
-    const data = await resp.json();
-    characters.value = data;
+    characters.value = await makeRequest<CharacterListDto[]>('/characters');
 }
 
 async function saveCharacter() {
     if (!selectedCharacter.value) return;
-    const resp = await fetch(`${API_URL}/character/${selectedCharacterId.value}`, {
+    const data = await makeRequest<CharacterDto>(`/character/${selectedCharacterId.value}`, {
         method: 'PUT',
-        headers: getHeaders(),
         body: JSON.stringify(selectedCharacter.value),
     });
-    const data = await resp.json();
     if (!data) {
         toast.add({
             severity: 'error',
@@ -60,12 +54,7 @@ async function saveCharacter() {
 }
 
 async function selectCharacter(characterId: string) {
-    const resp = await fetch(`${API_URL}/character/${characterId}`, {
-        method: 'GET',
-        headers: getHeaders(),
-    });
-    const data = await resp.json();
-    selectedCharacter.value = data;
+    selectedCharacter.value = await makeRequest<CharacterDto>(`/character/${characterId}`);
     selectedCharacterId.value = characterId;
 }
 async function deSelectCharacter() {
@@ -79,13 +68,11 @@ async function createCharacter(character: CharacterDto) {
     if (!character.info.name) {
         character.info.name = "New Character";
     }
-    const resp = await fetch(`${API_URL}/character`, {
+    const data = await makeRequest<CharacterListDto>('/character', {
         method: 'POST',
-        headers: getHeaders(),
         body: JSON.stringify(character),
     });
     
-    const data = await resp.json();
     characters.value = [
         ...characters.value,
         {
@@ -109,11 +96,9 @@ async function deleteCharacter(characterId: string) {
         rejectIcon: 'pi pi-times',
         header: 'Delete Character',
         accept: async () => {
-            const resp = await fetch(`${API_URL}/character/${characterId}`, {
+            const data = await makeRequest<CharacterListDto>(`/character/${characterId}`, {
                 method: 'DELETE',
-                headers: getHeaders(),
             });
-            const data = await resp.json();
             if (data) {
                 characters.value = characters.value.filter(c => c.id !== characterId);
             }

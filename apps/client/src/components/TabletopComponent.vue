@@ -15,7 +15,7 @@ import {
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from "vue";
 import { loadFromFile } from "../service/io";
 import * as TabletopService from "../service/tabletop";
-import { accessToken, API_URL, getHeaders } from "../service/api";
+import { accessToken, API_URL, getHeaders, makeRequest } from "../service/api";
 import {
   ImageUploadResponse,
   RoomDto,
@@ -132,47 +132,24 @@ onUnmounted(() => {
 });
 
 async function fetchRooms() {
-  const resp = await fetch(`${API_URL}/rooms`, {
-    method: "GET",
-    headers: getHeaders(),
-  });
-
-  if (!resp.ok) {
-    throw new Error("Failed to fetch rooms");
-  }
-
-  const data = await resp.json();
-  rooms.value = data;
+  rooms.value = await makeRequest<RoomDto[]>('/rooms');
 }
 
 async function createRoom() {
-  const resp = await fetch(`${API_URL}/room`, {
+  const data = await makeRequest<RoomDto>('/room', {
     method: "POST",
-    headers: getHeaders(),
     body: JSON.stringify({
       name: "New Room",
     }),
   });
-
-  if (!resp.ok) {
-    throw new Error("Failed to create room");
-  }
-
-  const data = await resp.json();
   rooms.value.push(data);
   TabletopService.joinRoomRequest(data.id);
 }
 
 async function deleteRoom(id: string) {
-  const resp = await fetch(`${API_URL}/room/${id}`, {
+  await makeRequest<RoomDto>(`/room/${id}`, {
     method: "DELETE",
-    headers: getHeaders(),
   });
-
-  if (!resp.ok) {
-    throw new Error("Failed to delete room");
-  }
-
   rooms.value = rooms.value.filter((room) => room.id !== id);
 }
 </script>

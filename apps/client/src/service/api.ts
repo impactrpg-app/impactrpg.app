@@ -45,3 +45,21 @@ export function getSocketHeaders(): Record<string, string> {
         'Authorization': `Bearer ${accessToken.value}`
     }
 }
+
+export async function makeRequest<T>(path: string, options: RequestInit = {}) : Promise<T> {
+    const response = await fetch(`${API_URL}${path}`, {
+        headers: getHeaders(),
+        ...options,
+    })
+
+    if (response.status === 401) {
+        logout();
+        throw new Error('Authorization error');
+    }
+
+    if (response.status >= 300) {
+        throw new Error(`API responded with ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+}

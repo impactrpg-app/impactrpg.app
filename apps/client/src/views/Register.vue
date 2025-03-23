@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { FloatLabel, InputText, Button, Dialog } from 'primevue'
 import { ref } from 'vue';
-import { API_URL, getHeaders, login } from '../service/api';
+import { login, makeRequest } from '../service/api';
 import { useRouter } from 'vue-router';
+import { LoginResponseDto } from '@impact/shared';
 
 const router = useRouter();
 const email = ref<string>('');
@@ -10,22 +11,13 @@ const password = ref<string>('');
 const showErrorMessage = ref<string | null>(null);
 
 async function register() {
-    const resp = await fetch(`${API_URL}/auth/register`, {
+    const data = await makeRequest<LoginResponseDto>('/auth/register', {
         method: 'POST',
         body: JSON.stringify({ email: email.value, password: password.value }),
-        headers: getHeaders(),
     });
 
-    if (resp.ok) {
-        const data = await resp.json();
-        login(data.accessToken);
-        router.push('/tabletop');
-    } else if (resp.status >= 400 && resp.status < 500) {
-        const data = await resp.json();
-        showErrorMessage.value = data.message;
-    } else {
-        showErrorMessage.value = 'An error occurred';
-    }
+    login(data.accessToken);
+    router.push('/tabletop');
 }
 </script>
 
