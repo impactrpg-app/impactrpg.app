@@ -57,11 +57,12 @@ async function addImageObject(fileContents: Uint8Array<ArrayBuffer>) {
     return;
   }
   const data: ImageUploadResponse = await resp.json();
+  console.log(TabletopService.camera.value.position);
   TabletopService.addObjectRequest({
     uuid: uuidv4(),
     type: TabletopObjectType.Image,
     image: `${API_URL}/image/${encodeURIComponent(data.path)}`,
-    position: { x: 0, y: 0 },
+    position: TabletopService.camera.value.position.clone().negate(),
     rotation: 0,
     scale: 1,
     locked: false,

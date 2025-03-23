@@ -13,7 +13,7 @@ export const camera = ref<{
   position: Vector2;
   zoom: number;
 }>({
-  position: { x: 0, y: 0 },
+  position: new Vector2(0, 0),
   zoom: 1,
 });
 export const selectedObjects = ref<Set<string>>(new Set());

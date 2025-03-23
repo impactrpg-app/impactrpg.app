@@ -26,4 +26,8 @@ export class Vector2 {
   negate(): Vector2 {
     return new Vector2(-this.x, -this.y);
   }
+
+  clone(): Vector2 {
+    return new Vector2(this.x, this.y);
+  }
 }
