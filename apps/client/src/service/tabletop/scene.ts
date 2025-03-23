@@ -49,6 +49,7 @@ export async function addObjectRequest(object: TabletopObject) {
 
 export function addObjectResponse(message: AddObjectMessage) {
   scene.value.set(message.object.uuid, message.object);
+  sortScene();
 }
 
 export function removeObjectRequest(object: TabletopObject) {
