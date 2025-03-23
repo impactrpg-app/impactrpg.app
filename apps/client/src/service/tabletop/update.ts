@@ -40,7 +40,7 @@ export function drawImageObject(object: TabletopObject, context: CanvasRendering
 
     if (selectedObjects.value.has(object.uuid)) {
         context.strokeStyle = '#58c9af';
-        context.lineWidth = 5 / camera.value.zoom;
+        context.lineWidth = 5 / (camera.value.zoom * object.scale);
         context.strokeRect(
             0,
             0,

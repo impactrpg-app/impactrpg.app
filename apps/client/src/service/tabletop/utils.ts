@@ -3,6 +3,8 @@ import { camera, getImageElement } from "./scene";
 import { canvasBindingRect } from "./update";
 import { scene } from "./scene";
 
+export type Bounds = [number, number, number, number];
+
 export function mouseToScreenSpace(pos: Vector2): Vector2 {
   const canvasRect = canvasBindingRect.value;
   if (!canvasRect) return new Vector2(0, 0);
@@ -24,37 +26,33 @@ export function screenToWorldSpace(pos: Vector2): Vector2 {
 }
 
 export function worldToScreenSpace(pos: Vector2): Vector2 {
-  return {
-    x: pos.x + camera.value.position.x,
-    y: pos.y + camera.value.position.y,
-  };
+  return new Vector2(
+    pos.x + camera.value.position.x,
+    pos.y + camera.value.position.y,
+  );
 }
 
 export function collisionDetection(
   point: Vector2,
+  objectBounds: Bounds,
   objectPosition: Vector2,
-  objectSize: Vector2
+  objectRotation: number,
+  objectScale: number
 ): boolean {
-  const halfSize = new Vector2(objectSize.x / 2, objectSize.y / 2);
+  let localPoint = point.sub(objectPosition);
+  localPoint = localPoint.rotate(-objectRotation);
+  localPoint = localPoint.scale(1.0 / objectScale);
 
   return (
-    point.x >= objectPosition.x - halfSize.x &&
-    point.x <= objectPosition.x + halfSize.x &&
-    point.y >= objectPosition.y - halfSize.y &&
-    point.y <= objectPosition.y + halfSize.y
+    localPoint.x >= objectBounds[0] &&
+    localPoint.y >= objectBounds[1] &&
+    localPoint.x <= objectBounds[2] &&
+    localPoint.y <= objectBounds[3]
   );
 }
 
-export type Bounds = {
-  position: Vector2;
-  size: Vector2;
-};
-
 export function getStrokeBounds(object: TabletopObject) : Bounds {
-  if (!object.strokes) return {
-    position: object.position,
-    size: new Vector2(0, 0),
-  };
+  if (!object.strokes) return [0, 0, 0, 0];
   let minX = Math.min(...object.strokes.map((stroke) => stroke.x));
   let minY = Math.min(...object.strokes.map((stroke) => stroke.y));
   let maxX = Math.max(...object.strokes.map((stroke) => stroke.x));
@@ -74,33 +72,22 @@ export function getStrokeBounds(object: TabletopObject) : Bounds {
     maxY += halfDiff;
   }
 
-  const size = new Vector2(maxX - minX, maxY - minY);
-  const position = {
-    x: minX + object.position.x + size.x / 2,
-    y: minY + object.position.y + size.y / 2,
-  };
-  return {
-    position,
-    size,
-  };
+  return [minX, minY, maxX, maxY];
 }
 
 export function getImageBounds(object: TabletopObject): Bounds {
   if (!object.image)
-    return {
-      position: new Vector2(0, 0),
-      size: new Vector2(0, 0),
-    };
+    return [0, 0, 0, 0];
   const imageEl = getImageElement(object.uuid, object.image);
   if (!imageEl)
-    return {
-      position: object.position,
-      size: new Vector2(0, 0),
-    };
-  return {
-    position: object.position,
-    size: new Vector2(imageEl.width, imageEl.height),
-  };
+    return [object.position.x, object.position.y, 0, 0];
+
+  return [
+    - imageEl.width / 2,
+    - imageEl.height / 2,
+    imageEl.width / 2,
+    imageEl.height / 2,
+  ];
 }
 
 export function getObjectBounds(object: TabletopObject): Bounds {
@@ -110,10 +97,7 @@ export function getObjectBounds(object: TabletopObject): Bounds {
     case "stroke":
       return getStrokeBounds(object);
     default:
-      return {
-        position: object.position,
-        size: new Vector2(0, 0),
-      };
+      return [0, 0, 0, 0];
   }
 }
 
@@ -128,7 +112,7 @@ export function getObjectAtPosition(
     if (!ignoreLock && object.locked) continue;
     
     const bounds = getObjectBounds(object);
-    if (collisionDetection(position, bounds.position, bounds.size)) {
+    if (collisionDetection(position, bounds, object.position, object.rotation, object.scale)) {
       return objectKeys[i]!;
     }
   }
