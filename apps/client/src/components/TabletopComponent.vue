@@ -19,9 +19,8 @@ import { accessToken, API_URL, getHeaders } from "../service/api";
 import {
   ImageUploadResponse,
   RoomDto,
-  TabletopObjectType,
+  TabletopObject,
 } from "@impact/shared";
-import { v4 as uuidv4 } from "uuid";
 import { watch } from "vue";
 
 const isCharactersOpen = ref(false);
@@ -63,15 +62,11 @@ async function addImageObject(fileContents: Uint8Array<ArrayBuffer>) {
     return;
   }
   const data: ImageUploadResponse = await resp.json();
-  TabletopService.addObjectRequest({
-    uuid: uuidv4(),
-    type: TabletopObjectType.Image,
-    image: `${API_URL}/image/${encodeURIComponent(data.path)}`,
-    position: TabletopService.camera.value.position.clone().negate(),
-    rotation: 0,
-    scale: 1,
-    locked: false,
-  });
+  const obj = TabletopObject.NewImageObject(
+    TabletopService.camera.value.position.clone().negate(),
+    `${API_URL}/image/${encodeURIComponent(data.path)}`
+  );
+  TabletopService.addObjectRequest(obj);
 }
 function onContextMenu(event: MouseEvent) {
   event.preventDefault();

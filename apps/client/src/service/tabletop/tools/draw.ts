@@ -1,4 +1,10 @@
-import { AddObjectMessage, RemoveObjectMessage, TabletopObjectType, Vector2 } from "@impact/shared";
+import {
+  AddObjectMessage,
+  RemoveObjectMessage,
+  TabletopObject,
+  TabletopObjectType,
+  Vector2,
+} from "@impact/shared";
 import { MouseType } from "../input";
 import {
   addObjectRequest,
@@ -9,7 +15,6 @@ import {
 } from "../scene";
 import { screenToWorldSpace } from "../utils";
 import { TabletopTool } from "./base";
-import { v4 as uuidv4 } from "uuid";
 
 export class DrawTool extends TabletopTool {
   public name: string = "Draw Tool (W)";
@@ -19,18 +24,9 @@ export class DrawTool extends TabletopTool {
   public onMouseDown(mouse: MouseType): void {
     if (mouse.leftClickDown) {
       const pos = screenToWorldSpace(mouse.position);
-      this.strokeId = uuidv4();
-      addObjectRequest({
-        uuid: this.strokeId,
-        type: TabletopObjectType.Stroke,
-        position: new Vector2(0, 0),
-        rotation: 0,
-        scale: 1,
-        locked: false,
-        strokeColor: "black",
-        strokeWidth: 5,
-        strokes: [pos],
-      }, false);
+      const obj = TabletopObject.NewStrokeObject(pos);
+      this.strokeId = obj.uuid;
+      addObjectRequest(obj, false);
     }
   }
 
@@ -65,11 +61,12 @@ export class DrawTool extends TabletopTool {
     );
     if (distance <= 1) return;
 
-    updateObjectRequest(this.strokeId, {
-      strokes: [
-        ...(stroke.strokes ?? []),
-        mouseToWorld
-      ],
-    }, false);
+    updateObjectRequest(
+      this.strokeId,
+      {
+        strokes: [...(stroke.strokes ?? []), mouseToWorld],
+      },
+      false
+    );
   }
 }
