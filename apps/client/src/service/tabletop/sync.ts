@@ -8,9 +8,7 @@ import {
 import { joinRoomResponse, leaveRoomResponse } from "./room";
 import {
   addObjectResponse,
-  imagesCache,
   removeObjectResponse,
-  scene,
   updateObjectResponse,
 } from "./scene";
 

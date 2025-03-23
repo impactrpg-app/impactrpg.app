@@ -45,6 +45,7 @@ const value = computed({
 
   input {
     width: 60px;
+    text-align: center;
   }
 }
 </style>

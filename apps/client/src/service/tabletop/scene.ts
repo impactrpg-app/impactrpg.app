@@ -48,6 +48,10 @@ export async function addObjectRequest(object: TabletopObject) {
 }
 
 export function addObjectResponse(message: AddObjectMessage) {
+  if ('strokes' in message.object) {
+    message.object.strokes = message.object.strokes!.map((stroke) => Vector2.convert(stroke));
+  }
+  message.object.position = Vector2.convert(message.object.position);
   scene.value.set(message.object.uuid, message.object);
   sortScene();
 }
@@ -97,6 +101,13 @@ export function updateObjectRequest(
 export function updateObjectResponse(message: UpdateObjectMessage) {
   if (!scene.value.has(message.objectId)) {
     throw new Error("Object not found");
+  }
+
+  if ('position' in message.object) {
+    message.object.position = Vector2.convert(message.object.position!);
+  }
+  if ('strokes' in message.object) {
+    message.object.strokes = message.object.strokes!.map((stroke) => Vector2.convert(stroke));
   }
 
   scene.value.set(message.objectId, {

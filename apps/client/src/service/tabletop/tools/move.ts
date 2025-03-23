@@ -1,3 +1,4 @@
+import { contextMenuRef } from "../contextMenu";
 import { keyboard, MouseType } from "../input";
 import { scene, selectedObjects, updateObjectRequest } from "../scene";
 import { getObjectAtPosition, screenToWorldSpace } from "../utils";
@@ -6,7 +7,6 @@ import { TabletopTool } from "./base";
 export class MoveTool extends TabletopTool {
   public name: string = "Move Tool (Q)";
   public icon: string = "pi pi-arrows-alt";
-  public disableContextMenu: boolean = false;
   private enableDragging: boolean = false;
 
   public onMouseDown(mouse: MouseType): void {
@@ -30,7 +30,15 @@ export class MoveTool extends TabletopTool {
         true
       );
       if (object) {
-        selectedObjects.value.add(object);
+        if (keyboard.value.shift) {
+          selectedObjects.value.add(object);
+        } else if (!selectedObjects.value.has(object)) {
+          selectedObjects.value = new Set([object]);
+        }
+        contextMenuRef.value.show(new MouseEvent('click', {
+          clientX: mouse.rawPosition.x,
+          clientY: mouse.rawPosition.y,
+        }));
       }
     }
   }
@@ -48,10 +56,7 @@ export class MoveTool extends TabletopTool {
       const obj = scene.value.get(objectUuid);
       if (!obj) return;
 
-      obj.position = {
-        x: obj.position.x + mouse.delta.x,
-        y: obj.position.y + mouse.delta.y,
-      };
+      obj.position = obj.position.add(mouse.delta);
 
       updateObjectRequest(objectUuid, {
         position: obj.position,

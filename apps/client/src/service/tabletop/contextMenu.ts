@@ -1,11 +1,11 @@
 import { removeObjectRequest } from "./scene";
 import { ref } from "vue";
-import { selectedObjects, updateObjectRequest } from "./scene";
+import { selectedObjects } from "./scene";
 import { scene } from "./scene";
 import { MenuItem } from "primevue/menuitem";
 
 export const objectPropertiesDialog = ref<Set<string>>(new Set());
-
+export const contextMenuRef = ref();
 export const contextMenuItems = ref<MenuItem[]>([
   {
     label: "Delete",

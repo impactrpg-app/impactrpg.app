@@ -30,4 +30,8 @@ export class Vector2 {
   clone(): Vector2 {
     return new Vector2(this.x, this.y);
   }
+
+  static convert({x, y}: {x: number, y: number}): Vector2 {
+    return new Vector2(x, y);
+  }
 }

@@ -6,6 +6,7 @@ import { mouseToScreenSpace } from "./utils";
 
 export type MouseType = {
   position: Vector2;
+  rawPosition: Vector2;
   delta: Vector2;
   overCanvas: boolean;
   leftClickDown: boolean;
@@ -21,8 +22,9 @@ export type KeyboardType = {
 };
 
 export const mouse = ref<MouseType>({
-  position: { x: 0, y: 0 },
-  delta: { x: 0, y: 0 },
+  position: new Vector2(0, 0),
+  rawPosition: new Vector2(0, 0),
+  delta: new Vector2(0, 0),
   overCanvas: false,
   leftClickDown: false,
   rightClickDown: false,
@@ -76,15 +78,10 @@ export function onMousemove(event: MouseEvent) {
   if (!mouse.value.overCanvas) return;
 
   // update mouse position
-  const newMousePosition = mouseToScreenSpace({
-    x: event.clientX,
-    y: event.clientY,
-  });
-  mouse.value.delta = {
-    x: newMousePosition.x - mouse.value.position.x,
-    y: newMousePosition.y - mouse.value.position.y,
-  };
+  const newMousePosition = mouseToScreenSpace(new Vector2(event.clientX, event.clientY));
+  mouse.value.delta = newMousePosition.sub(mouse.value.position);
   mouse.value.position = newMousePosition;
+  mouse.value.rawPosition = new Vector2(event.clientX, event.clientY);
 
   // update camera position
   if (
@@ -109,13 +106,6 @@ export function onScroll(event: WheelEvent) {
 
 export function onMouseOver(event: MouseEvent) {
   mouse.value.overCanvas = !!(event.target instanceof HTMLCanvasElement);
-}
-
-export function onContextMenu(event: MouseEvent, contextMenuRef: any) {
-  if (!mouse.value.overCanvas) return;
-  if (tool.value.disableContextMenu) return;
-  if (selectedObjects.value.size === 0) return;
-  contextMenuRef.show(event);
 }
 
 export function onKeyDown(event: KeyboardEvent) {
@@ -145,11 +135,15 @@ export function onKeyDown(event: KeyboardEvent) {
       break;
     case "Q":
     case "q":
-      tool.value = ALL_TOOLS[0]!;
+      if (mouse.value.overCanvas) {
+        tool.value = ALL_TOOLS[0]!;
+      }
       break;
     case "W":
     case "w":
-      tool.value = ALL_TOOLS[1]!;
+      if (mouse.value.overCanvas) {
+        tool.value = ALL_TOOLS[1]!;
+      }
       break;
   }
 

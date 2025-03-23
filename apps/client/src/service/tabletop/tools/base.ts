@@ -3,7 +3,6 @@ import { KeyboardType, MouseType } from "../input";
 export class TabletopTool {
     public name: string = 'Unknown Tool';
     public icon: string = 'pi pi-exclamation-triangle';
-    public disableContextMenu: boolean = false;
 
     public onMouseDown(_mouse: MouseType): void {}
 

@@ -22,6 +22,7 @@ import {
   TabletopObjectType,
 } from "@impact/shared";
 import { v4 as uuidv4 } from "uuid";
+import { watch } from "vue";
 
 const isCharactersOpen = ref(false);
 const isDiceTrayOpen = ref(false);
@@ -37,6 +38,11 @@ const context = computed(() => canvas.value?.getContext("2d"));
 const selectedCharacterName = ref("");
 const joinRoomCode = ref("");
 const rooms = ref<RoomDto[]>([]);
+
+watch(contextMenuRef, (el) => {
+  if (!el) return;
+  TabletopService.contextMenuRef.value = el;
+})
 
 async function uploadImage() {
   const imageSource = await loadFromFile("image/*");
@@ -70,7 +76,6 @@ async function addImageObject(fileContents: Uint8Array<ArrayBuffer>) {
 }
 function onContextMenu(event: MouseEvent) {
   event.preventDefault();
-  TabletopService.onContextMenu(event, contextMenuRef.value);
 }
 function onResize(_: UIEvent) {
   if (!canvas.value) return;

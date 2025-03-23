@@ -123,5 +123,12 @@ label {
   display: flex;
   gap: 20px;
   align-items: center;
+
+  span {
+    width: 150px;
+  }
+  input {
+    text-align: center;
+  }
 }
 </style>

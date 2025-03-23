@@ -1,4 +1,4 @@
-import { TabletopObjectType } from "@impact/shared";
+import { TabletopObjectType, Vector2 } from "@impact/shared";
 import { MouseType } from "../input";
 import {
   addObjectRequest,
@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from "uuid";
 export class DrawTool extends TabletopTool {
   public name: string = "Draw Tool (W)";
   public icon: string = "pi pi-pencil";
-  public disableContextMenu: boolean = false;
   private strokeId: string | null = null;
 
   public onMouseDown(mouse: MouseType): void {
@@ -23,7 +22,7 @@ export class DrawTool extends TabletopTool {
       addObjectRequest({
         uuid: this.strokeId,
         type: TabletopObjectType.Stroke,
-        position: { x: 0, y: 0 },
+        position: new Vector2(0, 0),
         rotation: 0,
         scale: 1,
         locked: false,
