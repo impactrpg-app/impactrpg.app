@@ -55,10 +55,24 @@ export function getStrokeBounds(object: TabletopObject) : Bounds {
     position: object.position,
     size: new Vector2(0, 0),
   };
-  const minX = Math.min(...object.strokes.map((stroke) => stroke.x));
-  const minY = Math.min(...object.strokes.map((stroke) => stroke.y));
-  const maxX = Math.max(...object.strokes.map((stroke) => stroke.x));
-  const maxY = Math.max(...object.strokes.map((stroke) => stroke.y));
+  let minX = Math.min(...object.strokes.map((stroke) => stroke.x));
+  let minY = Math.min(...object.strokes.map((stroke) => stroke.y));
+  let maxX = Math.max(...object.strokes.map((stroke) => stroke.x));
+  let maxY = Math.max(...object.strokes.map((stroke) => stroke.y));
+
+  const diffX = Math.abs(maxX - minX);
+  if (diffX < 10) {
+    const halfDiff = diffX / 2;
+    minX -= halfDiff;
+    maxX += halfDiff;
+  }
+
+  const diffY = Math.abs(maxY - minY);
+  if (diffY < 10) {
+    const halfDiff = diffY / 2;
+    minY -= halfDiff;
+    maxY += halfDiff;
+  }
 
   const size = new Vector2(maxX - minX, maxY - minY);
   const position = {
