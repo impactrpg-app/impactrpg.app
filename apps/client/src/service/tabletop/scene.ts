@@ -175,7 +175,6 @@ export function clearHistory() {
 }
 
 export function undo() {
-  console.log(history.value);
   if (history.value.length === 0) return;
   const item = history.value.pop();
   if (!item) return;
@@ -209,5 +208,4 @@ export function pushToHistory(
     performedActions: action,
     revertActions: revertAction,
   });
-  console.log(history.value);
 }
