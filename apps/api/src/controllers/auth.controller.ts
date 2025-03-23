@@ -2,7 +2,7 @@ import { Post, Body, Controller, UnauthorizedException, BadRequestException } fr
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "src/db/user";
-import { hash, compare } from "bcrypt";
+import { hash, compare } from "bcryptjs";
 import { JwtService } from "src/services/jwt.service";
 import { ApiOkResponse, ApiOperation } from "@nestjs/swagger";
 import { LoginResponseDto, RegisterDto, LoginDto } from "@impact/shared";
