@@ -3,13 +3,11 @@ import CustomResourceComponent from "./CustomResourceComponent.vue";
 import { Dialog, ToggleSwitch } from "primevue";
 import { computed } from "vue";
 import { objectPropertiesDialog } from "../service/tabletop/contextMenu";
-import { scene, sortScene, updateObjectRequest } from "../service/tabletop/scene";
-import { getUserClaims } from "@/service/api";
-import { CharacterDto, UserToken } from "@impact/shared";
-
-const props = defineProps<{
-  selectedCharacter: CharacterDto | null;
-}>();
+import {
+  scene,
+  sortScene,
+  updateObjectRequest,
+} from "../service/tabletop/scene";
 
 const objects = computed(() => objectPropertiesDialog.value);
 const order = computed({
@@ -28,7 +26,7 @@ const order = computed({
       obj.order = val;
       sortScene();
       updateObjectRequest(object, {
-        order: obj.order
+        order: obj.order,
       });
     }
   },
@@ -84,46 +82,6 @@ const lockObject = computed({
     }
   },
 });
-const useAsToken = computed({
-  get() {
-    for (const object of objects.value) {
-      const obj = scene.value.get(object);
-      if (!obj) continue;
-
-      return !!obj.userToken;
-    }
-    return false;
-  },
-  set(val: boolean) {
-    const userClaims = getUserClaims();
-    if (!userClaims) return;
-    if (!props.selectedCharacter) return;
-
-    for (const object of objects.value) {
-      const selectedObject = scene.value.get(object);
-      if (!selectedObject) continue;
-      if (val) {
-        const userToken = new UserToken(userClaims['id']);
-        if (props.selectedCharacter) {
-          userToken.uuid = props.selectedCharacter.id;
-          userToken.name = props.selectedCharacter.info.name;
-          userToken.owner = props.selectedCharacter.owner;
-          userToken.wounds = props.selectedCharacter.resources.wounds;
-          userToken.corruption = props.selectedCharacter.resources.corruption;
-          userToken.defense = props.selectedCharacter.abilities.agility + props.selectedCharacter.armor;
-          userToken.attack = props.selectedCharacter.abilities.strength + props.selectedCharacter.attack;
-        }
-        selectedObject.userToken = userToken;
-        console.log(selectedObject.userToken);
-      } else {
-        selectedObject.userToken = null;
-      }
-      updateObjectRequest(object, {
-        userToken: selectedObject.userToken,
-      });
-    }
-  },
-});
 
 function onVisibleUpdate(visible: boolean) {
   if (visible) return;
@@ -154,10 +112,6 @@ function onVisibleUpdate(visible: boolean) {
       <label>
         <span>Lock Object</span>
         <ToggleSwitch v-model="lockObject" input-id="lock-object" />
-      </label>
-      <label v-if="objects.size === 1 && selectedCharacter">
-        <span>Use as Token</span>
-        <ToggleSwitch v-model="useAsToken" input-id="use-as-token" />
       </label>
     </div>
   </Dialog>

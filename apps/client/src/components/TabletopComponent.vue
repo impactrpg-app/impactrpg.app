@@ -184,7 +184,7 @@ async function deleteRoom(id: string) {
     @contextmenu="onContextMenu"
   />
   <template v-if="TabletopService.isInRoom()">
-    <ObjectPropertiesComponent :selected-character="selectedCharacter" />
+    <ObjectPropertiesComponent />
     <div class="tabletop">
       <DiceRollerComponent
         :modal="false"
