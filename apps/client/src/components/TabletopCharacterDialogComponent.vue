@@ -6,8 +6,9 @@ import { Button, Dialog, Textarea } from 'primevue';
 import CharacterInfoComponent from './character-sheet/CharacterInfoComponent.vue';
 import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.vue';
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
-import { API_URL, getHeaders, makeRequest } from '../service/api';
-import { CharacterDto, CharacterListDto } from '@impact/shared';
+import { getUserClaims, makeRequest } from '../service/api';
+import { CharacterDto, CharacterListDto, TabletopObject, Vector2 } from '@impact/shared';
+import * as TabletopService from '@/service/tabletop';
 
 const props = defineProps<{
     isOpen: boolean;
@@ -30,7 +31,6 @@ onMounted(async () => {
 });
 watch(selectedCharacter, (newVal) => {
     if (newVal) {
-        console.log(JSON.stringify(newVal, null, 2));
         emits('setCharacter', newVal);
         saveCharacter();
     }
@@ -106,6 +106,23 @@ async function deleteCharacter(characterId: string) {
         }
     });
 }
+function createCharacterToken(character: CharacterDto) {
+    const obj = TabletopObject.NewImageObject(
+        new Vector2(0, 0),
+        character.info.image ?? '',
+    );
+    const user = getUserClaims();
+    obj.userToken = {
+        uuid: character.id,
+        owner: user?.id ?? '',
+        name: character.info.name,
+        wounds: character.resources.wounds,
+        corruption: character.resources.corruption,
+        defense: character.abilities.agility + character.armor,
+        attack: character.abilities.strength + character.attack,
+    };
+    TabletopService.addObjectRequest(obj);
+}
 </script>
 
 <template>
@@ -148,6 +165,14 @@ async function deleteCharacter(characterId: string) {
                     style="border-radius: 100%; height: 40px; width: 40px;"
                     v-tooltip.top="'Create Character'"
                     @click="createCharacter(new CharacterDto())"
+                />
+                <Button
+                    v-if="selectedCharacter"
+                    variant="outlined"
+                    icon="pi pi-user"
+                    style="border-radius: 100%; height: 40px; width: 40px;"
+                    v-tooltip.top="'Create Character Token'"
+                    @click="createCharacterToken(selectedCharacter)"
                 />
                 <Button
                     v-if="selectedCharacter"

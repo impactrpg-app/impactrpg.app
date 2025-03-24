@@ -110,7 +110,7 @@ export function drawTokenUi(object: TabletopObject, context: CanvasRenderingCont
 
     context.translate(
         (bounds[2] - bounds[0]) / 2,
-        -50
+        -30
     );
 
     // draw background

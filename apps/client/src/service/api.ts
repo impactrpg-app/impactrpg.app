@@ -46,11 +46,17 @@ export function getSocketHeaders(): Record<string, string> {
     }
 }
 
-export async function makeRequest<T>(path: string, options: RequestInit = {}) : Promise<T> {
+export async function makeRequest<T>(path: string, options: RequestInit = {}, nonJsonRequest = false) : Promise<T> {
+    let headers = getHeaders();
+    if (nonJsonRequest) {
+        headers = {
+            'Authorization': `Bearer ${accessToken.value}`,
+        };
+    };
     const response = await fetch(`${API_URL}${path}`, {
-        headers: getHeaders(),
+        headers,
         ...options,
-    })
+    });
 
     if (response.status === 401) {
         logout();

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
-import { CharacterDto } from '@impact/shared';
+import { CharacterDto, ImageUploadResponse } from '@impact/shared';
 import { loadFromFile } from '../../service/io';
 import { Age, ages } from '../../data/age';
 import { personalities } from "../../data/personality";
@@ -10,6 +10,7 @@ import {
   FloatLabel,
   InputText,
 } from "primevue";
+import { API_URL, makeRequest } from '@/service/api';
 
 const props = defineProps<{
   modelValue: CharacterDto
@@ -30,9 +31,15 @@ const value = computed({
 const ageOptions = ref<Age[]>(ages);
 
 async function updateCharacterImage() {
-  const data = await loadFromFile();
-  if (data === null) return;
-  //value.value.info.image = `data:image/png;base64,${btoa(data)}`;
+  const fileContents = await loadFromFile();
+  if (fileContents === null) return;
+  const formData = new FormData();
+  formData.append("image", new Blob([fileContents]));
+  const data: ImageUploadResponse = await makeRequest("/image", {
+    method: "POST",
+    body: formData,
+  }, true);
+  value.value.info.image = `${API_URL}/image/${encodeURIComponent(data.path)}`;
 }
 </script>
 
