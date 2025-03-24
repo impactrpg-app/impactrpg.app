@@ -33,7 +33,7 @@ export class MoveTool extends TabletopTool {
       }
       for (const objectUuid of selectedObjects.value) {
         this.dragging.set(objectUuid, scene.value.get(objectUuid)!.position);
-        this.dragStartedMousePosition = mouse.position;
+        this.dragStartedMousePosition = screenToWorldSpace(mouse.position);
       }
     } else if (mouse.rightClickDown) {
       const object = getObjectAtPosition(
