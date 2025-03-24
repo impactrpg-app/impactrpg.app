@@ -63,7 +63,7 @@ function editExistingGearItem(item: CharacterGearItemDto, index: number) {
 }
 function deleteExistingGearItem(index: number) {
   confirm.require({
-    message: `Do you want to remove ${value.value.gear[index].name} from your gear?`,
+    message: `Do you want to remove ${value.value.gear[index]?.name ?? ''} from your gear?`,
     header: "Remove Gear",
     icon: "pi pi-info-circle",
     rejectProps: {
@@ -123,7 +123,7 @@ function editExistingSkill(skill: CharacterSkillDto, index: number) {
 }
 function deleteExistingSkill(index: number) {
   confirm.require({
-    message: `Do you want to remove ${value.value.skills[index].name} from your skills?`,
+    message: `Do you want to remove ${value.value.skills[index]?.name ?? ''} from your skills?`,
     header: "Remove Skill",
     icon: "pi pi-info-circle",
     rejectProps: {

@@ -104,6 +104,14 @@ export class CharacterResources {
     @Prop({ required: true })
     @IsString()
     injury: string;
+
+    @ApiProperty({
+        description: 'The gold of the character',
+        example: 10
+    })
+    @Prop({ required: true, default: 0 })
+    @IsNumber()
+    gold: number;
 }
 
 export enum GoodsType {
@@ -230,6 +238,22 @@ export class Character {
     @Prop({ required: true })
     @IsNumber()
     progression: number;
+
+    @ApiProperty({
+        description: 'The armor of the character',
+        example: 10
+    })
+    @Prop({ required: true, default: 0 })
+    @IsNumber()
+    armor: number;
+
+    @ApiProperty({
+        description: 'The attack of the character',
+        example: 10
+    })
+    @Prop({ required: true, default: 0 })
+    @IsNumber()
+    attack: number;
 };
 
 export const CharacterSchema = SchemaFactory.createForClass(Character);

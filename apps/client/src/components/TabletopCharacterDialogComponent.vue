@@ -15,7 +15,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
     (e: 'update:isOpen', value: boolean): void;
-    (e: 'setCharacterName', value: string): void;
+    (e: 'setCharacter', value: CharacterDto): void;
 }>();
 
 const toast = useToast();
@@ -29,8 +29,9 @@ onMounted(async () => {
     fetchCharacters();
 });
 watch(selectedCharacter, (newVal) => {
-    if (newVal?.info.name) {
-        emits('setCharacterName', newVal.info.name);
+    if (newVal) {
+        console.log(JSON.stringify(newVal, null, 2));
+        emits('setCharacter', newVal);
         saveCharacter();
     }
 }, { deep: true });
@@ -125,7 +126,7 @@ async function deleteCharacter(characterId: string) {
         @update:visible="emits('update:isOpen', $event)"
         style="
             width: 700px; 
-            height: 700px;
+            height: 750px;
         "
 
     >
@@ -162,7 +163,7 @@ async function deleteCharacter(characterId: string) {
             class="column gap20"
             style="
                 overflow-y: auto;
-                max-height: calc(700px - 120px);
+                max-height: calc(750px - 120px);
                 padding-bottom: 20px;
                 padding-right: 20px;
             "

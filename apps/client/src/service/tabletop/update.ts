@@ -3,6 +3,7 @@ import { getImageElement, scene, selectedObjects } from "./scene";
 import { TabletopObject, Vector2 } from "@impact/shared";
 import { camera } from "./scene";
 import { ref } from "vue";
+import { getObjectBounds } from "./utils";
 
 export const canvasBindingRect = ref<DOMRect>();
 export function onResize(canvas: HTMLCanvasElement) {
@@ -102,6 +103,87 @@ export function drawStrokeObject(object: TabletopObject, context: CanvasRenderin
     }
 }
 
+export function drawTokenUi(object: TabletopObject, context: CanvasRenderingContext2D) {
+    context.save();
+
+    const bounds = getObjectBounds(object);
+
+    context.translate(
+        (bounds[2] - bounds[0]) / 2,
+        -50
+    );
+
+    // draw background
+    context.beginPath();
+    context.textAlign = 'center';
+    context.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    const size = object.userToken!.name.length / 2;
+    context.roundRect((-size * 15) - 20, -25, (size * 30) + 40, 50, 10);
+    context.fill();
+
+    // draw text
+    context.font = '30px Roboto';
+    context.fillStyle = '#e7e5e4';
+    context.fillText(object.userToken!.name, 0, 10);
+
+    context.restore();
+    context.save();
+
+    context.translate(
+        (bounds[2] - bounds[0]) / 2,
+        (bounds[3] - bounds[1]) + 30
+    );
+
+    // draw wounds
+    context.font = '40px Roboto';
+    context.fillStyle = 'red';
+    context.textAlign = 'center';
+    const wounds = new Array(object.userToken!.wounds).fill('●').join('');
+    context.fillText(wounds, 0, 0);
+
+    context.restore();
+    context.save();
+
+    context.translate(
+        20,
+        (bounds[3] - bounds[1]) - 20
+    );
+
+    // draw background
+    context.beginPath();
+    context.fillStyle = '#fb7185';
+    context.roundRect(-20, -20, 40, 40, 40);
+    context.fill();
+
+    // draw attack
+    context.font = '30px Roboto';
+    context.fillStyle = '#292524';
+    context.textAlign = 'center';
+    context.fillText(object.userToken!.attack?.toString() ?? '0', 0, 10);
+
+    context.restore();
+    context.save();
+
+    context.translate(
+        (bounds[2] - bounds[0]) - 20,
+        (bounds[3] - bounds[1]) - 20
+    );
+
+    // draw background
+    context.beginPath();
+    context.fillStyle = '#93c5fd';
+    context.roundRect(-20, -20, 40, 40, 40);
+    context.fill();
+
+    // draw defense
+    context.font = '30px Roboto';
+    context.fillStyle = '#292524';
+    context.textAlign = 'center';
+    context.fillText(object.userToken!.defense?.toString() ?? '0', 0, 10);
+
+    context.restore();
+}
+
 export function drawObject(object: TabletopObject, context: CanvasRenderingContext2D) {
     context.save();
     switch (object.type) {
@@ -111,6 +193,9 @@ export function drawObject(object: TabletopObject, context: CanvasRenderingConte
         case 'stroke':
             drawStrokeObject(object, context);
             break;
+    }
+    if (object.userToken) {
+        drawTokenUi(object, context);
     }
     context.restore();
 }

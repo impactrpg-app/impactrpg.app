@@ -4,7 +4,7 @@ import { ApiOkResponse, ApiOperation, ApiProperty, OmitType } from "@nestjs/swag
 import mongoose, { Model } from "mongoose";
 import { AuthGuard, AuthRequest } from "src/middleware/auth.guard";
 import { Character } from "src/db/character";
-import { CharacterDto, CharacterListDto } from "@impact/shared";
+import { CharacterDto, CharacterListDto, CreateCharacterDto } from "@impact/shared";
 
 @Controller()
 export class CharacterController {
@@ -47,19 +47,20 @@ export class CharacterController {
     @Get('character/:id')
     @UseGuards(AuthGuard)
     async character(@Req() req: AuthRequest, @Param('id') id: string): Promise<CharacterDto> {
-        const userId = req.user.id;
-
         const character = await this.characterService.findOne({
-            _id: new mongoose.Types.ObjectId(id),
-            owner: new mongoose.Types.ObjectId(userId)
+            _id: new mongoose.Types.ObjectId(id)
         });
         
         if (!character) {
             throw new NotFoundException();
         }
 
-        const characterDto = character as CharacterDto;
-        delete characterDto['owner'];
+        const characterDto: CharacterDto = {
+            ...character.toObject(),
+            id: character._id.toString(),
+            owner: character.owner.toString(),
+        };
+        delete characterDto['_id'];
         return characterDto;
     }
 
@@ -67,7 +68,7 @@ export class CharacterController {
     @ApiOkResponse({ type: CharacterListDto })
     @Post('character')
     @UseGuards(AuthGuard)
-    async createCharacter(@Req() req: AuthRequest, @Body() body: CharacterDto) {
+    async createCharacter(@Req() req: AuthRequest, @Body() body: CreateCharacterDto) {
         const userId = req.user.id;
 
         delete body['_id'];
@@ -97,7 +98,9 @@ export class CharacterController {
         @Body() body: CharacterDto
     ) {
         const userId = req.user.id;
-
+        delete body['_id'];
+        delete body['id'];
+        delete body['owner'];
         const character = await this.characterService.findOneAndUpdate(
             { 
                 _id: new mongoose.Types.ObjectId(id),
@@ -111,7 +114,13 @@ export class CharacterController {
             throw new NotFoundException();
         }
 
-        return character;
+        const characterDto: CharacterDto = {
+            ...character.toObject(),
+            id: character._id.toString(),
+            owner: character.owner.toString(),
+        };
+        delete characterDto['_id'];
+        return characterDto;
     }
 
     @ApiOperation({ summary: 'Delete a character' })

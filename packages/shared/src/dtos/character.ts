@@ -61,6 +61,10 @@ export class CharacterResourcesDto {
   @ApiProperty()
   @IsString()
   injury: string;
+
+  @ApiProperty()
+  @IsNumber()
+  gold: number;
 }
 
 export enum GoodsType {
@@ -108,7 +112,8 @@ export class CharacterSkillDto {
   description: string;
 }
 
-export class CharacterDto {
+
+export class CreateCharacterDto {
   @ApiProperty()
   @ValidateNested()
   info: CharacterInfoDto;
@@ -139,6 +144,14 @@ export class CharacterDto {
   @IsNumber()
   progression: number;
 
+  @ApiProperty()
+  @IsNumber()
+  armor: number;
+
+  @ApiProperty()
+  @IsNumber()
+  attack: number;
+
   constructor() {
     this.info = {
       image: "",
@@ -157,12 +170,25 @@ export class CharacterDto {
       endurance: 12,
       mana: 0,
       injury: "",
+      gold: 0,
     };
     this.skills = [];
     this.gear = [];
     this.notes = "";
     this.progression = 0;
+    this.armor = 0;
+    this.attack = 0;
   }
+}
+
+export class CharacterDto extends CreateCharacterDto {
+  @ApiProperty()
+  @IsString()
+  id: string;
+
+  @ApiProperty()
+  @IsString()
+  owner: string;
 }
 
 export class CharacterListDto {

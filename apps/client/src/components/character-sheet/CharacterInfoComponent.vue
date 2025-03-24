@@ -32,7 +32,7 @@ const ageOptions = ref<Age[]>(ages);
 async function updateCharacterImage() {
   const data = await loadFromFile();
   if (data === null) return;
-  value.value.info.image = `data:image/png;base64,${btoa(data)}`;
+  //value.value.info.image = `data:image/png;base64,${btoa(data)}`;
 }
 </script>
 
@@ -43,7 +43,7 @@ async function updateCharacterImage() {
         width: '215px',
         height: '215px',
         borderRadius: '10px',
-        background: `url('${value.info.image}')`,
+        background: `url('${value.info.image ?? ''}')`,
         backgroundColor: 'var(--p-stone-700)',
         backgroundSize: 'auto 100%',
         boxShadow: '0 0 5px 1px var(--p-stone-950)',

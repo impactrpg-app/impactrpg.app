@@ -7,6 +7,25 @@ export enum TabletopObjectType {
   Stroke = 'stroke'
 }
 
+export class UserToken {
+  uuid: string;
+  owner: string;
+  name: string;
+  wounds: number;
+  corruption: number;
+  defense: number;
+  attack: number;
+  constructor(owner: string) {
+    this.owner = owner;
+    this.uuid = "";
+    this.name = "";
+    this.wounds = 0;
+    this.corruption = 0;
+    this.defense = 2;
+    this.attack = 2;
+  }
+}
+
 export class TabletopObject {
   uuid: string;
   type: TabletopObjectType;
@@ -19,7 +38,7 @@ export class TabletopObject {
   strokeWidth?: number;
   strokeColor?: string;
   order?: number;
-  userToken?: string;
+  userToken?: UserToken | null;
 
   constructor(type: TabletopObjectType, position: Vector2) {
     this.uuid = uuidv4();
@@ -28,7 +47,7 @@ export class TabletopObject {
     this.rotation = 0;
     this.scale = 1;
     this.locked = false;
-    this.userToken = "";
+    this.userToken = null;
   }
 
   static NewImageObject(

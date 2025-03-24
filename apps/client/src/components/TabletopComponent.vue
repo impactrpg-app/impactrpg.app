@@ -17,11 +17,13 @@ import { loadFromFile } from "../service/io";
 import * as TabletopService from "../service/tabletop";
 import { accessToken, API_URL, getHeaders, makeRequest } from "../service/api";
 import {
+  CharacterDto,
   ImageUploadResponse,
   RoomDto,
   TabletopObject,
 } from "@impact/shared";
 import { watch } from "vue";
+import { scene } from "../service/tabletop";
 
 const isCharactersOpen = ref(false);
 const isDiceTrayOpen = ref(false);
@@ -34,14 +36,34 @@ const rulebookContainer = useTemplateRef<HTMLDivElement>("rulebookContainer");
 const updateInterval = ref<NodeJS.Timeout | null>(null);
 const canvas = useTemplateRef<HTMLCanvasElement>("canvas");
 const context = computed(() => canvas.value?.getContext("2d"));
-const selectedCharacterName = ref("");
+const selectedCharacter = ref<CharacterDto | null>(null);
 const joinRoomCode = ref("");
 const rooms = ref<RoomDto[]>([]);
 
 watch(contextMenuRef, (el) => {
   if (!el) return;
   TabletopService.contextMenuRef.value = el;
-})
+});
+
+watch(
+  selectedCharacter,
+  (newVal) => {
+    if (!newVal) return;
+    for (const object of scene.value.values()) {
+      if (object.userToken?.uuid === newVal.id) {
+        object.userToken = {
+          ...object.userToken,
+          name: newVal.info.name,
+          wounds: newVal.resources.wounds,
+          corruption: newVal.resources.corruption,
+          defense: newVal.abilities.agility + newVal.armor,
+          attack: newVal.abilities.strength + newVal.attack,
+        };
+      }
+    }
+  },
+  { deep: true }
+);
 
 async function uploadImage() {
   const imageSource = await loadFromFile("image/*");
@@ -76,7 +98,6 @@ function onResize(_: UIEvent) {
   TabletopService.onResize(canvas.value);
 }
 function generateImage() {}
-
 
 function onNotification(message: string, image?: string) {
   toast.add({
@@ -132,11 +153,11 @@ onUnmounted(() => {
 });
 
 async function fetchRooms() {
-  rooms.value = await makeRequest<RoomDto[]>('/rooms');
+  rooms.value = await makeRequest<RoomDto[]>("/rooms");
 }
 
 async function createRoom() {
-  const data = await makeRequest<RoomDto>('/room', {
+  const data = await makeRequest<RoomDto>("/room", {
     method: "POST",
     body: JSON.stringify({
       name: "New Room",
@@ -155,18 +176,24 @@ async function deleteRoom(id: string) {
 </script>
 
 <template>
-  <canvas :ondrop="onDropFile" :ondragover="onDragOver" class="tabletop-canvas" ref="canvas" @contextmenu="onContextMenu" />
+  <canvas
+    :ondrop="onDropFile"
+    :ondragover="onDragOver"
+    class="tabletop-canvas"
+    ref="canvas"
+    @contextmenu="onContextMenu"
+  />
   <template v-if="TabletopService.isInRoom()">
-    <ObjectPropertiesComponent />
+    <ObjectPropertiesComponent :selected-character="selectedCharacter" />
     <div class="tabletop">
       <DiceRollerComponent
         :modal="false"
-        :roll-author="selectedCharacterName"
+        :roll-author="selectedCharacter?.info?.name ?? ''"
         v-model:is-open="isDiceTrayOpen"
       />
       <TabletopCharacterDialogComponent
         v-model:is-open="isCharactersOpen"
-        @set-character-name="selectedCharacterName = $event"
+        @set-character="selectedCharacter = $event"
       />
       <Dialog
         :modal="false"

@@ -17,6 +17,7 @@ const value = computed({
     return props.modelValue ?? 0;
   },
   set(val: number){
+    if (!val) val = 0;
     emits('update:modelValue', val);
   }
 });

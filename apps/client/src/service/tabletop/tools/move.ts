@@ -15,6 +15,7 @@ export class MoveTool extends TabletopTool {
   public icon: string = "pi pi-arrows-alt";
   // contains dragging objects uuid and starting position
   private dragging: Map<string, Vector2> = new Map();
+  private dragStartedMousePosition: Vector2 = new Vector2(0, 0);
 
   public onMouseDown(mouse: MouseType): void {
     if (mouse.leftClickDown) {
@@ -32,6 +33,7 @@ export class MoveTool extends TabletopTool {
       }
       for (const objectUuid of selectedObjects.value) {
         this.dragging.set(objectUuid, scene.value.get(objectUuid)!.position);
+        this.dragStartedMousePosition = mouse.position;
       }
     } else if (mouse.rightClickDown) {
       const object = getObjectAtPosition(
@@ -87,10 +89,17 @@ export class MoveTool extends TabletopTool {
       const obj = scene.value.get(objectUuid);
       if (!obj) return;
 
+      const dragStartPosition = this.dragging.get(objectUuid);
+      if (!dragStartPosition) {
+        throw new Error("Something went wrong when dragging an object");
+      }
+
       updateObjectRequest(
         objectUuid,
         {
-          position: screenToWorldSpace(mouse.position),
+          position: screenToWorldSpace(mouse.position).add(
+            dragStartPosition.clone().sub(this.dragStartedMousePosition)
+          ),
         },
         false
       );

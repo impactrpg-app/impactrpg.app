@@ -40,6 +40,14 @@ const value = computed({
         <span>Progression</span>
         <CustomRatingComponent icon="pi-sparkles" :stars="6" v-model="value.progression" />
       </div>
+      <div class="stat">
+        <span>Armor</span>
+        <CustomRatingComponent icon="pi-shield" :stars="6" v-model="value.armor" />
+      </div>
+      <div class="stat">
+        <span>Attack</span>
+        <CustomRatingComponent material-icons icon="swords" :stars="6" v-model="value.attack" />
+      </div>
     </div>
     <div class="column gap10" style="align-items: end;">
       <div class="stat">
@@ -57,6 +65,10 @@ const value = computed({
       <div class="stat">
         <span>Corruption</span>
         <CustomResourceComponent v-model:model-value="value.resources.corruption" :min="0" />
+      </div>
+      <div class="stat">
+        <span>Gold</span>
+        <CustomResourceComponent v-model:model-value="value.resources.gold" :min="0" />
       </div>
     </div>
   </div>
