@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import * as PackageJson from '../../package.json';
-import { FloatLabel, InputText, Button, Dialog } from 'primevue'
+import { FloatLabel, InputText, Button, Dialog, Password } from 'primevue'
 import { ref } from 'vue';
 import { login, makeRequest } from '../service/api';
 import { useRouter } from 'vue-router';
@@ -35,7 +35,7 @@ async function signIn() {
       <label for="email">Email</label>
     </FloatLabel>
     <FloatLabel class="field">
-      <InputText id="password" v-model="password" />
+      <Password toggle-mask id="password" v-model="password" />
       <label for="password">Password</label>
     </FloatLabel>
     <div class="buttons">
