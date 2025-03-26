@@ -9,7 +9,7 @@
     target depending on the element of your choice.
   </p>
   <p>
-    All of the ailments last until the end of this round. You may spend mana to increase this.
+    All of the ailments last until the end of your next turn. You may spend mana to increase this.
     1 mana spend will increase the duration by 1 round.
   </p>
   <ul>

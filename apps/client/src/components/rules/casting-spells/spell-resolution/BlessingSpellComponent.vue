@@ -1,21 +1,26 @@
 <template>
   <h3>BLESSING SPELLS</h3>
-  <p>Blessings enhance objects or willing creatures.</p>
   <p>
-    To increase a creature's ability score, the mana spent must match or exceed the
-    current ability score.
+    Blessings can enhance a creatures abilities (strength, agility and
+    intelligence).
   </p>
   <p>
-    Spending mana equal to the ability score will increase it by one for a single round.
+    To increase a creature's ability, select the creature and roll dice equal to
+    the number of mana points spent.
   </p>
   <p>
-    Any more mana added to the spell will increase the duration of the blessing, however the ability will not increase.
+    For the spell to function you will need successes equal to the creature's
+    ability score.
+  </p>
+  <p>
+    Any additional successes will increase how long the spell lasts. You cannot
+    increase the ability more than 1 point in a single round.
   </p>
   <p>
     <i>
-      Increasing the an ability from 3 to 4 requires at least 3 mana for a single round.
-      Spending 5 mana would increase the duration to 3 rounds but only increases the
-      ability score by 1.
+      Increasing the an ability from 3 to 4 requires at least 3 successes for a
+      single round. Spending 5 successes would increase the duration to 3 rounds
+      but only increases the ability score by 1.
     </i>
   </p>
 </template>

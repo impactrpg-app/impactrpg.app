@@ -9,7 +9,7 @@
   </p>
   <p>
     When you cast an illusion spell, you must roll dice equal to the mana spent.
-    As long as you have more successes than the character's intelligence modifier,
+    As long as you have more successes than the character's intelligence,
     then the illusion is successful.
   </p>
   <p>

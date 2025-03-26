@@ -20,7 +20,7 @@
     affects the resurrected character or the party.
   </p>
   <p>
-    he DM will determine a suitable payment based on the story. Alternatively, you can
+    The DM will determine a suitable payment based on the story. Alternatively, you can
     roll on the following table to decide the payment:
   </p>
   <p>

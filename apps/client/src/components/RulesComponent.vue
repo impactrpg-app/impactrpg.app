@@ -3,7 +3,7 @@ import { Button } from "primevue";
 import { defineComponent } from "vue";
 
 export type RulesContent = {
-  title: string;
+  title?: string;
   section: {
     titleType?: string;
     title?: string;
@@ -33,7 +33,7 @@ function scrollToTop() {
       icon="pi pi-chevron-up"
       @click="scrollToTop"
     />
-    <h1 v-if="props.title">{{ title }}</h1>
+    <h1 v-if="props.title">{{ props.title }}</h1>
     <div class="contents" v-if="props.showContents">
       <div class="section" v-for="section in props.data">
         <a :href="`#${section.title}`">

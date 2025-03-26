@@ -7,7 +7,7 @@
   <p>
     <i>
       When doing an attack targeting 3 characters you may spend 5 mana to do 2 potential
-      wounds on each target.
+      wounds on each target (roll 2 dice as an attack roll for each target).
     </i>
   </p>
 </template>

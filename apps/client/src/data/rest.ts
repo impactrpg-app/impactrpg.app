@@ -17,7 +17,7 @@ export const restActions: RestAction[] = [
   {
     name: "Cook a Meal",
     description: [
-      "Prepare a meal for the group. Everyone gains +3 endurance, even if they are already at maximum endurance.",
+      "Prepare a meal for the group. Everyone gains +3 endurance and increase their maximum endurance by 3.",
     ],
   },
   {

@@ -344,7 +344,7 @@ const props = defineProps<{
       </div>
     </div>
   </Dialog>
-  <RulesComponent show-contents title="Rulebook" :data="data" :container="props.container" />
+  <RulesComponent show-contents :data="data" :container="props.container" />
 </template>
 
 <style lang="css">
