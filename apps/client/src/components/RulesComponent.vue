@@ -33,7 +33,7 @@ function scrollToTop() {
       icon="pi pi-chevron-up"
       @click="scrollToTop"
     />
-    <h1 v-if="props.title">{{ props.title }}</h1>
+    <h1 v-if="title">{{ title }}</h1>
     <div class="contents" v-if="props.showContents">
       <div class="section" v-for="section in props.data">
         <a :href="`#${section.title}`">
@@ -47,7 +47,7 @@ function scrollToTop() {
       </div>
     </div>
     <template v-for="section in props.data">
-      <h1 v-if="title" :id="section.title">{{ section.title }}</h1>
+      <h1 v-if="section.title" :id="section.title">{{ section.title }}</h1>
       <div class="container">
         <div
           class="item"
