@@ -7,3 +7,15 @@ export class ImageUploadResponse {
   @IsString()
   path: string;
 }
+
+export class ImageListResponse {
+  @ApiProperty({
+    description: "The path to the image",
+  })
+  path: string;
+
+  @ApiProperty({
+    description: "Is the image being used or in a room",
+  })
+  inUse: boolean;
+}

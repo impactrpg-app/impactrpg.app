@@ -13,16 +13,16 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { ApiBody, ApiOkResponse, ApiProperty } from "@nestjs/swagger";
+import { ApiBody, ApiOkResponse } from "@nestjs/swagger";
 import { ApiConsumes } from "@nestjs/swagger";
 import { ApiOperation } from "@nestjs/swagger";
 import { Response } from "express";
-import Sharp from "sharp";
 import { StorageService } from "src/services/storage.service";
 import { AuthRequest } from "src/middleware/auth.guard";
 import { AuthGuard } from "src/middleware/auth.guard";
 import { v4 as uuidv4 } from "uuid";
 import { ImageUploadResponse } from "@impact/shared";
+import Sharp from "sharp";
 
 @Controller()
 export class ImageController {
@@ -51,7 +51,7 @@ export class ImageController {
   async uploadImage(
     @UploadedFile() image: Express.Multer.File,
     @Req() req: AuthRequest
-  ) : Promise<ImageUploadResponse> {
+  ): Promise<ImageUploadResponse> {
     try {
       // convert to webp
       const webpBuffer = await Sharp(image.buffer)
@@ -76,7 +76,9 @@ export class ImageController {
     @Res() res: Response
   ) {
     res.shouldKeepAlive = true;
-    const response = await this.storageService.get(decodeURIComponent(imagePath));
+    const response = await this.storageService.get(
+      decodeURIComponent(imagePath)
+    );
     res.setHeader("Content-Type", "image/webp");
     res.setHeader("Content-Length", response.ContentLength);
     res.setHeader("Cache-Control", "public, max-age=31536000");

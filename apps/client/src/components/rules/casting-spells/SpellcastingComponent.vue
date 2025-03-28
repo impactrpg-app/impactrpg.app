@@ -1,15 +1,8 @@
 <template>
+  <p>Casting a spell requires an action and a minimum of 1 mana.</p>
   <p>
-    You must spend an action to channel mana by doing an intelligence check.
-    Therefore, in combat you can only channel mana once per turn.
-  </p>
-  <p>
-    Casting a spell does not require an action and you can cast as many spells
-    as you want, as long as you have the mana to cast them.
-  </p>
-  <p>Pouring more mana into a spell typically yields stronger effects.</p>
-  <p>
-    However, you may use more mana to increase the range, area or duration of
+    Pouring more mana into a spell typically yields stronger effects. However,
+    you may use more mana to increase the range, area or duration of the effect.
     the effect.
   </p>
   <h3>How to cast a spell</h3>

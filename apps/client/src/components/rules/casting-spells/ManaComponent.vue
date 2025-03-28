@@ -3,7 +3,6 @@
     Mana is used to cast spells. Without mana it is not possible to cast a
     spell.
   </p>
-  <p>During combat you can spend an action to channel mana.</p>
   <h4>Maximum Mana</h4>
   <p>
     You can have as much mana as you want. But if you have more mana than your
@@ -19,6 +18,10 @@
     by your armor value.
   </p>
   <h4>Channeling Mana</h4>
+  <p>
+    Channeling mana requires mental focus and does not cost an action. A
+    character channeling mana will not be able to perform any free actions.
+  </p>
   <p>
     Any player may spend 1 endurance to do an intelligence check. The player
     gains double the successes rolled as mana.
