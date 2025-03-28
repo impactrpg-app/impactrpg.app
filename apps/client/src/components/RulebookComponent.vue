@@ -34,7 +34,6 @@ import CraftingMaterialsComponent from "./rules/playing-the-game/CraftingMateria
 import FightingMonstersComponent from "./rules/fighting-monsters/FightingMonstersComponent.vue";
 import ActionsComponent from "./rules/fighting-monsters/ActionsComponent.vue";
 import AttackingComponent from "./rules/fighting-monsters/AttackingComponent.vue";
-import DefendingComponent from "./rules/fighting-monsters/DefendingComponent.vue";
 import MovementComponent from "./rules/fighting-monsters/MovementComponent.vue";
 import ManeuversComponent from "./rules/fighting-monsters/ManeuversComponent.vue";
 import UnarmedCombat from "./rules/fighting-monsters/UnarmedCombat.vue";
@@ -216,10 +215,6 @@ const data: RulesContent[] = [
         content: AttackingComponent
       },
       {
-        title: "Defending",
-        content: DefendingComponent
-      },
-      {
         title: "Unarmed Combat",
         content: UnarmedCombat,
       },
@@ -247,6 +242,11 @@ const data: RulesContent[] = [
       {
         title: "Fleeing",
         content: FleeingComponent,
+        rows: 2,
+      },
+      {
+        title: "Modifiers",
+        content: ModifiersComponent,
       },
       {
         title: "Ambush",
@@ -257,10 +257,6 @@ const data: RulesContent[] = [
         content: AilmentComponent,
         rows: 2
       },
-      {
-        title: 'Modifiers',
-        content: ModifiersComponent
-      }
     ],
   },
   {

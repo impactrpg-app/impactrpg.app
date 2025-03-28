@@ -77,6 +77,7 @@ export class StorageService {
   async cleanUpTask() {
     // get a list of all files in the bucket
     const files = await this.list("");
+    if (!files?.Contents) return;
     const imagePaths = files.Contents.map((file) => [
       file.Key,
       `https://${config.storage.bucket}.${config.storage.region}.${config.storage.host}/image/${file.Key}`,
