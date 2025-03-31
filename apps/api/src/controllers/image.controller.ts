@@ -4,6 +4,7 @@ import {
   Get,
   Header,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   Post,
   Req,
@@ -76,15 +77,19 @@ export class ImageController {
     @Res() res: Response
   ) {
     res.shouldKeepAlive = true;
-    const response = await this.storageService.get(
-      decodeURIComponent(imagePath)
-    );
-    res.setHeader("Content-Type", "image/webp");
-    res.setHeader("Content-Length", response.ContentLength);
-    res.setHeader("Cache-Control", "public, max-age=31536000");
-    const data = await response.Body.transformToByteArray();
-    res.write(data);
-    res.end();
+    try {
+      const response = await this.storageService.get(
+        decodeURIComponent(imagePath)
+      );
+      res.setHeader("Content-Type", "image/webp");
+      res.setHeader("Content-Length", response.ContentLength);
+      res.setHeader("Cache-Control", "public, max-age=31536000");
+      const data = await response.Body.transformToByteArray();
+      res.write(data);
+      res.end();
+    } catch (e) {
+      throw new NotFoundException();
+    }
   }
 
   @ApiOperation({ summary: "Delete an image" })
