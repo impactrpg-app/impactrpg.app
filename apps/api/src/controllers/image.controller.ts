@@ -88,7 +88,23 @@ export class ImageController {
       res.write(data);
       res.end();
     } catch (e) {
-      throw new NotFoundException();
+      if (e instanceof Error) {
+        if (e.name === "NoSuchKey") {
+          // Base64-encoded 1x1 red pixel in webp format
+          const redPixelBase64 =
+            "UklGRiIAAABXRUJQVlA4IC4AAACwAQCdASoIAAgAAkA4JaQAA3AA/vuUAAA=";
+          res.setHeader("Content-Type", "image/webp");
+          res.setHeader(
+            "Content-Length",
+            Buffer.byteLength(redPixelBase64, "base64")
+          );
+          res.setHeader("Cache-Control", "no-cache");
+          res.write(Buffer.from(redPixelBase64, "base64"));
+          res.end();
+          return;
+        }
+      }
+      throw e;
     }
   }
 

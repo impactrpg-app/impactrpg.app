@@ -162,23 +162,43 @@ export function drawTokenUi(
   context.restore();
 }
 
-export function drawObject(
+export function drawErrorObject(
   object: TabletopObject,
   context: CanvasRenderingContext2D
 ) {
   context.save();
-  switch (object.type) {
-    case "image":
-      drawImageObject(object, context);
-      break;
-    case "stroke":
-      drawStrokeObject(object, context);
-      break;
-  }
-  if (object.userToken) {
-    drawTokenUi(object, context);
-  }
+  context.fillStyle = "red";
+  context.fillRect(
+    object.position.x,
+    object.position.y,
+    object.scale * 100,
+    object.scale * 100
+  );
   context.restore();
+}
+
+export function drawObject(
+  object: TabletopObject,
+  context: CanvasRenderingContext2D
+) {
+  try {
+    context.save();
+    switch (object.type) {
+      case "image":
+        drawImageObject(object, context);
+        break;
+      case "stroke":
+        drawStrokeObject(object, context);
+        break;
+    }
+    if (object.userToken) {
+      drawTokenUi(object, context);
+    }
+  } catch (e) {
+    console.warn(`failed to render object: ${e}`);
+  } finally {
+    context.restore();
+  }
 }
 
 export function onUpdate(
