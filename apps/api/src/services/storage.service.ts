@@ -13,6 +13,7 @@ import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
 import { CronExpression } from "@nestjs/schedule";
 import { Cron } from "@nestjs/schedule";
+import { User } from "src/db/user";
 
 @Injectable()
 export class StorageService {
@@ -20,7 +21,9 @@ export class StorageService {
 
   constructor(
     @InjectModel(Room.name)
-    private readonly roomModel: Model<Room>
+    private readonly roomModel: Model<Room>,
+    @InjectModel(User.name)
+    private readonly userModel: Model<User>,
   ) {
     const endpoint = `${config.storage.region}.${config.storage.host}`;
     this.s3Client = new S3Client({
@@ -73,53 +76,70 @@ export class StorageService {
     return result;
   }
 
-  // @Cron(CronExpression.EVERY_10_MINUTES)
-  // async cleanUpTask() {
-  //   // get a list of all files in the bucket
-  //   const files = await this.list("");
-  //   if (!files?.Contents) return;
-  //   const imagePaths = files.Contents.map((file) => [
-  //     file.Key,
-  //     `https://${config.storage.bucket}.${config.storage.region}.${config.storage.host}/image/${file.Key}`,
-  //   ]);
-  //   const imageUrls = [...imagePaths.values()];
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async cleanUpTask() {
+    // get a list of all files in the bucket
+    const files = await this.list("");
+    if (!files?.Contents) return;
+    const imagePaths = files.Contents.map((file) => [
+      file.Key,
+      `https://${config.host}/image/${encodeURIComponent(file.Key)}`,
+    ]);
+    const imageUrls = [...imagePaths.values()];
 
-  //   // filter only the images not in use
-  //   const result = await this.roomModel.aggregate([
-  //     {
-  //       $match: {
-  //         "objects.image": {
-  //           $in: imageUrls,
-  //         },
-  //       },
-  //     },
-  //     {
-  //       $unwind: "$objects",
-  //     },
-  //     {
-  //       $match: {
-  //         "objects.image": {
-  //           $in: imageUrls,
-  //         },
-  //       },
-  //     },
-  //     {
-  //       $addFields: {
-  //         path: "$objects.image",
-  //       },
-  //     },
-  //     {
-  //       $project: {
-  //         path: 1,
-  //       },
-  //     },
-  //   ]);
-  //   const imagesInUse = result.map((item) => item.path);
-  //   const deletingImages: Promise<DeleteObjectCommandOutput>[] = [];
-  //   for (const [path, url] of imagePaths) {
-  //     if (imagesInUse.includes(url)) continue;
-  //     deletingImages.push(this.delete(path));
-  //   }
-  //   await Promise.all(deletingImages);
-  // }
+    // fetch objects in room
+    const objects = await this.roomModel.aggregate([
+      {
+        $match: {
+          "objects.image": {
+            $in: imageUrls,
+          },
+        },
+      },
+      {
+        $unwind: "$objects",
+      },
+      {
+        $match: {
+          "objects.image": {
+            $in: imageUrls,
+          },
+        },
+      },
+      {
+        $addFields: {
+          path: "$objects.image",
+        },
+      },
+      {
+        $project: {
+          path: 1,
+        },
+      },
+    ]);
+    const characters = await this.userModel.aggregate([
+      {
+        $match: {
+          'info.image': {
+            $in: imageUrls,
+          }
+        }
+      },
+      {
+        $project: {
+          "info.image": 1
+        }
+      }
+    ]);
+    const imagesInUse = [
+      ...objects.map((item) => item.path),
+      ...characters.map((item) => item.info.image),
+    ];
+    const deletingImages: Promise<DeleteObjectCommandOutput>[] = [];
+    for (const [path, url] of imagePaths) {
+      if (imagesInUse.includes(url)) continue;
+      deletingImages.push(this.delete(path));
+    }
+    await Promise.all(deletingImages);
+  }
 }

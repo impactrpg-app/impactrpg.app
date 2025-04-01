@@ -76,35 +76,28 @@ export class ImageController {
     @Param("imagePath") imagePath: string,
     @Res() res: Response
   ) {
+    res.setHeader("Content-Type", "image/webp");
     res.shouldKeepAlive = true;
     try {
       const response = await this.storageService.get(
         decodeURIComponent(imagePath)
       );
-      res.setHeader("Content-Type", "image/webp");
       res.setHeader("Content-Length", response.ContentLength);
       res.setHeader("Cache-Control", "public, max-age=31536000");
       const data = await response.Body.transformToByteArray();
       res.write(data);
-      res.end();
     } catch (e) {
-      if (e instanceof Error) {
-        if (e.name === "NoSuchKey") {
-          // Base64-encoded 1x1 red pixel in webp format
-          const redPixelBase64 =
-            "UklGRiIAAABXRUJQVlA4IC4AAACwAQCdASoIAAgAAkA4JaQAA3AA/vuUAAA=";
-          res.setHeader("Content-Type", "image/webp");
-          res.setHeader(
-            "Content-Length",
-            Buffer.byteLength(redPixelBase64, "base64")
-          );
-          res.setHeader("Cache-Control", "no-cache");
-          res.write(Buffer.from(redPixelBase64, "base64"));
-          res.end();
-          return;
-        }
-      }
-      throw e;
+      console.error(e);
+      const redPixelBase64 =
+        "UklGRiIAAABXRUJQVlA4IC4AAACwAQCdASoIAAgAAkA4JaQAA3AA/vuUAAA=";
+      res.setHeader(
+        "Content-Length",
+        Buffer.byteLength(redPixelBase64, "base64")
+      );
+      res.setHeader("Cache-Control", "no-cache");
+      res.write(Buffer.from(redPixelBase64, "base64"));
+    } finally {
+      res.end();
     }
   }
 
