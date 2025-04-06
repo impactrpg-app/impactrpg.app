@@ -195,7 +195,7 @@ export function drawObject(
       drawTokenUi(object, context);
     }
   } catch (e) {
-    console.warn(`failed to render object: ${e}`);
+    console.warn(`failed to render object ${object.uuid}, error: ${e}`);
   } finally {
     context.restore();
   }
