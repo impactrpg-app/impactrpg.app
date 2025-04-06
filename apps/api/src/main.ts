@@ -19,6 +19,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('impact')
     .build();
+
   const documentFactory = () => SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('swagger', app, documentFactory);
   app.useGlobalPipes(new ValidationPipe());

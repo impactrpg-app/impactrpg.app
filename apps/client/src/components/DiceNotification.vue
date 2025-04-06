@@ -9,7 +9,7 @@ import { Toast } from 'primevue';
         <p>
           {{ slotProps.message.summary }}
         </p>
-        <img :src="slotProps.message.detail" class="dice-tray" />
+        <img :src="slotProps.message.detail" class="notification-image" />
       </div>
     </template>
   </Toast>

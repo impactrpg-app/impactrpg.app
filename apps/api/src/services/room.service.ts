@@ -6,18 +6,18 @@ import {
   RemoveObjectMessage,
   SendNotificationMessage,
   UpdateObjectMessage,
-} from '@impact/shared';
-import { connectedUsers } from '../events/users';
-import { Socket } from 'socket.io';
-import { MessageType } from '@impact/shared';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
-import { Room as RoomSchema } from 'src/db/room';
-import { TabletopObject } from 'src/db/room';
-import { StorageService } from 'src/services/storage.service';
-import { CronExpression } from '@nestjs/schedule';
-import { Cron } from '@nestjs/schedule';
+} from "@impact/shared";
+import { connectedUsers } from "../events/users";
+import { Socket } from "socket.io";
+import { MessageType } from "@impact/shared";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model, Types } from "mongoose";
+import { Injectable } from "@nestjs/common";
+import { Room as RoomSchema } from "src/db/room";
+import { TabletopObject } from "src/db/room";
+import { StorageService } from "src/services/storage.service";
+import { CronExpression } from "@nestjs/schedule";
+import { Cron } from "@nestjs/schedule";
 
 export type Room = {
   id: string;
@@ -33,7 +33,7 @@ export class RoomService {
   constructor(
     @InjectModel(RoomSchema.name)
     private readonly roomModel: Model<RoomSchema>,
-    private readonly storageService: StorageService,
+    private readonly storageService: StorageService
   ) {}
 
   private async saveRoom(roomId: string) {
@@ -55,17 +55,17 @@ export class RoomService {
 
     const roomId = this.findUsersRoom(userId);
     if (!roomId) {
-      client.emit('event', {
+      client.emit("event", {
         type: MessageType.Error,
-        message: 'Room not found',
+        message: "Room not found",
       } as ErrorMessage);
       return;
     }
 
     for (const object of this.rooms.get(roomId)!.tabletopObjects) {
-      client.emit('event', {
+      client.emit("event", {
         type: MessageType.AddObject,
-        object
+        object,
       } as AddObjectMessage);
     }
   }
@@ -100,30 +100,34 @@ export class RoomService {
     }
     return null;
   }
-  private verifyUser(client: Socket): { userId: string, room: Room, error: boolean } {
+  private verifyUser(client: Socket): {
+    userId: string;
+    room: Room;
+    error: boolean;
+  } {
     const userId = connectedUsers.get(client);
     if (!userId) {
-      console.error('User Id not found');
+      console.error("User Id not found");
       client.disconnect();
       return { userId: null, room: null, error: true };
     }
 
     const roomId = this.findUsersRoom(userId);
     if (!roomId) {
-      console.error('Room Id not found');
-      client.emit('event', {
+      console.error("Room Id not found");
+      client.emit("event", {
         type: MessageType.Error,
-        message: 'Room not found',
+        message: "Room not found",
       } as ErrorMessage);
       return { userId, room: null, error: true };
     }
 
     const room = this.rooms.get(roomId);
     if (!room) {
-      console.error('Room not found');
-      client.emit('event', {
+      console.error("Room not found");
+      client.emit("event", {
         type: MessageType.Error,
-        message: 'Room not found',
+        message: "Room not found",
       } as ErrorMessage);
       return { userId, room, error: true };
     }
@@ -138,6 +142,11 @@ export class RoomService {
       return;
     }
 
+    if (!Types.ObjectId.isValid(roomId)) {
+      client.emit("event", new ErrorMessage(404, "Room not found"));
+      return;
+    }
+
     const foundRoomId = this.findUsersRoom(userId, [roomId]);
     if (foundRoomId) {
       await this.leaveRoom(client, foundRoomId);
@@ -146,10 +155,7 @@ export class RoomService {
     if (!this.rooms.has(roomId)) {
       const query = await this.roomModel.findById(roomId);
       if (!query) {
-        client.emit('event', {
-          type: MessageType.Error,
-          message: 'Room not found',
-        } as ErrorMessage);
+        client.emit("event", new ErrorMessage(404, "Room not found"));
         return;
       }
       this.rooms.set(roomId, {
@@ -161,7 +167,7 @@ export class RoomService {
     }
 
     this.rooms.get(roomId)!.users.set(userId, client);
-    client.emit('event', {
+    client.emit("event", {
       type: MessageType.JoinRoom,
       roomId: roomId,
     } as JoinRoomMessage);
@@ -174,7 +180,7 @@ export class RoomService {
     }
 
     room.users.delete(userId);
-    client.emit('event', {
+    client.emit("event", {
       type: MessageType.LeaveRoom,
       roomId: roomId,
     } as LeaveRoomMessage);
@@ -205,10 +211,10 @@ export class RoomService {
     this.rooms.get(room.id)!.tabletopObjects.push(object);
     // todo: replace image content with url
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit('event', {
+      socket.emit("event", {
         type: MessageType.AddObject,
         object: object,
-      } as AddObjectMessage),
+      } as AddObjectMessage)
     );
   }
   async removeObject(client: Socket, objectId: string) {
@@ -217,41 +223,50 @@ export class RoomService {
       return;
     }
 
-    const object = room.tabletopObjects.find((object) => object.uuid === objectId);
+    const object = room.tabletopObjects.find(
+      (object) => object.uuid === objectId
+    );
     if (!object) {
-      client.emit('event', {
+      client.emit("event", {
         type: MessageType.Error,
-        message: 'Object not found',
+        message: "Object not found",
       } as ErrorMessage);
       return;
     }
     if (object.image) {
-      const imageId = object.image.replace(new RegExp('http[s]*://[a-zA-Z0-9\:\.]+/image/'), '');
+      const imageId = object.image.replace(
+        new RegExp("http[s]*://[a-zA-Z0-9\:\.]+/image/"),
+        ""
+      );
       await this.storageService.delete(decodeURIComponent(imageId));
-  }
-    room.tabletopObjects = room.tabletopObjects.filter((object) => object.uuid !== objectId);
+    }
+    room.tabletopObjects = room.tabletopObjects.filter(
+      (object) => object.uuid !== objectId
+    );
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit('event', {
+      socket.emit("event", {
         type: MessageType.RemoveObject,
         objectId: objectId,
-      } as RemoveObjectMessage),
+      } as RemoveObjectMessage)
     );
   }
   async updateObject(
     client: Socket,
     objectId: string,
-    object: Partial<TabletopObject>,
+    object: Partial<TabletopObject>
   ) {
     const { userId, room, error } = this.verifyUser(client);
     if (error) {
       return;
     }
 
-    const objectIndex = room.tabletopObjects.findIndex((object) => object.uuid === objectId);
+    const objectIndex = room.tabletopObjects.findIndex(
+      (object) => object.uuid === objectId
+    );
     if (objectIndex === -1) {
-      client.emit('event', {
+      client.emit("event", {
         type: MessageType.Error,
-        message: 'Object not found',
+        message: "Object not found",
       } as ErrorMessage);
       return;
     }
@@ -260,13 +275,15 @@ export class RoomService {
       ...this.rooms.get(room.id)!.tabletopObjects[objectIndex],
       ...object,
     };
-    this.triggerForAllUsersInRoom(room.id, (userId, socket) =>
-      socket.emit('event', {
-        type: MessageType.UpdateObject,
-        objectId: objectId,
-        object: object,
-      } as UpdateObjectMessage),
-      [userId],
+    this.triggerForAllUsersInRoom(
+      room.id,
+      (userId, socket) =>
+        socket.emit("event", {
+          type: MessageType.UpdateObject,
+          objectId: objectId,
+          object: object,
+        } as UpdateObjectMessage),
+      [userId]
     );
   }
   async sendNotification(client: Socket, message: string, image?: string) {
@@ -276,17 +293,17 @@ export class RoomService {
     }
 
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit('event', {
+      socket.emit("event", {
         type: MessageType.SendNotification,
         message: message,
         image: image,
-      } as SendNotificationMessage),
+      } as SendNotificationMessage)
     );
   }
 
   @Cron(CronExpression.EVERY_5_MINUTES)
   async saveRooms() {
-    console.log('Saving rooms');
+    console.log("Saving rooms");
     for (const room of this.rooms.values()) {
       await this.saveRoom(room.id);
     }

@@ -15,9 +15,11 @@ export enum MessageType {
 export class ErrorMessage {
   type: MessageType.Error;
   message: string;
+  code: number;
 
-  constructor(message: string) {
+  constructor(code: number, message: string) {
     this.type = MessageType.Error;
+    this.code = code;
     this.message = message;
   }
 }

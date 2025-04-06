@@ -107,6 +107,13 @@ function onNotification(message: string, image?: string) {
     group: "dice-roll",
   });
 }
+function onErrorEvent(_: number, message: string) {
+  toast.add({
+    severity: "error",
+    summary: message,
+  });
+}
+
 async function onDropFile(event: DragEvent) {
   event.preventDefault();
   for (const file of event.dataTransfer?.files ?? []) {
@@ -132,6 +139,7 @@ onMounted(async () => {
   window.addEventListener("keydown", TabletopService.onKeyDown);
   window.addEventListener("keyup", TabletopService.onKeyUp);
   TabletopService.notificationListeners.add(onNotification);
+  TabletopService.errorListeners.add(onErrorEvent);
   updateInterval.value = setInterval(() => {
     if (!canvas.value || !context.value) return;
     TabletopService.onUpdate(canvas.value, context.value);

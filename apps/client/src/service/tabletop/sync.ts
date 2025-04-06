@@ -12,8 +12,10 @@ import {
   updateObjectResponse,
 } from "./scene";
 
+export type ErrorListner = (code: number, message: string) => void;
 export type NotificationListener = (message: string, image?: string) => void;
-export const notificationListeners: Set<NotificationListener> = new Set();
+export const notificationListeners = new Set<NotificationListener>();
+export const errorListeners = new Set<ErrorListner>();
 export let socket: Socket | null = null;
 
 export function init() {
@@ -26,6 +28,9 @@ export function init() {
   socket.on("event", (data: AllMessageTypes) => {
     switch (data.type) {
       case MessageType.Error:
+        for (const listener of errorListeners) {
+          listener(data.code, data.message);
+        }
         break;
       case MessageType.JoinRoom:
         joinRoomResponse(data);
