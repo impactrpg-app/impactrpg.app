@@ -103,8 +103,6 @@ function onNotification(message: string, image?: string) {
   toast.add({
     severity: "info",
     summary: message,
-    detail: image,
-    group: "dice-roll",
   });
 }
 function onErrorEvent(_: number, message: string) {

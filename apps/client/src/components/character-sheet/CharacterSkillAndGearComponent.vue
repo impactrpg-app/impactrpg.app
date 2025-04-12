@@ -1,28 +1,43 @@
-<script lang=ts setup>
-import { computed, ref } from 'vue';
-import { useConfirm, Button, InputText, FloatLabel, Select, InputNumber, Textarea, Dialog, Card } from 'primevue';
-import { Skill, skills } from '../../data/skills';
-import { GoodsType } from '../../data/goods';
-import { CharacterDto, CharacterGearItemDto, CharacterSkillDto } from '@impact/shared';
+<script lang="ts" setup>
+import { computed, ref } from "vue";
+import {
+  useConfirm,
+  Button,
+  InputText,
+  FloatLabel,
+  Select,
+  InputNumber,
+  Textarea,
+  Dialog,
+  Card,
+} from "primevue";
+import { Skill, skills } from "../../data/skills";
+import { GoodsType } from "../../data/goods";
+import {
+  CharacterDto,
+  CharacterGearItemDto,
+  CharacterSkillDto,
+} from "@impact/shared";
+import { sendNotificationRequest } from "@/service/tabletop";
 
 const NewGearItem: CharacterGearItemDto = {
-  name: '',
+  name: "",
   type: GoodsType.Small,
   attack: 0,
   armor: 0,
-  description: '',
-}
+  description: "",
+};
 
 const NewSkill: CharacterSkillDto = {
-  name: '',
-  description: '',
-}
+  name: "",
+  description: "",
+};
 
 const props = defineProps<{
-  modelValue: CharacterDto
+  modelValue: CharacterDto;
 }>();
 const emits = defineEmits<{
-  (e: 'update:modelValue', data: CharacterDto): void;
+  (e: "update:modelValue", data: CharacterDto): void;
 }>();
 
 const value = computed({
@@ -30,8 +45,8 @@ const value = computed({
     return props.modelValue;
   },
   set(val: CharacterDto) {
-    emits('update:modelValue', val);
-  }
+    emits("update:modelValue", val);
+  },
 });
 
 const confirm = useConfirm();
@@ -44,7 +59,6 @@ const existingGearIndex = ref<number>(-1);
 const editingSkill = ref<CharacterSkillDto>({ ...NewSkill });
 const showSkillEditor = ref<boolean>(false);
 const existingSkillIndex = ref<number>(-1);
-
 
 // gear
 function createNewGearItem() {
@@ -63,7 +77,7 @@ function editExistingGearItem(item: CharacterGearItemDto, index: number) {
 }
 function deleteExistingGearItem(index: number) {
   confirm.require({
-    message: `Do you want to remove ${value.value.gear[index]?.name ?? ''} from your gear?`,
+    message: `Do you want to remove ${value.value.gear[index]?.name ?? ""} from your gear?`,
     header: "Remove Gear",
     icon: "pi pi-info-circle",
     rejectProps: {
@@ -80,10 +94,7 @@ function deleteExistingGearItem(index: number) {
         ...value.value,
         gear: [
           ...value.value.gear.slice(0, index),
-          ...value.value.gear.slice(
-            index + 1,
-            value.value.gear.length
-          ),
+          ...value.value.gear.slice(index + 1, value.value.gear.length),
         ],
       };
     },
@@ -123,7 +134,7 @@ function editExistingSkill(skill: CharacterSkillDto, index: number) {
 }
 function deleteExistingSkill(index: number) {
   confirm.require({
-    message: `Do you want to remove ${value.value.skills[index]?.name ?? ''} from your skills?`,
+    message: `Do you want to remove ${value.value.skills[index]?.name ?? ""} from your skills?`,
     header: "Remove Skill",
     icon: "pi pi-info-circle",
     rejectProps: {
@@ -140,10 +151,7 @@ function deleteExistingSkill(index: number) {
         ...value.value,
         skills: [
           ...value.value.skills.slice(0, index),
-          ...value.value.skills.slice(
-            index + 1,
-            value.value.skills.length
-          ),
+          ...value.value.skills.slice(index + 1, value.value.skills.length),
         ],
       };
     },
@@ -171,10 +179,26 @@ function skillSelectedFromDropdown(skill: Skill) {
     description: skill.description.join("\n"),
   };
 }
+
+function gearShareText(gear: CharacterGearItemDto): string {
+  let automaton = gear.isAutomaton ? "*" : "";
+  let str = `${gear.name}${automaton}, ${gear.type}`;
+  if (gear.attack) str += `, Attack: ${gear.attack}`;
+  if (gear.armor) str += `, Armor: ${gear.armor}`;
+  return str;
+}
+function skillShareText(skill: CharacterSkillDto): string {
+  return `${skill.name}: ${skill.description}`;
+}
 </script>
 
 <template>
-  <Dialog modal v-model:visible="showGearEditor" header="Gear" :style="{ width: '650px' }">
+  <Dialog
+    modal
+    v-model:visible="showGearEditor"
+    header="Gear"
+    :style="{ width: '650px' }"
+  >
     <div class="column gap15">
       <FloatLabel variant="on" class="field">
         <InputText id="gear-name" v-model="editingGear.name" />
@@ -182,7 +206,10 @@ function skillSelectedFromDropdown(skill: Skill) {
       </FloatLabel>
       <div class="field no-margin">
         <label class="field-label"> Goods Type </label>
-        <Select v-model="editingGear.type" :options="Object.values(GoodsType)" />
+        <Select
+          v-model="editingGear.type"
+          :options="Object.values(GoodsType)"
+        />
       </div>
       <FloatLabel class="field">
         <InputNumber id="gear-attack" v-model="editingGear.attack" />
@@ -194,19 +221,38 @@ function skillSelectedFromDropdown(skill: Skill) {
       </FloatLabel>
       <div class="field no-margin">
         <label class="field-label"> Description </label>
-        <Textarea style="height: 100px; resize: vertical" v-model="editingGear.description" />
+        <Textarea
+          style="height: 100px; resize: vertical"
+          v-model="editingGear.description"
+        />
       </div>
       <div class="dialog-buttons">
-        <Button variant="text" label="Cancel" @click="() => (showGearEditor = false)" />
-        <Button :label="existingGearIndex !== -1 ? 'Save' : 'Create'" @click="finishEditingGearItem()" />
+        <Button
+          variant="text"
+          label="Cancel"
+          @click="() => (showGearEditor = false)"
+        />
+        <Button
+          :label="existingGearIndex !== -1 ? 'Save' : 'Create'"
+          @click="finishEditingGearItem()"
+        />
       </div>
     </div>
   </Dialog>
-  <Dialog modal v-model:visible="showSkillEditor" header="Skill" :style="{ width: '650px' }">
+  <Dialog
+    modal
+    v-model:visible="showSkillEditor"
+    header="Skill"
+    :style="{ width: '650px' }"
+  >
     <div class="column gap15">
       <div class="field no-margin">
         <label class="field-label"> Predefined Skills </label>
-        <Select :options="skills" option-label="name" @value-change="skillSelectedFromDropdown" />
+        <Select
+          :options="skills"
+          option-label="name"
+          @value-change="skillSelectedFromDropdown"
+        />
       </div>
       <FloatLabel class="field">
         <InputText id="skill-name" v-model="editingSkill.name" />
@@ -214,23 +260,46 @@ function skillSelectedFromDropdown(skill: Skill) {
       </FloatLabel>
       <div class="field no-margin">
         <label class="field-label"> Description </label>
-        <Textarea style="height: 300px; resize: vertical" v-model="editingSkill.description" />
+        <Textarea
+          style="height: 300px; resize: vertical"
+          v-model="editingSkill.description"
+        />
       </div>
       <div class="dialog-buttons">
-        <Button variant="text" label="Cancel" @click="() => (showSkillEditor = false)" />
-        <Button :label="existingGearIndex !== -1 ? 'Save' : 'Create'" @click="finishEditingSkill()" />
+        <Button
+          variant="text"
+          label="Cancel"
+          @click="() => (showSkillEditor = false)"
+        />
+        <Button
+          :label="existingGearIndex !== -1 ? 'Save' : 'Create'"
+          @click="finishEditingSkill()"
+        />
       </div>
     </div>
   </Dialog>
   <div class="row gap20 w100">
-    <div class="column w50 gap15" style="align-items: center;">
+    <div class="column w50 gap15" style="align-items: center">
       <h4>GEAR</h4>
       <Card v-for="(gear, index) in value.gear" class="w100 card">
         <template #title>
           <div class="tools">
             <div>
-              <Button icon="pi pi-pencil" variant="text" @click="editExistingGearItem(gear, index)" />
-              <Button icon="pi pi-trash" variant="text" @click="deleteExistingGearItem(index)" />
+              <Button
+                icon="pi pi-pencil"
+                variant="text"
+                @click="editExistingGearItem(gear, index)"
+              />
+              <Button
+                icon="pi pi-trash"
+                variant="text"
+                @click="deleteExistingGearItem(index)"
+              />
+              <Button
+                icon="pi pi-share"
+                variant="text"
+                @click="sendNotificationRequest(gearShareText(gear))"
+              />
             </div>
           </div>
           <h3>{{ gear.name }}</h3>
@@ -243,8 +312,14 @@ function skillSelectedFromDropdown(skill: Skill) {
             <div v-if="gear.attack">
               <h6 style="color: var(--p-lime-200)">
                 Attack: {{ gear.attack }}
-                <span v-if="gear.isAutomaton" v-tooltip.bottom="'Do not add your strength when attacking with this weapon'
-                  " style="cursor: default">*</span>
+                <span
+                  v-if="gear.isAutomaton"
+                  v-tooltip.bottom="
+                    'Do not add your strength when attacking with this weapon'
+                  "
+                  style="cursor: default"
+                  >*</span
+                >
               </h6>
             </div>
             <div v-if="gear.armor">
@@ -258,16 +333,33 @@ function skillSelectedFromDropdown(skill: Skill) {
           </div>
         </template>
       </Card>
-      <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px" @click="createNewGearItem" />
+      <Button
+        icon="pi pi-plus"
+        style="border-radius: 100%; margin-top: 10px"
+        @click="createNewGearItem"
+      />
     </div>
-    <div class="column w50 gap15" style="align-items: center;">
+    <div class="column w50 gap15" style="align-items: center">
       <h4>SKILLS</h4>
       <Card v-for="(skill, index) in value.skills" class="w100 card">
         <template #title>
           <div class="tools">
             <div>
-              <Button icon="pi pi-pencil" variant="text" @click="editExistingSkill(skill, index)" />
-              <Button icon="pi pi-trash" variant="text" @click="deleteExistingSkill(index)" />
+              <Button
+                icon="pi pi-pencil"
+                variant="text"
+                @click="editExistingSkill(skill, index)"
+              />
+              <Button
+                icon="pi pi-trash"
+                variant="text"
+                @click="deleteExistingSkill(index)"
+              />
+              <Button
+                icon="pi pi-share"
+                variant="text"
+                @click="sendNotificationRequest(skillShareText(skill))"
+              />
             </div>
           </div>
           <h3>{{ skill.name }}</h3>
@@ -276,7 +368,11 @@ function skillSelectedFromDropdown(skill: Skill) {
           <p>{{ skill.description }}</p>
         </template>
       </Card>
-      <Button icon="pi pi-plus" style="border-radius: 100%; margin-top: 10px" @click="createSkill" />
+      <Button
+        icon="pi pi-plus"
+        style="border-radius: 100%; margin-top: 10px"
+        @click="createSkill"
+      />
     </div>
   </div>
 </template>
@@ -293,6 +389,6 @@ function skillSelectedFromDropdown(skill: Skill) {
 }
 .card {
   border-radius: 10px;
-  box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.3)
+  box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, 0.3);
 }
 </style>
