@@ -296,7 +296,7 @@ function skillShareText(skill: CharacterSkillDto): string {
                 @click="deleteExistingGearItem(index)"
               />
               <Button
-                icon="pi pi-share"
+                icon="pi pi-share-alt"
                 variant="text"
                 @click="sendNotificationRequest(gearShareText(gear))"
               />
@@ -356,7 +356,7 @@ function skillShareText(skill: CharacterSkillDto): string {
                 @click="deleteExistingSkill(index)"
               />
               <Button
-                icon="pi pi-share"
+                icon="pi pi-share-alt"
                 variant="text"
                 @click="sendNotificationRequest(skillShareText(skill))"
               />
