@@ -26,7 +26,6 @@ import { watch } from "vue";
 import { scene } from "../service/tabletop";
 
 const isCharactersOpen = ref(false);
-const isDiceTrayOpen = ref(false);
 const isEncountersOpen = ref(false);
 const isRulebookOpen = ref(false);
 
@@ -192,11 +191,6 @@ async function deleteRoom(id: string) {
   <template v-if="TabletopService.isInRoom()">
     <ObjectPropertiesComponent />
     <div class="tabletop">
-      <DiceRollerComponent
-        :modal="false"
-        :roll-author="selectedCharacter?.info?.name ?? ''"
-        v-model:is-open="isDiceTrayOpen"
-      />
       <TabletopCharacterDialogComponent
         v-model:is-open="isCharactersOpen"
         @set-character="selectedCharacter = $event"
@@ -228,11 +222,9 @@ async function deleteRoom(id: string) {
       />
       <TabletopToolsComponent
         :is-characters-open="isCharactersOpen"
-        :is-dice-tray-open="isDiceTrayOpen"
         :is-encounters-open="isEncountersOpen"
         :is-rulebook-open="isRulebookOpen"
         @update:is-characters-open="isCharactersOpen = $event"
-        @update:is-dice-tray-open="isDiceTrayOpen = $event"
         @update:is-encounters-open="isEncountersOpen = $event"
         @update:is-rulebook-open="isRulebookOpen = $event"
         @upload-image="uploadImage"

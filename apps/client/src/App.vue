@@ -11,7 +11,6 @@ import { isLoading } from './service/loading';
   </div>
   <ConfirmDialog />
   <Toast />
-  <DiceNotification />
   <RouterView />
 </template>
 

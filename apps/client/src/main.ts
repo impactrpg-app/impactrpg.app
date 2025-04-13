@@ -10,8 +10,7 @@ import {
   ToastService,
   Tooltip,
 } from "primevue";
-// @ts-ignore dice-box does not support typescript
-import DiceBox from "@3d-dice/dice-box";
+import { DiceRoller } from "./plugins/diceRoller";
 
 const app = createApp(App);
 
@@ -21,7 +20,7 @@ app.use(PrimeVue, {
     preset: Material,
     options: {
       prefix: "p",
-      darkModeSelector: '.my-app-dark',
+      darkModeSelector: ".my-app-dark",
     },
   },
 });
@@ -29,16 +28,5 @@ app.directive("tooltip", Tooltip);
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
+app.use(DiceRoller);
 app.mount("#app");
-
-// preload dicebox
-new DiceBox({
-  assetPath: "/assets/",
-  theme: "theme-rock",
-  id: 'dicebox-preload',
-}).init().then(() => {
-  const preload = document.getElementById('dicebox-preload');
-  if (preload) {
-    document.body.removeChild(preload);
-  }
-});
