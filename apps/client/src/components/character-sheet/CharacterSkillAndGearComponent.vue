@@ -190,6 +190,7 @@ function gearShareText(gear: CharacterGearItemDto): string {
 function skillShareText(skill: CharacterSkillDto): string {
   return `${skill.name}: ${skill.description}`;
 }
+function rollDice(gear: CharacterGearItemDto) {}
 </script>
 
 <template>
@@ -289,16 +290,25 @@ function skillShareText(skill: CharacterSkillDto): string {
                 icon="pi pi-pencil"
                 variant="text"
                 @click="editExistingGearItem(gear, index)"
+                v-tooltip.top="'Edit this item'"
               />
               <Button
                 icon="pi pi-trash"
                 variant="text"
                 @click="deleteExistingGearItem(index)"
+                v-tooltip.top="'Delete this item'"
               />
               <Button
                 icon="pi pi-share-alt"
                 variant="text"
                 @click="sendNotificationRequest(gearShareText(gear))"
+                v-tooltip.top="'Share with others'"
+              />
+              <Button
+                icon="pi pi-sync"
+                variant="text"
+                @click="rollDice(gear)"
+                v-tooltip.top="'Roll Dice'"
               />
             </div>
           </div>
@@ -349,16 +359,19 @@ function skillShareText(skill: CharacterSkillDto): string {
                 icon="pi pi-pencil"
                 variant="text"
                 @click="editExistingSkill(skill, index)"
+                v-tooltip.top="'Edit this skill'"
               />
               <Button
                 icon="pi pi-trash"
                 variant="text"
                 @click="deleteExistingSkill(index)"
+                v-tooltip.top="'Delete this skill'"
               />
               <Button
                 icon="pi pi-share-alt"
                 variant="text"
                 @click="sendNotificationRequest(skillShareText(skill))"
+                v-tooltip.top="'Share with others'"
               />
             </div>
           </div>
