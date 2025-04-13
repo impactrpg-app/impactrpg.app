@@ -2,6 +2,7 @@
 import * as TabletopService from "../service/tabletop";
 import { Button, Divider, Dialog, InputNumber } from "primevue";
 import { useDiceRoller } from "@/plugins/diceRoller";
+import { getUserClaims } from "@/service/api";
 
 const diceRoller = useDiceRoller();
 const props = defineProps<{
@@ -25,8 +26,14 @@ async function rollDice() {
     result.filter((r) => r.value === 4 || r.value === 5).length +
     result.filter((r) => r.value === 6).length * 2;
 
+  const claims = getUserClaims();
+  if (!claims) {
+    console.error("No user claims found");
+    return;
+  }
+  const { displayName } = claims;
   TabletopService.sendNotificationRequest(
-    `Rolled ${numberOfDice} dice: ${result
+    `${displayName} Rolled ${numberOfDice} dice: ${result
       .map((r) => r.value)
       .join(", ")}. Successes: ${successes}`
   );
