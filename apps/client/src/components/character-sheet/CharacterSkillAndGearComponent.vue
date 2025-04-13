@@ -305,10 +305,13 @@ function rollDice(gear: CharacterGearItemDto) {}
                 v-tooltip.top="'Share with others'"
               />
               <Button
+                v-if="gear.attack || gear.armor"
                 icon="pi pi-sync"
                 variant="text"
                 @click="rollDice(gear)"
-                v-tooltip.top="'Roll Dice'"
+                v-tooltip.top="
+                  gear.attack ? 'Roll for attack' : 'Roll for defense'
+                "
               />
             </div>
           </div>
