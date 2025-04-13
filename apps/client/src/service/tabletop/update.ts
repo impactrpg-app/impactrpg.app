@@ -28,6 +28,10 @@ export function drawImageObject(
     console.warn(`Image object ${object.uuid} has no image`);
     return;
   }
+  if (object.userToken) {
+    image.width = 250;
+    image.height = 250;
+  }
   const imageSize = new Vector2(image.width, image.height);
 
   context.translate(object.position.x, object.position.y);
