@@ -190,7 +190,6 @@ function gearShareText(gear: CharacterGearItemDto): string {
 function skillShareText(skill: CharacterSkillDto): string {
   return `${skill.name}: ${skill.description}`;
 }
-function rollDice(gear: CharacterGearItemDto) {}
 </script>
 
 <template>
@@ -303,15 +302,6 @@ function rollDice(gear: CharacterGearItemDto) {}
                 variant="text"
                 @click="sendNotificationRequest(gearShareText(gear))"
                 v-tooltip.top="'Share with others'"
-              />
-              <Button
-                v-if="gear.attack || gear.armor"
-                icon="pi pi-sync"
-                variant="text"
-                @click="rollDice(gear)"
-                v-tooltip.top="
-                  gear.attack ? 'Roll for attack' : 'Roll for defense'
-                "
               />
             </div>
           </div>
