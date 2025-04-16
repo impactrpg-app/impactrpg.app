@@ -1,8 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { Toast, ConfirmDialog } from "primevue";
-import DiceNotification from './components/DiceNotification.vue';
-import ProgressSpinner from 'primevue/progressspinner';
-import { isLoading } from './service/loading';
+import { isLoading } from "./service/loading";
+import ProgressSpinner from "primevue/progressspinner";
 </script>
 
 <template>
@@ -66,7 +65,8 @@ div {
   z-index: 9000 !important;
 }
 
-.p-dialog, .p-toast-message {
+.p-dialog,
+.p-toast-message {
   background-color: rgba(0, 0, 0, 0.7) !important;
   backdrop-filter: blur(5px) !important;
   border: 0 !important;
@@ -159,7 +159,9 @@ em {
     font-weight: normal;
   }
 
-  div.p-autocomplete,div.p-password,input {
+  div.p-autocomplete,
+  div.p-password,
+  input {
     width: 100%;
   }
 }

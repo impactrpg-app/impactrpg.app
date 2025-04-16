@@ -3,6 +3,7 @@ import * as TabletopService from "../service/tabletop";
 import { Button, Divider, Dialog, InputNumber } from "primevue";
 import { useDiceRoller } from "@/plugins/diceRoller";
 import { getUserClaims } from "@/service/api";
+import { ref } from "vue";
 
 const diceRoller = useDiceRoller();
 const props = defineProps<{
@@ -20,61 +21,11 @@ const emits = defineEmits<{
 }>();
 
 async function rollDice() {
-  const numberOfDice = diceRoller.getNumberOfDice();
-  const result = await diceRoller.rollDice();
-  const successes =
-    result.filter((r) => r.value === 4 || r.value === 5).length +
-    result.filter((r) => r.value === 6).length * 2;
-
-  const claims = getUserClaims();
-  if (!claims) {
-    console.error("No user claims found");
-    return;
-  }
-  const { displayName } = claims;
-  TabletopService.sendNotificationRequest(
-    `${displayName} Rolled ${numberOfDice} dice: ${result
-      .map((r) => r.value)
-      .join(", ")}. Successes: ${successes}`
-  );
-  setTimeout(() => {
-    diceRoller.clear();
-  }, 3000);
+  diceRoller.roll();
 }
 </script>
 
 <template>
-  <Dialog
-    :modal="false"
-    header="Roll Dice"
-    :visible="diceRoller.getNumberOfDice() > 0"
-    @update:visible="diceRoller.setNumberOfDice(0)"
-  >
-    <div class="column gap20">
-      <InputNumber
-        :min="0"
-        :max="100"
-        show-buttons
-        button-layout="horizontal"
-        :input-style="{ 'text-align': 'center' }"
-        :model-value="diceRoller.getNumberOfDice()"
-        @update:model-value="diceRoller.setNumberOfDice($event)"
-      >
-        <template #incrementicon>
-          <span class="pi pi-plus" />
-        </template>
-        <template #decrementicon>
-          <span class="pi pi-minus" />
-        </template>
-      </InputNumber>
-      <Button
-        label="Roll"
-        class="w-full"
-        :disabled="diceRoller.getNumberOfDice() <= 0"
-        @click="rollDice"
-      />
-    </div>
-  </Dialog>
   <div class="tools">
     <Button
       :variant="!props.isCharactersOpen ? 'outlined' : undefined"
@@ -84,10 +35,9 @@ async function rollDice() {
       @click="emits('update:isCharactersOpen', !props.isCharactersOpen)"
     />
     <Button
-      :variant="diceRoller.getNumberOfDice() <= 0 ? 'outlined' : undefined"
       class="rounded-button"
       v-tooltip.top="'Roll Dice'"
-      @click="diceRoller.setNumberOfDice(1)"
+      @click="rollDice"
     >
       <template #icon>
         <span class="material-symbols-outlined">casino</span>

@@ -2,8 +2,8 @@ import { getImageElement, scene, selectedObjects } from "./scene";
 
 import { TabletopObject, Vector2 } from "@impact/shared";
 import { camera } from "./scene";
-import { ref } from "vue";
 import { getObjectBounds } from "./utils";
+import { ref } from "vue";
 
 export const canvasBindingRect = ref<DOMRect>();
 export function onResize(canvas: HTMLCanvasElement) {
@@ -200,6 +200,7 @@ export function drawObject(
     }
   } catch (e) {
     console.warn(`failed to render object ${object.uuid}, error: ${e}`);
+    drawErrorObject(object, context);
   } finally {
     context.restore();
   }
