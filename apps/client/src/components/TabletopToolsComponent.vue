@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import * as TabletopService from "../service/tabletop";
+import * as TabletopService from "../service/tabletop_old";
 import { Button, Divider, Dialog, InputNumber } from "primevue";
 import { useDiceRoller } from "@/plugins/diceRoller";
 import { getUserClaims } from "@/service/api";

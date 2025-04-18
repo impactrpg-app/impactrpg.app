@@ -4,7 +4,7 @@ import { Dialog, InputNumber, Button, ToggleSwitch, InputText } from "primevue";
 import { $dt } from "@primeuix/themes";
 // @ts-ignore dice-box does not support typescript
 import DiceBox from "@3d-dice/dice-box";
-import { sendNotificationRequest } from "../service/tabletop/sync";
+import { sendNotificationRequest } from "../service/tabletop_old/sync";
 let diceBox: any = null;
 const announceRolls = ref<boolean>(true);
 const author = ref<string>("");

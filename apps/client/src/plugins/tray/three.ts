@@ -1,6 +1,6 @@
 import * as Three from "three";
 import { scene as worldScene } from "./scene";
-import { camera as TabletopCamera } from "../../service/tabletop";
+import { camera as TabletopCamera } from "../../service/tabletop_old";
 
 export const scene = new Three.Scene();
 
@@ -45,9 +45,9 @@ function setupCamera() {
 window.addEventListener("resize", setupCamera);
 function camreaUpdate() {
   const { position, zoom } = TabletopCamera.value;
-  camera.position.x = -position.x * zoom * 0.01;
-  camera.position.y = 5.0 * zoom;
-  camera.position.z = -position.y * zoom * 0.01;
+  camera.position.x = -position.x * 0.01;
+  camera.position.y = 5.0 / zoom;
+  camera.position.z = -position.y * 0.01;
 }
 window.addEventListener("wheel", camreaUpdate);
 window.addEventListener("mousemove", camreaUpdate);

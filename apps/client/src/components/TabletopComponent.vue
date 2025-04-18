@@ -14,8 +14,8 @@ import {
 } from "primevue";
 import { computed, ref, useTemplateRef, onMounted, onUnmounted } from "vue";
 import { loadFromFile } from "../service/io";
-import * as TabletopService from "../service/tabletop";
-import { accessToken, API_URL, getHeaders, makeRequest } from "../service/api";
+import * as TabletopService from "../service/tabletop_old";
+import { accessToken, API_URL, makeRequest } from "../service/api";
 import {
   CharacterDto,
   ImageUploadResponse,
@@ -23,7 +23,7 @@ import {
   TabletopObject,
 } from "@impact/shared";
 import { watch } from "vue";
-import { scene } from "../service/tabletop";
+import { scene } from "../service/tabletop_old";
 
 const isCharactersOpen = ref(false);
 const isEncountersOpen = ref(false);

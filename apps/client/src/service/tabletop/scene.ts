@@ -1,211 +1,97 @@
-import {
-  Vector2,
-  TabletopObject,
-  AddObjectMessage,
-  RemoveObjectMessage,
-  UpdateObjectMessage,
-  AllMessageTypes,
-  MessageType,
-} from "@impact/shared";
-import { ref } from "vue";
-import { socket } from "./sync";
+import * as Uuid from "uuid";
 
-export const camera = ref<{
-  position: Vector2;
-  zoom: number;
-}>({
-  position: new Vector2(0, 0),
-  zoom: 1,
-});
-export const selectedObjects = ref<Set<string>>(new Set());
-export const scene = ref<Map<string, TabletopObject>>(new Map());
-export const imagesCache = ref<Map<string, HTMLImageElement>>(new Map());
-const updateThrottle = ref<Map<string, number>>(new Map());
+export class Vector3 {
+  x: number;
+  y: number;
+  z: number;
 
-type HistoryItem = {
-  performedActions: AllMessageTypes[];
-  revertActions: AllMessageTypes[];
-};
-
-const history = ref<HistoryItem[]>([]);
-const redoHistory = ref<HistoryItem[]>([]);
-
-export function getImageElement(uuid: string, imageSrc: string) {
-  if (imagesCache.value.has(uuid)) {
-    return imagesCache.value.get(uuid);
-  }
-  const image = new Image();
-  image.src = imageSrc;
-  image.crossOrigin = "anonymous";
-  imagesCache.value.set(uuid, image);
-  return image;
-}
-
-export async function addObjectRequest(
-  object: TabletopObject,
-  addToHistory: boolean = true
-) {
-  if (!socket) {
-    throw new Error("Not connected to server");
-  }
-
-  if (object.type === "image" && !object.image) {
-    throw new Error("Image is required");
-  } else if (object.type === "stroke" && !object.strokes) {
-    throw new Error("Strokes are required");
-  }
-  if (object.type === "image" && object.image && object.image.length > 1024) {
-    throw new Error("image is too large, please upload it first");
-  }
-  socket.emit("event", new AddObjectMessage(object));
-  if (addToHistory) {
-    pushToHistory(
-      [new AddObjectMessage(object)],
-      [new RemoveObjectMessage(object.uuid)]
-    );
+  constructor(x: number, y: number, z: number) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
   }
 }
 
-export function addObjectResponse(message: AddObjectMessage) {
-  if ("strokes" in message.object) {
-    message.object.strokes = message.object.strokes!.map((stroke) =>
-      Vector2.convert(stroke)
-    );
-  }
-  message.object.position = Vector2.convert(message.object.position);
-  scene.value.set(message.object.uuid, message.object);
-  sortScene();
+export class Module<T> {
+  entity: Entity = null as any;
+  type: string = "error";
+  data: T = null as any;
+
+  async init(): Promise<void> {}
+  async destroy(): Promise<void> {}
 }
 
-export function removeObjectRequest(
-  object: TabletopObject,
-  addToHistory: boolean = true
-) {
-  if (!socket) {
-    throw new Error("Not connected to server");
+export class Entity {
+  uuid: string;
+  name: string;
+  position: Vector3;
+  rotation: Vector3;
+  scale: Vector3;
+  modules: {
+    [key: string]: Module<any>;
+  };
+
+  constructor(name: string) {
+    this.uuid = Uuid.v7();
+    this.name = name;
+    this.position = new Vector3(0, 0, 0);
+    this.rotation = new Vector3(0, 0, 0);
+    this.scale = new Vector3(1, 1, 1);
+    this.modules = {};
+    scene.set(this.uuid, this);
   }
 
-  if (object.type === "image") {
-    imagesCache.value.delete(object.uuid);
+  getModule<T>(type: string): Module<T> | undefined {
+    return this.modules[type] as Module<T>;
   }
 
-  socket.emit("event", {
-    type: "removeObject",
-    objectId: object.uuid,
-  } as RemoveObjectMessage);
-  if (addToHistory) {
-    pushToHistory(
-      [new RemoveObjectMessage(object.uuid)],
-      [new AddObjectMessage(object)]
-    );
+  /**
+   * Add a module to the entity.
+   * @param type The type of the module to add
+   * @param module The module to add
+   */
+  async addModule<T>(module: Module<T>): Promise<Module<T>> {
+    module.entity = this;
+    await module.init();
+    this.modules[module.type] = module;
+    scene.set(this.uuid, this);
+    return module;
+  }
+
+  /**
+   * Remove a module from the entity.
+   * @param module The module to remove
+   */
+  async removeModule(type: string) {
+    await this.modules[type]?.destroy();
+    delete this.modules[type];
+    scene.set(this.uuid, this);
+  }
+
+  /**
+   * Destroy the entity and all its modules.
+   * This will remove the entity from the scene and call destroy on all its modules.
+   */
+  destroy() {
+    Object.values(this.modules).forEach((module) => module.destroy());
+    this.modules = {};
+    scene.delete(this.uuid);
+  }
+
+  update() {
+    scene.set(this.uuid, this);
   }
 }
 
-export function removeObjectResponse(message: RemoveObjectMessage) {
-  if (!scene.value.get(message.objectId)) return;
-  imagesCache.value.delete(message.objectId);
-  scene.value.delete(message.objectId);
-}
+export const scene = new Map<string, Entity>();
 
-export function updateObjectRequest(
-  uuid: string,
-  object: Partial<TabletopObject>,
-  addToHistory: boolean = true,
-  disableThrottle: boolean = false
-) {
-  if (!socket) {
-    throw new Error("Not connected to server");
-  }
-
-  if (!disableThrottle) {
-    if (
-      updateThrottle.value.has(uuid) &&
-      updateThrottle.value.get(uuid)! > Date.now()
-    ) {
-      return;
-    }
-    updateThrottle.value.set(uuid, Date.now() + 10);
-  }
-  
-  if (addToHistory) {
-    pushToHistory(
-      [new UpdateObjectMessage(uuid, object)],
-      [new UpdateObjectMessage(uuid, scene.value.get(uuid)! as TabletopObject)]
-    );
-  }
-
-  scene.value.set(uuid, {
-    ...scene.value.get(uuid)!,
-    ...object,
-    uuid,
-  });
-  socket.emit("event", new UpdateObjectMessage(uuid, object));
-}
-
-export function updateObjectResponse(message: UpdateObjectMessage) {
-  if (!scene.value.has(message.objectId)) {
-    throw new Error("Object not found");
-  }
-
-  if ("position" in message.object) {
-    message.object.position = Vector2.convert(message.object.position!);
-  }
-  if ("strokes" in message.object) {
-    message.object.strokes = message.object.strokes!.map((stroke) =>
-      Vector2.convert(stroke)
-    );
-  }
-
-  scene.value.set(message.objectId, {
-    ...scene.value.get(message.objectId)!,
-    ...message.object,
-  });
-  sortScene();
-}
-
-export function sortScene() {
-  const sortedScene = [...scene.value.values()].sort(
-    (a, b) => (a.order ?? 0) - (b.order ?? 0)
-  );
-  scene.value = new Map(sortedScene.map((object) => [object.uuid, object]));
-}
-
-export function clearHistory() {
-  history.value = [];
-}
-
-export function undo() {
-  if (history.value.length === 0) return;
-  const item = history.value.pop();
-  if (!item) return;
-  for (const action of item.revertActions) {
-    socket?.emit("event", action);
-    if (action.type === MessageType.UpdateObject) {
-      updateObjectResponse(action as UpdateObjectMessage);
-    }
-  }
-  redoHistory.value.push(item);
-}
-
-export function redo() {
-  if (redoHistory.value.length === 0) return;
-  const item = redoHistory.value.pop();
-  if (!item) return;
-  for (const action of item.performedActions) {
-    socket?.emit("event", action);
-    if (action.type === MessageType.UpdateObject) {
-      updateObjectResponse(action as UpdateObjectMessage);
-    }
-  }
-  history.value.push(item);
-}
-
-export function pushToHistory(
-  action: AllMessageTypes[],
-  revertAction: AllMessageTypes[]
-) {
-  history.value.push({
-    performedActions: action,
-    revertActions: revertAction,
-  });
+export function getAllComponentsOfType<T>(type: string): Module<T>[] {
+  const objects = [...scene.values()]
+    .map((obj) =>
+      Object.values(obj.modules)
+        .filter((module) => module.type.startsWith(type))
+        .map((module) => module)
+    )
+    .flat() as Module<T>[];
+  return objects;
 }

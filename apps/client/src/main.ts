@@ -10,7 +10,6 @@ import {
   ToastService,
   Tooltip,
 } from "primevue";
-import { DiceRoller } from "./plugins/diceRoller";
 
 const app = createApp(App);
 
@@ -28,5 +27,4 @@ app.directive("tooltip", Tooltip);
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
-app.use(DiceRoller);
 app.mount("#app");

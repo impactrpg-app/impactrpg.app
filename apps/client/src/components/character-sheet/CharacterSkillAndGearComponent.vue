@@ -18,7 +18,7 @@ import {
   CharacterGearItemDto,
   CharacterSkillDto,
 } from "@impact/shared";
-import { sendNotificationRequest } from "@/service/tabletop";
+import { sendNotificationRequest } from "@/service/tabletop_old";
 
 const NewGearItem: CharacterGearItemDto = {
   name: "",

@@ -8,7 +8,7 @@ import CharacterStatsComponent from './character-sheet/CharacterStatsComponent.v
 import CharacterSkillAndGearComponent from './character-sheet/CharacterSkillAndGearComponent.vue';
 import { getUserClaims, makeRequest } from '../service/api';
 import { CharacterDto, CharacterListDto, TabletopObject, Vector2 } from '@impact/shared';
-import * as TabletopService from '@/service/tabletop';
+import * as TabletopService from '@/service/tabletop_old';
 
 const props = defineProps<{
     isOpen: boolean;

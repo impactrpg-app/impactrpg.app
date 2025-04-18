@@ -2,12 +2,12 @@
 import CustomResourceComponent from "./CustomResourceComponent.vue";
 import { Dialog, ToggleSwitch } from "primevue";
 import { computed } from "vue";
-import { objectPropertiesDialog } from "../service/tabletop/contextMenu";
+import { objectPropertiesDialog } from "../service/tabletop_old/contextMenu";
 import {
   scene,
   sortScene,
   updateObjectRequest,
-} from "../service/tabletop/scene";
+} from "../service/tabletop_old/scene";
 
 const objects = computed(() => objectPropertiesDialog.value);
 const order = computed({

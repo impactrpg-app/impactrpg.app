@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import TabletopComponent from '../components/TabletopComponent.vue';
+import { onMounted } from "vue";
+import * as TabletopService from "../service/tabletop";
+
+onMounted(() => {
+  TabletopService.init();
+});
 </script>
 
-<template>
-    <TabletopComponent />
-</template>
+<template></template>
