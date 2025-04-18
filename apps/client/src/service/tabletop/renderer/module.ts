@@ -27,10 +27,12 @@ export class ImageRendererModule extends RendererModule {
       texture.image.width,
       texture.image.height
     );
-    const material = new Three.MeshBasicMaterial({
+    const material = new Three.MeshPhysicalMaterial({
       map: texture,
     });
     this.data = new Three.Mesh(geometry, material);
+    this.data.castShadow = false;
+    this.data.receiveShadow = true;
     threeScene.add(this.data);
   }
 }
@@ -48,6 +50,8 @@ export class BoxRendererModule extends RendererModule {
     const geometry = new Three.BoxGeometry(this.width, this.height, this.depth);
     const material = new Three.MeshPhysicalMaterial({});
     this.data = new Three.Mesh(geometry, material);
+    this.data.castShadow = true;
+    this.data.receiveShadow = true;
     threeScene.add(this.data);
   }
 }

@@ -26,36 +26,36 @@ export class BoxCollider extends Collider {
   }
 }
 
+function convertCollider(
+  collider: Collider,
+  rigidbody?: Rapier.RigidBody
+): Rapier.Collider {
+  switch (collider.type) {
+    case ColliderType.Box: {
+      const col = collider as BoxCollider;
+      return world.createCollider(
+        Rapier.ColliderDesc.cuboid(
+          col.size.x,
+          col.size.y,
+          col.size.z
+        ).setTranslation(col.offset.x, col.offset.y, col.offset.z),
+        rigidbody
+      );
+    }
+    default: {
+      throw new Error(`Unknown collider type: ${collider.type}`);
+    }
+  }
+}
+
+function convertColliders(colliders: Collider[], rigidbody?: Rapier.RigidBody) {
+  return colliders.map((col) => convertCollider(col, rigidbody));
+}
+
 export const PHYSICS_BODY_MODULE = "Module::PhysicsBody";
 export class PhysicsBodyModule extends Module<PhysicsBodyType> {
   constructor(private colliders: Collider[]) {
     super();
-  }
-
-  private convertCollider(
-    collider: Collider,
-    rigidbody: Rapier.RigidBody
-  ): Rapier.Collider {
-    switch (collider.type) {
-      case ColliderType.Box: {
-        const col = collider as BoxCollider;
-        return world.createCollider(
-          Rapier.ColliderDesc.cuboid(
-            col.size.x,
-            col.size.y,
-            col.size.z
-          ).setTranslation(col.offset.x, col.offset.y, col.offset.z),
-          rigidbody
-        );
-      }
-      default: {
-        throw new Error(`Unknown collider type: ${collider.type}`);
-      }
-    }
-  }
-
-  private convertColliders(colliders: Collider[], rigidbody: Rapier.RigidBody) {
-    return colliders.map((col) => this.convertCollider(col, rigidbody));
   }
 
   async init() {
@@ -81,7 +81,7 @@ export class PhysicsBodyModule extends Module<PhysicsBodyType> {
           w: rotation.w,
         })
     );
-    const colliders = this.convertColliders(this.colliders, body);
+    const colliders = convertColliders(this.colliders, body);
     this.data = {
       body,
       colliders,
@@ -92,5 +92,17 @@ export class PhysicsBodyModule extends Module<PhysicsBodyType> {
       world.removeCollider(collider, false);
     }
     world.removeRigidBody(this.data.body);
+  }
+}
+
+export const STATIC_BODY_MODULE = "Module::StaticBody";
+export class StaticBodyModule extends Module<Rapier.Collider> {
+  constructor(private collider: Collider) {
+    super();
+  }
+
+  async init() {
+    this.type = STATIC_BODY_MODULE;
+    this.data = convertCollider(this.collider);
   }
 }

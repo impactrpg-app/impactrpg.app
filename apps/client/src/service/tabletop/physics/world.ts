@@ -5,8 +5,3 @@ export const world = new Rapier.World({
   y: -9.81,
   z: 0.0,
 });
-
-export const ground = world.createCollider(
-  Rapier.ColliderDesc.cuboid(1000, 0.1, 1000)
-);
-ground.setFriction(1);

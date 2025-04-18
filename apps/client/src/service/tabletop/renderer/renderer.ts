@@ -37,6 +37,10 @@ export const renderer = new Three.WebGLRenderer({
 renderer.setClearColor(0x000000, 0);
 renderer.toneMapping = Three.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1;
+
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = Three.PCFSoftShadowMap;
+
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(devicePixelRatio);
 renderer.domElement.id = "tabletop";

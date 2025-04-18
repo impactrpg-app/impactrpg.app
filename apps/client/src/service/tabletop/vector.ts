@@ -32,6 +32,9 @@ export class Vector3 {
   static zero() {
     return new Vector3(0, 0, 0);
   }
+  static half() {
+    return new Vector3(0.5, 0.5, 0.5);
+  }
   static one() {
     return new Vector3(1, 1, 1);
   }
