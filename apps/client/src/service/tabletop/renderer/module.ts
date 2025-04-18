@@ -17,7 +17,7 @@ export class RendererModule extends Module<Three.Object3D> {
 
 export const IMAGE_MODULE = "Module::Renderer::Image";
 
-export class ImageModule extends RendererModule {
+export class ImageRendererModule extends RendererModule {
   constructor(private image: string) {
     super();
   }
@@ -37,7 +37,7 @@ export class ImageModule extends RendererModule {
   }
 }
 
-export class BoxModule extends RendererModule {
+export class BoxRendererModule extends RendererModule {
   constructor(
     private width: number,
     private height: number,

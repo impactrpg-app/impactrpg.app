@@ -1,8 +1,8 @@
-import * as Rapier from "@dimforge/rapier3d";
 import * as Three from "three";
 import { world } from "./world";
-import { getAllComponentsOfType, Vector3 } from "../scene";
+import { getAllComponentsOfType } from "../scene";
 import { PHYSICS_BODY_MODULE, PhysicsBodyType } from "./module";
+import { Vector3 } from "../vector";
 
 function physicsLoop() {
   world.step();

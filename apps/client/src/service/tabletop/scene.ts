@@ -1,16 +1,5 @@
 import * as Uuid from "uuid";
-
-export class Vector3 {
-  x: number;
-  y: number;
-  z: number;
-
-  constructor(x: number, y: number, z: number) {
-    this.x = x;
-    this.y = y;
-    this.z = z;
-  }
-}
+import { Vector3 } from "./vector";
 
 export class Module<T> {
   entity: Entity = null as any;
@@ -24,19 +13,44 @@ export class Module<T> {
 export class Entity {
   uuid: string;
   name: string;
-  position: Vector3;
-  rotation: Vector3;
-  scale: Vector3;
+  isDirty: boolean;
   modules: {
     [key: string]: Module<any>;
   };
 
+  private _position: Vector3;
+  private _rotation: Vector3;
+  private _scale: Vector3;
+
+  get position() {
+    return this._position;
+  }
+  set position(value: Vector3) {
+    this._position = value;
+    this.isDirty = true;
+  }
+  get rotation() {
+    return this._rotation;
+  }
+  set rotation(value: Vector3) {
+    this._rotation = value;
+    this.isDirty = true;
+  }
+  get scale() {
+    return this._scale;
+  }
+  set scale(value: Vector3) {
+    this._scale = value;
+    this.isDirty = true;
+  }
+
   constructor(name: string) {
     this.uuid = Uuid.v7();
     this.name = name;
-    this.position = new Vector3(0, 0, 0);
-    this.rotation = new Vector3(0, 0, 0);
-    this.scale = new Vector3(1, 1, 1);
+    this._position = new Vector3(0, 0, 0);
+    this._rotation = new Vector3(0, 0, 0);
+    this._scale = new Vector3(1, 1, 1);
+    this.isDirty = true;
     this.modules = {};
     scene.set(this.uuid, this);
   }

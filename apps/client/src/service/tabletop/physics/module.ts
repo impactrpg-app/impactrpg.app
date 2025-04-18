@@ -2,6 +2,7 @@ import * as Rapier from "@dimforge/rapier3d";
 import * as Three from "three";
 import { Module } from "../scene";
 import { world } from "./world";
+import { Vector3 } from "../vector";
 
 export type PhysicsBodyType = {
   body: Rapier.RigidBody;
@@ -18,16 +19,15 @@ export class Collider {
 
 export class BoxCollider extends Collider {
   constructor(
-    public readonly width: number,
-    public readonly height: number,
-    public readonly depth: number
+    public readonly offset: Vector3,
+    public readonly size: Vector3
   ) {
     super(ColliderType.Box);
   }
 }
 
 export const PHYSICS_BODY_MODULE = "Module::PhysicsBody";
-export class PhysicsBody extends Module<PhysicsBodyType> {
+export class PhysicsBodyModule extends Module<PhysicsBodyType> {
   constructor(private colliders: Collider[]) {
     super();
   }
@@ -40,7 +40,11 @@ export class PhysicsBody extends Module<PhysicsBodyType> {
       case ColliderType.Box: {
         const col = collider as BoxCollider;
         return world.createCollider(
-          Rapier.ColliderDesc.cuboid(col.width, col.height, col.depth),
+          Rapier.ColliderDesc.cuboid(
+            col.size.x,
+            col.size.y,
+            col.size.z
+          ).setTranslation(col.offset.x, col.offset.y, col.offset.z),
           rigidbody
         );
       }
