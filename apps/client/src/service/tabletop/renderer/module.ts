@@ -17,19 +17,25 @@ export class RendererModule extends Module<Three.Object3D> {
   }
 }
 export class ImageRendererModule extends RendererModule {
+  private _texture: Three.Texture | null = null;
+
   constructor(private image: string) {
     super();
   }
 
+  get texture() {
+    return this._texture;
+  }
+
   async init(): Promise<void> {
     this.type = RENDERER_MODULE;
-    const texture = await loadImage(this.image);
+    this._texture = await loadImage(this.image);
     const geometry = new Three.PlaneGeometry(
-      texture.image.width,
-      texture.image.height
+      this._texture.image.width,
+      this._texture.image.height
     );
     const material = new Three.MeshPhysicalMaterial({
-      map: texture,
+      map: this._texture,
     });
     this.data = new Three.Mesh(geometry, material);
     this.data.castShadow = false;
