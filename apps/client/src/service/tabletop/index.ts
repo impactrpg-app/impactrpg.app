@@ -1,9 +1,22 @@
+import { CameraControllsModule } from "./modules/cameraControlls";
 import { BoxCollider, PhysicsBodyModule } from "./physics";
-import { BoxRendererModule, ImageRendererModule } from "./renderer";
+import {
+  BoxRendererModule,
+  CameraModule,
+  ImageRendererModule,
+} from "./renderer";
 import { Entity } from "./scene";
 import { Vector3 } from "./vector";
 
 export async function init() {
+  const camera = new Entity("Camera");
+  camera.position = new Vector3(0, 5, 0);
+  camera.rotation = new Vector3(-Math.PI / 2, 0, 0);
+  camera.addModule(
+    new CameraModule(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+  );
+  camera.addModule(new CameraControllsModule());
+
   const image = new Entity("Image");
   const imageUrl =
     "https://api.dev.impactrpg.app/image/67df255f73a91ebf12529b62%2Fdbe20305-1e44-435a-841b-2185d7eee686";

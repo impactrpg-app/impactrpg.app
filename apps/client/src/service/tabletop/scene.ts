@@ -55,6 +55,11 @@ export class Entity {
     scene.set(this.uuid, this);
   }
 
+  /**
+   * Get an existing module that is attached to the entity
+   * @param type The type of module to get
+   * @returns The returned module
+   */
   getModule<T>(type: string): Module<T> | undefined {
     return this.modules[type] as Module<T>;
   }
@@ -65,6 +70,9 @@ export class Entity {
    * @param module The module to add
    */
   async addModule<T>(module: Module<T>): Promise<Module<T>> {
+    if (!!this.modules[module.type]) {
+      throw new Error(`duplicate module ${module.type}`);
+    }
     module.entity = this;
     await module.init();
     this.modules[module.type] = module;
@@ -98,12 +106,13 @@ export class Entity {
 }
 
 export const scene = new Map<string, Entity>();
+export const selectedObjects = new Set<string>();
 
 export function getAllComponentsOfType<T>(type: string): Module<T>[] {
   const objects = [...scene.values()]
     .map((obj) =>
       Object.values(obj.modules)
-        .filter((module) => module.type.startsWith(type))
+        .filter((module) => module.type === type)
         .map((module) => module)
     )
     .flat() as Module<T>[];

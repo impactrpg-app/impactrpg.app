@@ -1,7 +1,7 @@
 import * as Three from "three";
-import { RENDERER_MODULE } from "./module";
+import { CAMERA_MODULE, RENDERER_MODULE } from "./module";
 import { getAllComponentsOfType } from "../scene";
-import { threeScene, camera } from "./scene";
+import { threeScene } from "./scene";
 
 function animate() {
   const rendererModules =
@@ -13,7 +13,22 @@ function animate() {
     module.data.rotation.set(rotation.x, rotation.y, rotation.z);
     module.data.scale.set(scale.x, scale.y, scale.z);
   }
-  renderer.render(threeScene, camera);
+  const cameraModules = getAllComponentsOfType<Three.Camera>(CAMERA_MODULE);
+  for (const module of cameraModules) {
+    module.data.position.set(
+      module.entity.position.x,
+      module.entity.position.y,
+      module.entity.position.z
+    );
+    module.data.setRotationFromEuler(
+      new Three.Euler(
+        module.entity.rotation.x,
+        module.entity.rotation.y,
+        module.entity.rotation.z
+      )
+    );
+    renderer.render(threeScene, module.data);
+  }
 }
 
 export const renderer = new Three.WebGLRenderer({
@@ -27,9 +42,3 @@ renderer.setPixelRatio(devicePixelRatio);
 renderer.domElement.id = "tabletop";
 document.body.appendChild(renderer.domElement);
 renderer.setAnimationLoop(animate);
-
-window.addEventListener("resize", () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-});
