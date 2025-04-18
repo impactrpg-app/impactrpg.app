@@ -1,5 +1,5 @@
 import { BoxCollider, PhysicsBodyModule } from "./physics";
-import { BoxRendererModule, ImageRendererModule, loadImage, RendererModule } from "./renderer";
+import { BoxRendererModule, ImageRendererModule } from "./renderer";
 import { Entity } from "./scene";
 import { Vector3 } from "./vector";
 
@@ -15,5 +15,7 @@ export async function init() {
   const dice = new Entity("dice");
   dice.position = new Vector3(0, 2, 0);
   dice.addModule(new BoxRendererModule(1, 1, 1));
-  dice.addModule(new PhysicsBodyModule([new BoxCollider(1, 1, 1)]));
+  dice.addModule(
+    new PhysicsBodyModule([new BoxCollider(Vector3.zero(), Vector3.one())])
+  );
 }
