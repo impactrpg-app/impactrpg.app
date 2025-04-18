@@ -107,12 +107,17 @@ export class Entity {
 
 export const scene = new Map<string, Entity>();
 export const selectedObjects = new Set<string>();
+export function clearScene() {
+  for (const entity of scene.values()) {
+    entity.destroy();
+  }
+}
 
-export function getAllComponentsOfType<T>(type: string): Module<T>[] {
+export function getAllComponentsOfType<T>(types: string[]): Module<T>[] {
   const objects = [...scene.values()]
     .map((obj) =>
       Object.values(obj.modules)
-        .filter((module) => module.type === type)
+        .filter((module) => types.includes(module.type))
         .map((module) => module)
     )
     .flat() as Module<T>[];

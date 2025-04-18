@@ -2,8 +2,9 @@ import { CameraControllsModule } from "./modules/cameraControlls";
 import { BoxCollider, PhysicsBodyModule, StaticBodyModule } from "./physics";
 import {
   BoxRendererModule,
-  CameraModule,
+  PerspectiveCameraModule,
   ImageRendererModule,
+  DirectionalLightModule,
 } from "./renderer";
 import { Entity } from "./scene";
 import { Vector3 } from "./vector";
@@ -14,9 +15,19 @@ export async function init() {
   camera.position = new Vector3(0, 5, 0);
   camera.rotation = new Vector3(-Math.PI / 2, 0, 0);
   camera.addModule(
-    new CameraModule(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    new PerspectiveCameraModule(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    )
   );
   camera.addModule(new CameraControllsModule());
+
+  // directional light
+  const light = new Entity("Light");
+  light.rotation = new Vector3(45, 0, 45);
+  light.addModule(new DirectionalLightModule());
 
   // ground
   const ground = new Entity("Ground");

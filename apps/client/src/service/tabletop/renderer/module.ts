@@ -3,6 +3,7 @@ import { Module } from "../scene";
 import { threeScene } from "./scene";
 import { loadImage } from "./loader";
 import { renderer } from "./renderer";
+import { Vector3 } from "../vector";
 
 export const RENDERER_MODULE = "Module::Renderer";
 
@@ -57,7 +58,7 @@ export class BoxRendererModule extends RendererModule {
 }
 
 export const CAMERA_MODULE = "Module::Camera";
-export class CameraModule extends Module<Three.PerspectiveCamera> {
+export class PerspectiveCameraModule extends Module<Three.PerspectiveCamera> {
   constructor(
     private _fov: number,
     private _aspectRatio: number,
@@ -130,6 +131,42 @@ export class CameraModule extends Module<Three.PerspectiveCamera> {
 
   async destroy(): Promise<void> {
     window.removeEventListener("resize", () => this.onResize());
+    threeScene.remove(this.data);
+  }
+}
+
+export const LIGHT_MODULE = "Module::Light";
+export class DirectionalLightModule extends Module<Three.DirectionalLight> {
+  constructor() {
+    super();
+  }
+
+  get intensity() {
+    return this.data.intensity;
+  }
+  set intensity(value: number) {
+    this.data.intensity = value;
+  }
+  get color() {
+    return new Vector3(this.data.color.r, this.data.color.g, this.data.color.b);
+  }
+  set color(value: Vector3) {
+    this.data.color = new Three.Color(value.r, value.g, value.b);
+  }
+
+  async init() {
+    this.type = LIGHT_MODULE;
+    this.data = new Three.DirectionalLight(new Three.Color(1, 1, 1), 1);
+    this.data.position.set(
+      this.entity.position.x,
+      this.entity.position.y,
+      this.entity.position.z
+    );
+    this.data.setRotationFromEuler(new Three.Euler(45, 0, 45));
+    this.data.castShadow = true;
+    threeScene.add(this.data);
+  }
+  async destroy(): Promise<void> {
     threeScene.remove(this.data);
   }
 }

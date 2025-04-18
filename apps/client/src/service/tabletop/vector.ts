@@ -3,6 +3,25 @@ export class Vector3 {
   y: number;
   z: number;
 
+  get r() {
+    return this.x;
+  }
+  set r(value: number) {
+    this.x = value;
+  }
+  get g() {
+    return this.y;
+  }
+  set g(value: number) {
+    this.y = value;
+  }
+  get b() {
+    return this.z;
+  }
+  set b(value: number) {
+    this.z = value;
+  }
+
   constructor(x: number, y: number, z: number) {
     this.x = x;
     this.y = y;
@@ -37,5 +56,9 @@ export class Vector3 {
   }
   static one() {
     return new Vector3(1, 1, 1);
+  }
+  static fromAngles(x: number, y: number, z: number) {
+    const converter = Math.PI / 180;
+    return new Vector3(x * converter, y * converter, z * converter);
   }
 }

@@ -1,19 +1,25 @@
 import * as Three from "three";
-import { CAMERA_MODULE, RENDERER_MODULE } from "./module";
-import { getAllComponentsOfType } from "../scene";
+import { CAMERA_MODULE, LIGHT_MODULE, RENDERER_MODULE } from "./module";
+import { getAllComponentsOfType, Module } from "../scene";
 import { threeScene } from "./scene";
 
-function animate() {
-  const rendererModules =
-    getAllComponentsOfType<Three.Object3D>(RENDERER_MODULE);
-  for (const module of rendererModules) {
+function updateObjectTransforms(modules: Module<Three.Object3D>[]) {
+  const objs = new Set<string>();
+  for (const module of modules) {
     const entity = module.entity;
+    objs.add(module.data.uuid);
     const { position, rotation, scale } = entity;
     module.data.position.set(position.x, position.y, position.z);
     module.data.rotation.set(rotation.x, rotation.y, rotation.z);
     module.data.scale.set(scale.x, scale.y, scale.z);
   }
-  const cameraModules = getAllComponentsOfType<Three.Camera>(CAMERA_MODULE);
+}
+
+function animate() {
+  updateObjectTransforms(
+    getAllComponentsOfType<Three.Object3D>([RENDERER_MODULE, LIGHT_MODULE])
+  );
+  const cameraModules = getAllComponentsOfType<Three.Camera>([CAMERA_MODULE]);
   for (const module of cameraModules) {
     module.data.position.set(
       module.entity.position.x,
@@ -39,10 +45,12 @@ renderer.toneMapping = Three.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1;
 
 renderer.shadowMap.enabled = true;
+renderer.shadowMap.autoUpdate = true;
 renderer.shadowMap.type = Three.PCFSoftShadowMap;
 
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(devicePixelRatio);
+renderer.setPixelRatio(window.devicePixelRatio);
+
 renderer.domElement.id = "tabletop";
 document.body.appendChild(renderer.domElement);
 renderer.setAnimationLoop(animate);
