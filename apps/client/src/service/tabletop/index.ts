@@ -5,11 +5,14 @@ import {
   PerspectiveCameraModule,
   ImageRendererModule,
   DirectionalLightModule,
+  AmbientLightModule,
 } from "./renderer";
-import { Entity } from "./scene";
+import { clearScene, Entity } from "./scene";
 import { Vector3 } from "./vector";
 
 export async function init() {
+  clearScene();
+
   // camera
   const camera = new Entity("Camera");
   camera.position = new Vector3(0, 5, 0);
@@ -26,8 +29,10 @@ export async function init() {
 
   // directional light
   const light = new Entity("Light");
-  light.rotation = new Vector3(45, 0, 45);
-  light.addModule(new DirectionalLightModule());
+  light.rotation = Vector3.fromAngles(45, 30, 0);
+  const directionalLight = await light.addModule(new DirectionalLightModule());
+  directionalLight.intensity = 2;
+  light.addModule(new AmbientLightModule());
 
   // ground
   const ground = new Entity("Ground");

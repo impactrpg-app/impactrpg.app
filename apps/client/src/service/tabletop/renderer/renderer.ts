@@ -1,5 +1,5 @@
 import * as Three from "three";
-import { CAMERA_MODULE, LIGHT_MODULE, RENDERER_MODULE } from "./module";
+import { CAMERA_MODULE, DIRECTIONAL_LIGHT_MODULE, RENDERER_MODULE } from "./module";
 import { getAllComponentsOfType, Module } from "../scene";
 import { threeScene } from "./scene";
 
@@ -15,9 +15,25 @@ function updateObjectTransforms(modules: Module<Three.Object3D>[]) {
   }
 }
 
+function updateDirectionalLights(mdoule: Module<Three.DirectionalLight>[]) {
+  for (const module of mdoule) {
+    const entity = module.entity;
+    const { position, rotation } = entity;
+    const pitch = module.entity.rotation.x;
+    const yaw = module.entity.rotation.y;
+    const x = Math.cos(pitch) * Math.sin(yaw);
+    const y = Math.sin(pitch);
+    const z = Math.cos(pitch) * Math.cos(yaw);
+    module.data.position.set(x, y, z);
+  }
+}
+
 function animate() {
   updateObjectTransforms(
-    getAllComponentsOfType<Three.Object3D>([RENDERER_MODULE, LIGHT_MODULE])
+    getAllComponentsOfType<Three.Object3D>([RENDERER_MODULE])
+  );
+  updateDirectionalLights(
+    getAllComponentsOfType<Three.DirectionalLight>([DIRECTIONAL_LIGHT_MODULE])
   );
   const cameraModules = getAllComponentsOfType<Three.Camera>([CAMERA_MODULE]);
   for (const module of cameraModules) {

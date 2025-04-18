@@ -135,7 +135,7 @@ export class PerspectiveCameraModule extends Module<Three.PerspectiveCamera> {
   }
 }
 
-export const LIGHT_MODULE = "Module::Light";
+export const DIRECTIONAL_LIGHT_MODULE = "Module::Light::Directional";
 export class DirectionalLightModule extends Module<Three.DirectionalLight> {
   constructor() {
     super();
@@ -155,15 +155,44 @@ export class DirectionalLightModule extends Module<Three.DirectionalLight> {
   }
 
   async init() {
-    this.type = LIGHT_MODULE;
+    this.type = DIRECTIONAL_LIGHT_MODULE;
     this.data = new Three.DirectionalLight(new Three.Color(1, 1, 1), 1);
-    this.data.position.set(
-      this.entity.position.x,
-      this.entity.position.y,
-      this.entity.position.z
-    );
-    this.data.setRotationFromEuler(new Three.Euler(45, 0, 45));
+    const pitch = this.entity.rotation.x;
+    const yaw = this.entity.rotation.y;
+    const x = Math.cos(pitch) * Math.sin(yaw);
+    const y = Math.sin(pitch);
+    const z = Math.cos(pitch) * Math.cos(yaw);
+    this.data.position.set(x, y, z);
     this.data.castShadow = true;
+    threeScene.add(this.data);
+  }
+  async destroy(): Promise<void> {
+    threeScene.remove(this.data);
+  }
+}
+
+export const AMBIENT_LIGHT_MODULE = "Module::Light::Ambient";
+export class AmbientLightModule extends Module<Three.AmbientLight> {
+  constructor() {
+    super();
+  }
+
+  get intensity() {
+    return this.data.intensity;
+  }
+  set intensity(value: number) {
+    this.data.intensity = value;
+  }
+  get color() {
+    return new Vector3(this.data.color.r, this.data.color.g, this.data.color.b);
+  }
+  set color(value: Vector3) {
+    this.data.color = new Three.Color(value.r, value.g, value.b);
+  }
+
+  async init() {
+    this.type = AMBIENT_LIGHT_MODULE;
+    this.data = new Three.AmbientLight(new Three.Color(1, 1, 1), 0.2);
     threeScene.add(this.data);
   }
   async destroy(): Promise<void> {

@@ -60,8 +60,8 @@ export class Entity {
    * @param type The type of module to get
    * @returns The returned module
    */
-  getModule<T>(type: string): Module<T> | undefined {
-    return this.modules[type] as Module<T>;
+  getModule<A, B extends Module<A>>(type: string): B | undefined {
+    return this.modules[type] as B;
   }
 
   /**
@@ -69,7 +69,7 @@ export class Entity {
    * @param type The type of the module to add
    * @param module The module to add
    */
-  async addModule<T>(module: Module<T>): Promise<Module<T>> {
+  async addModule<A, B extends Module<A>>(module: B): Promise<B> {
     if (!!this.modules[module.type]) {
       throw new Error(`duplicate module ${module.type}`);
     }
