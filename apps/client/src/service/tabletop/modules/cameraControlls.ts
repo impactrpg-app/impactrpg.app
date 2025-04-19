@@ -1,11 +1,15 @@
+import { CAMERA_MODULE, CameraModule } from "../renderer";
 import { Module } from "../scene";
 import { Vector3 } from "../vector";
+import { Tool } from "./tools/base";
+import { MoveTool } from "./tools/move";
 
 export class CameraControllsModule extends Module<any> {
   private isCameraMoveKeyDown: boolean = false;
   private previousCameraPos = Vector3.zero();
   private readonly minZoom = 0.5;
   private readonly maxZoom = 20;
+  private currentTool: Tool = new MoveTool();
 
   async init() {
     this.type = "Module::CameraControlls";
@@ -33,6 +37,7 @@ export class CameraControllsModule extends Module<any> {
     this.entity.position = pos;
   }
   private onMouseMove(e: MouseEvent) {
+    this.currentTool.onMouseMove(e);
     const currentCameraPos = new Vector3(e.clientX, 0, e.clientY);
     if (this.isCameraMoveKeyDown) {
       const mouseDelta = this.previousCameraPos.subtract(currentCameraPos);
@@ -44,11 +49,16 @@ export class CameraControllsModule extends Module<any> {
     this.previousCameraPos = currentCameraPos.clone();
   }
   private onMouseDown(e: MouseEvent) {
+    const cameraModule = this.entity.getModule<CameraModule>(CAMERA_MODULE);
+    if (cameraModule)
+      (this.currentTool as MoveTool).perspectiveCamera = cameraModule;
+    this.currentTool.onMouseDown(e);
     if (e.button === 1) {
       this.isCameraMoveKeyDown = true;
     }
   }
   private onMouseUp(e: MouseEvent) {
+    this.currentTool.onMouseUp(e);
     if (e.button === 1) {
       this.isCameraMoveKeyDown = false;
     }

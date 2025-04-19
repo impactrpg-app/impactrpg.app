@@ -15,6 +15,10 @@ export class DynamicBodyModule extends Module<DynamicBodyType> {
     super();
   }
 
+  setActive(value: boolean) {
+    this.data.body.setEnabled(value);
+  }
+
   async init() {
     this.type = "Module::Physics";
     const rot = new Three.Quaternion().setFromEuler(
@@ -55,6 +59,29 @@ export class DynamicBodyModule extends Module<DynamicBodyType> {
     }
   }
   physicsUpdate(): void {
+    if (this.entity.isDirty) {
+      this.data.body.setTranslation(
+        new Rapier.Vector3(
+          this.entity.position.x,
+          this.entity.position.y,
+          this.entity.position.z
+        ),
+        false
+      );
+      const rot = new Three.Quaternion().setFromEuler(
+        new Three.Euler(
+          this.entity.rotation.x,
+          this.entity.rotation.y,
+          this.entity.rotation.z
+        )
+      );
+      this.data.body.setRotation(
+        new Rapier.Quaternion(rot.x, rot.y, rot.z, rot.w),
+        true
+      );
+      this.entity.isDirty = false;
+      return;
+    }
     for (const collider of this._colliders) {
       collider.physicsUpdate();
     }

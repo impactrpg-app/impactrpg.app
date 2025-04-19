@@ -1,6 +1,6 @@
 import * as Three from "three";
 import { Module } from "../../scene";
-import { threeScene } from "../scene";
+import { threeScene, threeToEntity } from "../scene";
 import { Vector3 } from "../../vector";
 
 export class BoxRendererModule extends Module<Three.Object3D> {
@@ -30,9 +30,11 @@ export class BoxRendererModule extends Module<Three.Object3D> {
     this.data.castShadow = true;
     this.data.receiveShadow = true;
     threeScene.add(this.data);
+    threeToEntity.set(this.data, this.entity.uuid);
   }
   async destroy() {
     threeScene.remove(this.data);
+    threeToEntity.delete(this.data);
   }
 
   update(): void {

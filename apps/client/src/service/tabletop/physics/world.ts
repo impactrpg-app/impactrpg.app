@@ -1,6 +1,7 @@
 import * as Rapier from "@dimforge/rapier3d";
 import { Vector3 } from "../vector";
-import { scene } from "../scene";
+import { Entity, scene } from "../scene";
+import { DynamicBodyModule } from "./modules";
 
 export let world = new Rapier.World({
   x: 0.0,
@@ -26,5 +27,11 @@ export function CastRay(origin: Vector3, direction: Vector3, distance: number) {
   if (!result) return null;
   const entityUuid = colliderToEntity.get(result.collider);
   if (!entityUuid) return null;
-  return scene.get(entityUuid);
+  const entity = scene.get(entityUuid);
+  if (!entity) return null;
+  const point = origin.add(direction.multiply(result.timeOfImpact));
+  return {
+    entity,
+    point,
+  };
 }

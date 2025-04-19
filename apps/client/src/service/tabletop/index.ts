@@ -6,10 +6,10 @@ import {
   CameraType,
   ImageRendererModule,
 } from "./renderer";
-import { clearScene, Entity, scene } from "./scene";
+import { clearScene, Entity } from "./scene";
 import { Vector3 } from "./vector";
-import * as Physics from "./physics";
 import { LightModule, LightType } from "./renderer/modules/light";
+import { DebuggerModule } from "./modules/debugger";
 
 export async function init() {
   clearScene();
@@ -18,22 +18,8 @@ export async function init() {
   const camera = new Entity("Camera");
   camera.position = new Vector3(0, 5, 0);
   camera.rotation = new Vector3(-Math.PI / 2, 0, 0);
-  const perspectiveCamera = await camera.addModule(
-    new CameraModule(CameraType.Perspective)
-  );
+  camera.addModule(new CameraModule(CameraType.Perspective));
   camera.addModule(new CameraControllsModule());
-
-  window.addEventListener("click", (e) => {
-    const x = (e.clientX / window.innerWidth) * 2 - 1;
-    const y = (e.clientY / window.innerHeight) * 2 - 1;
-    const ray = perspectiveCamera.getRayFromScreenPoint(x, y);
-    const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
-    if (rayResult) {
-      console.log("Ray hit:", rayResult);
-    } else {
-      console.log("Ray did not hit anything.");
-    }
-  });
 
   // directional light
   const directionalLight = new Entity("DirectionalLight");
@@ -48,6 +34,7 @@ export async function init() {
   ground.addModule(
     new StaticBodyModule([new BoxCollider(new Vector3(1000, 0.01, 1000))])
   );
+  ground.isInteractable = false;
 
   // image
   const image = new Entity("Image");
@@ -71,4 +58,7 @@ export async function init() {
   dice.position = new Vector3(0, 2, 0);
   dice.addModule(new BoxRendererModule(new Vector3(1, 1, 1)));
   dice.addModule(new DynamicBodyModule([new BoxCollider(Vector3.half())]));
+
+  // const debug = new Entity("Debugger");
+  // debug.addModule(new DebuggerModule());
 }

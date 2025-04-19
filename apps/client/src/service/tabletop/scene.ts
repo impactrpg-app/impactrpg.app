@@ -6,6 +6,10 @@ export class Module<T> {
   type: string = "error";
   protected data: T = null as any;
 
+  getData() {
+    return this.data;
+  }
+
   async init(): Promise<void> {}
   async destroy(): Promise<void> {}
   update(): void {}
@@ -16,6 +20,7 @@ export class Entity {
   uuid: string;
   name: string;
   isDirty: boolean;
+  isInteractable: boolean;
   modules: {
     [key: string]: Module<any>;
   };
@@ -53,6 +58,7 @@ export class Entity {
     this._rotation = new Vector3(0, 0, 0);
     this._scale = new Vector3(1, 1, 1);
     this.isDirty = true;
+    this.isInteractable = true;
     this.modules = {};
     scene.set(this.uuid, this);
   }
@@ -62,7 +68,7 @@ export class Entity {
    * @param type The type of module to get
    * @returns The returned module
    */
-  getModule<A, B extends Module<A>>(type: string): B | undefined {
+  getModule<B extends Module<unknown>>(type: string): B | undefined {
     return this.modules[type] as B;
   }
 
@@ -71,7 +77,7 @@ export class Entity {
    * @param type The type of the module to add
    * @param module The module to add
    */
-  async addModule<A, B extends Module<A>>(module: B): Promise<B> {
+  async addModule<B extends Module<unknown>>(module: B): Promise<B> {
     if (!!this.modules[module.type]) {
       throw new Error(`duplicate module ${module.type}`);
     }
