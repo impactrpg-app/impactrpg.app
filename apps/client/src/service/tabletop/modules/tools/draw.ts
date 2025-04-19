@@ -38,40 +38,39 @@ export class DrawTool extends BaseTool {
     this._entity.addModule(this._renderer!);
   }
   onMouseUp(e: MouseEvent): void {
-    // clear line renderer
-    const { center, size } = this.getBounds();
-    this.points = this.points.map((line) => line.subtract(center));
-    this._renderer?.setPoints(this.points);
-
-    if (this._entity) {
-      const entity = this._entity;
-      this._entity.position = this._entity.position.add(center);
-      this._entity
-        .addModule(
-          new Physics.StaticBodyModule([
-            new Physics.BoxCollider(
-              new Vector3(size.x / 2, size.y / 2, size.z / 2)
-            ),
-          ])
-        )
-        .then((body) => {
-          body.autoUpdateTransform = false;
-          body.getData().body.setTranslation(
-            {
-              x: entity.position.x,
-              y: entity.position.y,
-              z: entity.position.z,
-            },
-            true
-          );
-        });
+    if (this.points.length <= 2) {
+      this._entity?.destroy();
+    } else {
+      const { center, size } = this.getBounds();
+      this.points = this.points.map((line) => line.subtract(center));
+      this._renderer?.setPoints(this.points);
+      if (this._entity) {
+        const entity = this._entity;
+        this._entity.position = this._entity.position.add(center);
+        this._entity
+          .addModule(
+            new Physics.StaticBodyModule([
+              new Physics.BoxCollider(
+                new Vector3(size.x / 2, size.y / 2, size.z / 2)
+              ),
+            ])
+          )
+          .then((body) => {
+            body.autoUpdateTransform = false;
+            body.getData().body.setTranslation(
+              {
+                x: entity.position.x,
+                y: entity.position.y,
+                z: entity.position.z,
+              },
+              true
+            );
+          });
+      }
     }
+    this.isDrawing = false;
     this._entity = null;
     this._renderer = null;
-    this.points = [];
-    this.lastPoint = Vector3.zero();
-
-    this.isDrawing = false;
     this.lastPoint = Vector3.zero();
     this.points = [];
   }

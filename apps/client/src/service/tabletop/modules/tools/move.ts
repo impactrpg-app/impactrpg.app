@@ -39,14 +39,17 @@ export class MoveTool extends BaseTool {
     for (const uuid of selectedObjects) {
       const entity = scene.get(uuid);
       if (!entity) continue;
-      const body =
-        entity.getModule<Physics.DynamicBodyModule>("Module::Physics");
+      const body = entity.getModule<Physics.BaseBodyModule>("Module::Physics");
       if (body) body.setActive(!this._isDragging);
       if (this._isDragging === false) continue;
       const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
       const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
       if (rayResult) {
-        entity.position = rayResult.point.add(new Vector3(0, 1, 0));
+        if (body instanceof Physics.DynamicBodyModule) {
+          entity.position = rayResult.point.add(new Vector3(0, 1, 0));
+        } else {
+          entity.position = rayResult.point.add(new Vector3(0, 0.1, 0));
+        }
       }
     }
   }
