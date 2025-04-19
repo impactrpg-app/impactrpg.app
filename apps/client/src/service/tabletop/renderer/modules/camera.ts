@@ -144,8 +144,10 @@ export class CameraModule extends Module<Three.Camera> {
   }
 
   getRayFromScreenPoint(x: number, y: number) {
+    x = (x / window.innerWidth) * 2 - 1;
+    y = -(y / window.innerHeight) * 2 + 1;
     const raycaster = new Three.Raycaster();
-    raycaster.setFromCamera(new Three.Vector2(x, -y), this.data);
+    raycaster.setFromCamera(new Three.Vector2(x, y), this.data);
     const direction = new Vector3(
       raycaster.ray.direction.x,
       raycaster.ray.direction.y,

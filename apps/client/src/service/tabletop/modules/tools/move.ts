@@ -17,9 +17,7 @@ export class MoveTool extends BaseTool {
     if (e.button === 0) {
       this._isDragging = true;
       // Left mouse button down
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = (e.clientY / window.innerHeight) * 2 - 1;
-      const ray = this._camera.getRayFromScreenPoint(x, y);
+      const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
       const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
       if (rayResult && rayResult.entity.isInteractable) {
         selectedObjects.clear();
@@ -45,9 +43,7 @@ export class MoveTool extends BaseTool {
         entity.getModule<Physics.DynamicBodyModule>("Module::Physics");
       if (body) body.setActive(!this._isDragging);
       if (this._isDragging === false) continue;
-      const x = (e.clientX / window.innerWidth) * 2 - 1;
-      const y = (e.clientY / window.innerHeight) * 2 - 1;
-      const ray = this._camera.getRayFromScreenPoint(x, y);
+      const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
       const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
       if (rayResult) {
         entity.position = rayResult.point.add(new Vector3(0, 1, 0));

@@ -19,4 +19,15 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["@nestjs/swagger", "class-validator"],
   },
+  server: {
+    hmr: {
+      protocol: "ws",
+      overlay: false,
+      reload: true,
+    },
+    watch: {
+      usePolling: true,
+      interval: 1000,
+    },
+  },
 });
