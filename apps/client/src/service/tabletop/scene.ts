@@ -90,7 +90,7 @@ export class Entity {
    */
   async addModule<T extends Module<unknown>>(module: T): Promise<T> {
     if (!!this.modules[module.type]) {
-      throw new Error(`duplicate module ${module.type}`);
+      return this.modules[module.type] as T;
     }
     module.entity = this;
     await module.init();
@@ -177,5 +177,13 @@ export const selectedObjects = new Set<string>();
 export function clearScene() {
   for (const entity of scene.values()) {
     entity.destroy();
+  }
+}
+
+export function clearDirtyEntities() {
+  for (const entity of scene.values()) {
+    if (entity.isDirty) {
+      entity.isDirty = false;
+    }
   }
 }

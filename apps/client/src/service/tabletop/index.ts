@@ -24,7 +24,7 @@ export async function init() {
   await camera.addModule(new CameraModule(CameraType.Perspective));
   await camera.addModule(new CameraControllsModule());
   await camera.addModule(new MoveTool());
-  // await camera.updateModule(new DrawTool());
+  await camera.updateModule(new DrawTool());
 
   // directional light
   const directionalLight = new Entity("DirectionalLight");

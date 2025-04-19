@@ -79,7 +79,6 @@ export class DynamicBodyModule extends Module<DynamicBodyType> {
         new Rapier.Quaternion(rot.x, rot.y, rot.z, rot.w),
         true
       );
-      this.entity.isDirty = false;
       return;
     }
     for (const collider of this._colliders) {

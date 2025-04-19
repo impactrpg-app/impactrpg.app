@@ -1,4 +1,4 @@
-import { scene } from "../scene";
+import { clearDirtyEntities, scene } from "../scene";
 import { world } from "./world";
 
 function physicsLoop() {
@@ -8,6 +8,7 @@ function physicsLoop() {
       module.physicsUpdate();
     }
   }
+  clearDirtyEntities();
   setTimeout(physicsLoop, 16);
 }
 physicsLoop();
