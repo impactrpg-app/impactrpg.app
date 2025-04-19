@@ -1,19 +1,16 @@
-import { Module } from "../../scene";
 import { world } from "../world";
+import { BaseBodyModule } from "./baseBody";
 import { Collider } from "./collider";
 import * as Rapier from "@dimforge/rapier3d";
-import * as Three from "three";
 
 export type StaticBodyType = {
   body: Rapier.RigidBody;
   colliders: Rapier.Collider[];
 };
 
-export class StaticBodyModule extends Module<StaticBodyType> {
-  public autoUpdateTransform = true;
-
-  constructor(private colliders: Collider[]) {
-    super();
+export class StaticBodyModule extends BaseBodyModule {
+  constructor(colliders: Collider[]) {
+    super(colliders);
   }
 
   async init() {
@@ -25,47 +22,14 @@ export class StaticBodyModule extends Module<StaticBodyType> {
         this.entity.position.z
       )
     );
-    for (const collider of this.colliders) {
+    for (const collider of this._colliders) {
       collider.init(this.entity.uuid, body);
     }
     this.data = {
       body,
-      colliders: this.colliders
+      colliders: this._colliders
         .map((collider) => collider.data)
         .filter((collider) => collider !== null),
     };
-  }
-  async destroy() {
-    world.removeRigidBody(this.data.body);
-    for (const collider of this.colliders) {
-      collider.destroy();
-    }
-  }
-  physicsUpdate() {
-    if (!this.autoUpdateTransform) return;
-    this.data.body.setTranslation(
-      {
-        x: this.entity.position.x,
-        y: this.entity.position.y,
-        z: this.entity.position.z,
-      },
-      false
-    );
-    const rot = new Three.Quaternion().setFromEuler(
-      new Three.Euler(
-        this.entity.rotation.x,
-        this.entity.rotation.y,
-        this.entity.rotation.z
-      )
-    );
-    this.data.body.setRotation(
-      {
-        x: rot.x,
-        y: rot.y,
-        z: rot.z,
-        w: rot.w,
-      },
-      false
-    );
   }
 }

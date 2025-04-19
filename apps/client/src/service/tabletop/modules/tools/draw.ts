@@ -6,62 +6,89 @@ import { LineRendererModule } from "../../renderer/modules/LineRenderer";
 import { Entity } from "../../scene";
 
 export class DrawTool extends BaseTool {
+  public name: string = "Draw (W)";
+  public icon: string = "pi pi-pencil";
+
   public lineWidth: number = 5;
 
   private isDrawing: boolean = false;
   private lastPoint = Vector3.zero();
-  private lines: Vector3[] = [];
-  private lineEntity: Entity | null = null;
-  private lineRenderer: LineRendererModule | null = null;
-  private linePhysicsBody: Physics.StaticBodyModule | null = null;
+  private points: Vector3[] = [];
+
+  private _entity: Entity | null = null;
+  private _renderer: LineRendererModule | null = null;
 
   onMouseDown(e: MouseEvent): void {
     const ray = this._camera?.getRayFromScreenPoint(e.clientX, e.clientY);
     if (!ray) return;
     const hit = Physics.CastRay(ray.origin, ray.direction, 100);
     if (!hit) return;
-    this.lineRenderer = null;
     this.isDrawing = true;
-    this.lineEntity = new Entity("Drawing");
-    this.lineEntity.position = hit.point.subtract(ray.direction.multiply(0.2));
-    this.lastPoint = this.lineEntity.position;
-    this.lines = [this.lineEntity.position];
+    const startPosition = hit.point.subtract(ray.direction.multiply(0.2));
+    this.lastPoint = Vector3.zero();
+    this.points = [this.lastPoint];
+
+    // create line renderer
+    this._entity = new Entity("Line");
+    this._entity.position = startPosition;
+    this._renderer = new LineRendererModule(this.lineWidth);
+    this._renderer
+      .getData()
+      .position.set(startPosition.x, startPosition.y, startPosition.z);
+    this._entity.addModule(this._renderer!);
   }
   onMouseUp(e: MouseEvent): void {
-    if (this.linePhysicsBody) {
-      const collider = this.linePhysicsBody.getData().colliders[0]!;
-      const { center, size } = this.getBounds();
-      this.linePhysicsBody.getData().body.setTranslation(center, true);
-      collider.setShape(new Rapier.Cuboid(size.x / 2, size.y / 2, size.z / 2));
-      this.linePhysicsBody.getData().body.setEnabled(true);
-    } else {
-      this.lineEntity?.destroy();
+    // clear line renderer
+    const { center, size } = this.getBounds();
+    this.points = this.points.map((line) => line.subtract(center));
+    this._renderer?.setPoints(this.points);
+
+    if (this._entity) {
+      const entity = this._entity;
+      this._entity.position = this._entity.position.add(center);
+      this._entity
+        .addModule(
+          new Physics.StaticBodyModule([
+            new Physics.BoxCollider(
+              new Vector3(size.x / 2, size.y / 2, size.z / 2)
+            ),
+          ])
+        )
+        .then((body) => {
+          body.autoUpdateTransform = false;
+          body.getData().body.setTranslation(
+            {
+              x: entity.position.x,
+              y: entity.position.y,
+              z: entity.position.z,
+            },
+            true
+          );
+        });
     }
+    this._entity = null;
+    this._renderer = null;
+    this.points = [];
+    this.lastPoint = Vector3.zero();
+
     this.isDrawing = false;
     this.lastPoint = Vector3.zero();
-    this.lineEntity = null;
-    this.lineRenderer = null;
-    this.linePhysicsBody = null;
-    this.lines = [];
+    this.points = [];
   }
   onMouseMove(e: MouseEvent): void {
-    if (!this.isDrawing) return;
-    if (!this.lineEntity) return;
+    if (!this.isDrawing || !this._entity) return;
     const ray = this._camera?.getRayFromScreenPoint(e.clientX, e.clientY);
     if (!ray) return;
     const hit = Physics.CastRay(ray.origin, ray.direction, 100);
     if (!hit) return;
-    const point = hit.point.subtract(ray.direction.multiply(0.2));
+    const point = hit.point
+      .subtract(this._entity?.position)
+      .subtract(ray.direction.multiply(0.2));
     const distance = point.distanceTo(this.lastPoint);
     if (distance < 0.1) return;
-    this.lines.push(point);
-    if (this.lines.length > 1 && this.lineRenderer === null) {
-      this.createLineRenderer();
-    }
-    if (this.lineRenderer) {
-      this.lineRenderer.setPoints(this.lines);
-    }
+    this.points.push(point);
     this.lastPoint = point;
+    this._renderer!.setPoints(this.points);
   }
 
   private getBounds() {
@@ -71,7 +98,7 @@ export class DrawTool extends BaseTool {
     let maxY = Number.MIN_SAFE_INTEGER;
     let minZ = Number.MAX_SAFE_INTEGER;
     let maxZ = Number.MIN_SAFE_INTEGER;
-    for (const point of this.lines) {
+    for (const point of this.points) {
       if (point.x < minX) minX = point.x;
       if (point.x > maxX) maxX = point.x;
       if (point.y < minY) minY = point.y;
@@ -95,17 +122,5 @@ export class DrawTool extends BaseTool {
       center: center,
       size: size,
     };
-  }
-
-  private async createLineRenderer() {
-    const lineRendererEntity = new Entity("LineRenderer");
-    this.lineRenderer = await lineRendererEntity.addModule(
-      new LineRendererModule(this.lineWidth)
-    );
-    this.linePhysicsBody = await lineRendererEntity.addModule(
-      new Physics.StaticBodyModule([new Physics.BoxCollider()])
-    );
-    this.linePhysicsBody.autoUpdateTransform = false;
-    this.linePhysicsBody.getData().body.setEnabled(false);
   }
 }

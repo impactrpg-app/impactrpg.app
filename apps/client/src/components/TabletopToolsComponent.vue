@@ -1,11 +1,27 @@
 <script lang="ts" setup>
-import * as TabletopService from "../service/tabletop_old";
-import { Button, Divider, Dialog, InputNumber } from "primevue";
-import { useDiceRoller } from "@/plugins/diceRoller";
-import { getUserClaims } from "@/service/api";
-import { ref } from "vue";
+import { Button, Divider } from "primevue";
+import * as Tabletop from "../service/tabletop";
+import { ref, onMounted } from "vue";
 
-const diceRoller = useDiceRoller();
+function getToolModule() {
+  const cameraEntity = Tabletop.Entity.findWithTag("Camera");
+  if (!cameraEntity) return null;
+  const tool = cameraEntity.getModule<Tabletop.BaseTool>("Module::Tool");
+  return tool ?? null;
+}
+
+onMounted(async () => {
+  const tool = getToolModule();
+  if (tool) {
+    selectedToolName.value = tool.name;
+  }
+});
+
+const ALL_TOOLS: Tabletop.BaseTool[] = [
+  new Tabletop.MoveTool(),
+  new Tabletop.DrawTool(),
+];
+const selectedToolName = ref<string | null>(null);
 const props = defineProps<{
   isCharactersOpen: boolean;
   isEncountersOpen: boolean;
@@ -20,9 +36,15 @@ const emits = defineEmits<{
   (e: "generateImage"): void;
 }>();
 
-async function rollDice() {
-  diceRoller.roll();
+function changeTool(tool: Tabletop.BaseTool) {
+  const module = getToolModule();
+  if (module) {
+    module.entity.updateModule(tool);
+    selectedToolName.value = tool.name;
+  }
 }
+
+async function rollDice() {}
 </script>
 
 <template>
@@ -57,13 +79,13 @@ async function rollDice() {
       v-tooltip.top="'Rulebook'"
       @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
     />
-    <Button
+    <!-- <Button
       variant="outlined"
       class="rounded-button"
       icon="pi pi-sign-out"
       v-tooltip.top="'Leave Room'"
       @click="TabletopService.leaveRoomRequest()"
-    />
+    /> -->
     <Divider layout="vertical" />
     <Button
       variant="outlined"
@@ -80,15 +102,13 @@ async function rollDice() {
       @click="emits('generateImage')"
     />
     <Divider layout="vertical" />
-    <template v-for="tool in TabletopService.ALL_TOOLS">
+    <template v-for="tool in ALL_TOOLS">
       <Button
-        :variant="
-          TabletopService.tool.value.name !== tool.name ? 'outlined' : undefined
-        "
+        :variant="selectedToolName !== tool.name ? 'outlined' : undefined"
         class="rounded-button"
         :icon="tool.icon"
         v-tooltip.top="tool.name"
-        @click="TabletopService.tool.value = tool"
+        @click="changeTool(tool)"
       />
     </template>
   </div>

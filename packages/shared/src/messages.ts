@@ -78,12 +78,10 @@ export class UpdateObjectMessage {
 export class SendNotificationMessage {
   type: MessageType.SendNotification;
   message: string;
-  image?: string;
 
-  constructor(message: string, image?: string) {
+  constructor(message: string) {
     this.type = MessageType.SendNotification;
     this.message = message;
-    this.image = image;
   }
 }
 

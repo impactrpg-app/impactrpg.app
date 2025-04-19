@@ -1,70 +1,57 @@
 import mongoose, { HydratedDocument } from "mongoose";
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 export type RoomDocument = HydratedDocument<Room>;
 
 export const TabletopObjectType = {
-    None: 'none',
-    Image: 'image',
-    Stroke: 'stroke'
+  None: "none",
+  Image: "image",
+  Stroke: "stroke",
 } as const;
 
-export type TabletopObjectType = (typeof TabletopObjectType)[keyof typeof TabletopObjectType];
+export type TabletopObjectType =
+  (typeof TabletopObjectType)[keyof typeof TabletopObjectType];
 
-export class Vector2 {
-    x: number;
-    y: number;
+export class Vector3 {
+  x: number;
+  y: number;
+  z: number;
 }
 
 export class TabletopObject {
-    @Prop({required: true})
-    uuid: string;
+  @Prop({ required: true })
+  uuid: string;
 
-    @Prop({ required: true, type: TabletopObjectType })
-    type: TabletopObjectType;
+  @Prop({ required: true })
+  position: Vector3;
 
-    @Prop({required: true})
-    position: Vector2;
+  @Prop({ required: true })
+  rotation: Vector3;
 
-    @Prop({required: true})
-    rotation: number;
+  @Prop({ required: true })
+  scale: Vector3;
 
-    @Prop({required: true})
-    scale: number;
-
-    @Prop({required: true})
-    locked: boolean;
-
-    @Prop({ required: false })
-    image?: string;
-
-    @Prop({ required: false })
-    strokes?: Vector2[];
-
-    @Prop({ required: false })
-    strokeWidth?: number;
-
-    @Prop({ required: false })
-    strokeColor?: string;
+  @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
+  modules: any;
 }
 
 @Schema()
 export class Room {
-    @Prop({required: true})
-    name: string;
+  @Prop({ required: true })
+  name: string;
 
-    @Prop({
-        required: true,
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    })
-    owner: mongoose.Schema.Types.ObjectId;
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  })
+  owner: mongoose.Schema.Types.ObjectId;
 
-    @Prop({
-        required: true,
-        type: [TabletopObject]
-    })
-    objects: TabletopObject[]
+  @Prop({
+    required: true,
+    type: [TabletopObject],
+  })
+  objects: TabletopObject[];
 }
 
 export const RoomSchema = SchemaFactory.createForClass(Room);

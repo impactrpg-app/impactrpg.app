@@ -63,10 +63,7 @@ export class RoomService {
     }
 
     for (const object of this.rooms.get(roomId)!.tabletopObjects) {
-      client.emit("event", {
-        type: MessageType.AddObject,
-        object,
-      } as AddObjectMessage);
+      client.emit("event", new AddObjectMessage(object));
     }
   }
 
@@ -211,10 +208,7 @@ export class RoomService {
     this.rooms.get(room.id)!.tabletopObjects.push(object);
     // todo: replace image content with url
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit("event", {
-        type: MessageType.AddObject,
-        object: object,
-      } as AddObjectMessage)
+      socket.emit("event", new AddObjectMessage(object))
     );
   }
   async removeObject(client: Socket, objectId: string) {
@@ -232,13 +226,6 @@ export class RoomService {
         message: "Object not found",
       } as ErrorMessage);
       return;
-    }
-    if (object.image) {
-      const imageId = object.image.replace(
-        new RegExp("http[s]*://[a-zA-Z0-9\:\.]+/image/"),
-        ""
-      );
-      await this.storageService.delete(decodeURIComponent(imageId));
     }
     room.tabletopObjects = room.tabletopObjects.filter(
       (object) => object.uuid !== objectId
