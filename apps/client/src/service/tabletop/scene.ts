@@ -14,6 +14,14 @@ export class Module<T> {
   async destroy(): Promise<void> {}
   update(): void {}
   physicsUpdate(): void {}
+
+  // input events
+  onMouseDown(e: MouseEvent): void {}
+  onMouseUp(e: MouseEvent): void {}
+  onMouseMove(e: MouseEvent): void {}
+  onKeyDown(e: KeyboardEvent): void {}
+  onKeyUp(e: KeyboardEvent): void {}
+  onWheel(e: WheelEvent): void {}
 }
 
 export class Entity {
@@ -70,16 +78,17 @@ export class Entity {
    * @param type The type of module to get
    * @returns The returned module
    */
-  getModule<B extends Module<unknown>>(type: string): B | undefined {
-    return this.modules[type] as B;
+  getModule<T extends Module<unknown>>(type: string): T | undefined {
+    return this.modules[type] as T;
   }
 
   /**
    * Add a module to the entity.
-   * @param type The type of the module to add
    * @param module The module to add
+   * @returns The added module
+   * @throws Error if the module is already added
    */
-  async addModule<B extends Module<unknown>>(module: B): Promise<B> {
+  async addModule<T extends Module<unknown>>(module: T): Promise<T> {
     if (!!this.modules[module.type]) {
       throw new Error(`duplicate module ${module.type}`);
     }
@@ -109,6 +118,24 @@ export class Entity {
       moduleToEntity.get(type)!.filter((uuid) => uuid !== this.uuid)
     );
     scene.set(this.uuid, this);
+  }
+
+  /**
+   * Update a module attached to the entity.
+   * @param data The module to update
+   * @returns The updated module
+   * @throws Error if the module is not found
+   */
+  async updateModule<T extends Module<unknown>>(data: T): Promise<T> {
+    await data.init();
+    const module = this.modules[data.type];
+    if (!module) {
+      await data.destroy();
+      throw new Error(`Module ${data.type} not found`);
+    }
+    await module.destroy();
+    this.modules[data.type] = data;
+    return data;
   }
 
   /**

@@ -9,6 +9,8 @@ import {
 import { clearScene, Entity } from "./scene";
 import { Vector3 } from "./vector";
 import { LightModule, LightType } from "./renderer/modules/light";
+import { MoveTool, DrawTool } from "./modules/tools";
+import "./input";
 import { DebuggerModule } from "./modules/debugger";
 
 export async function init() {
@@ -21,6 +23,8 @@ export async function init() {
   camera.rotation = Vector3.fromAngles(-85, 0, 0);
   await camera.addModule(new CameraModule(CameraType.Perspective));
   await camera.addModule(new CameraControllsModule());
+  await camera.addModule(new MoveTool());
+  // await camera.updateModule(new DrawTool());
 
   // directional light
   const directionalLight = new Entity("DirectionalLight");
@@ -63,6 +67,5 @@ export async function init() {
     new DynamicBodyModule([new BoxCollider(Vector3.half())])
   );
 
-  // const debug = new Entity("Debugger");
-  // debug.addModule(new DebuggerModule());
+  new Entity("Debugger").addModule(new DebuggerModule());
 }

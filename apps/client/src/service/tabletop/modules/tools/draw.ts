@@ -1,5 +1,5 @@
-import { Tool } from "./base";
+import { BaseTool } from "./base";
 
-export class DrawTool extends Tool {
+export class DrawTool extends BaseTool {
   
 }
