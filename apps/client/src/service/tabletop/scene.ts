@@ -4,10 +4,12 @@ import { Vector3 } from "./vector";
 export class Module<T> {
   entity: Entity = null as any;
   type: string = "error";
-  data: T = null as any;
+  protected data: T = null as any;
 
   async init(): Promise<void> {}
   async destroy(): Promise<void> {}
+  update(): void {}
+  physicsUpdate(): void {}
 }
 
 export class Entity {
@@ -111,15 +113,4 @@ export function clearScene() {
   for (const entity of scene.values()) {
     entity.destroy();
   }
-}
-
-export function getAllComponentsOfType<T>(types: string[]): Module<T>[] {
-  const objects = [...scene.values()]
-    .map((obj) =>
-      Object.values(obj.modules)
-        .filter((module) => types.includes(module.type))
-        .map((module) => module)
-    )
-    .flat() as Module<T>[];
-  return objects;
 }

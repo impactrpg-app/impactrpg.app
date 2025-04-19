@@ -1,54 +1,52 @@
 import { CameraControllsModule } from "./modules/cameraControlls";
-import { BoxCollider, PhysicsBodyModule, StaticBodyModule } from "./physics";
+import { BoxCollider, DynamicBodyModule, StaticBodyModule } from "./physics";
 import {
   BoxRendererModule,
-  PerspectiveCameraModule,
+  CameraModule,
+  CameraType,
   ImageRendererModule,
-  DirectionalLightModule,
-  AmbientLightModule,
 } from "./renderer";
 import { clearScene, Entity, scene } from "./scene";
 import { Vector3 } from "./vector";
+import * as Physics from "./physics";
+import { LightModule, LightType } from "./renderer/modules/light";
 
 export async function init() {
   clearScene();
-
-  window.addEventListener("click", (e) => {
-    const x = e.clientX / window.innerWidth;
-    const y = e.clientY / window.innerHeight;
-    console.log(x, y);
-    const entities = [...scene.values()];
-    for (const entity of entities) {
-    }
-  });
 
   // camera
   const camera = new Entity("Camera");
   camera.position = new Vector3(0, 5, 0);
   camera.rotation = new Vector3(-Math.PI / 2, 0, 0);
-  camera.addModule(
-    new PerspectiveCameraModule(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    )
+  const perspectiveCamera = await camera.addModule(
+    new CameraModule(CameraType.Perspective)
   );
   camera.addModule(new CameraControllsModule());
 
+  window.addEventListener("click", (e) => {
+    const x = (e.clientX / window.innerWidth) * 2 - 1;
+    const y = (e.clientY / window.innerHeight) * 2 - 1;
+    const ray = perspectiveCamera.getRayFromScreenPoint(x, y);
+    const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
+    if (rayResult) {
+      console.log("Ray hit:", rayResult);
+    } else {
+      console.log("Ray did not hit anything.");
+    }
+  });
+
   // directional light
-  const light = new Entity("Light");
-  light.rotation = Vector3.fromAngles(45, 30, 0);
-  const directionalLight = await light.addModule(new DirectionalLightModule());
-  directionalLight.intensity = 2;
-  light.addModule(new AmbientLightModule());
+  const directionalLight = new Entity("DirectionalLight");
+  directionalLight.rotation = Vector3.fromAngles(45, 30, 0);
+  directionalLight.addModule(new LightModule(LightType.Directional));
+
+  const ambientLight = new Entity("AmbientLight");
+  ambientLight.addModule(new LightModule(LightType.Ambient));
 
   // ground
   const ground = new Entity("Ground");
   ground.addModule(
-    new StaticBodyModule(
-      new BoxCollider(Vector3.zero(), new Vector3(1000, 0.01, 1000))
-    )
+    new StaticBodyModule([new BoxCollider(new Vector3(1000, 0.01, 1000))])
   );
 
   // image
@@ -58,24 +56,19 @@ export async function init() {
   const imageRenderer = await image.addModule(
     new ImageRendererModule(imageUrl)
   );
-  image.position = new Vector3(0, 2, 0);
+  image.position = new Vector3(0, 0, 0);
   image.rotation = Vector3.fromAngles(-90, 0, 0);
   image.scale = new Vector3(0.01, 0.01, 0.01);
   const tex = imageRenderer.texture!.image;
   image.addModule(
-    new PhysicsBodyModule([
-      new BoxCollider(
-        Vector3.zero(),
-        new Vector3(tex.width / 2, tex.height / 2, 0.01)
-      ),
+    new DynamicBodyModule([
+      new BoxCollider(new Vector3(tex.width / 2, tex.height / 2, 0.01)),
     ])
   );
 
   // dice
   const dice = new Entity("Dice");
   dice.position = new Vector3(0, 2, 0);
-  dice.addModule(new BoxRendererModule(1, 1, 1));
-  dice.addModule(
-    new PhysicsBodyModule([new BoxCollider(Vector3.zero(), Vector3.half())])
-  );
+  dice.addModule(new BoxRendererModule(new Vector3(1, 1, 1)));
+  dice.addModule(new DynamicBodyModule([new BoxCollider(Vector3.half())]));
 }

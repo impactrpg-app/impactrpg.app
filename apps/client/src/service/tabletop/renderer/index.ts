@@ -1,4 +1,4 @@
 export * from "./loader";
 export * from "./renderer";
-export * from "./module";
+export * from "./modules";
 export * from "./scene";
