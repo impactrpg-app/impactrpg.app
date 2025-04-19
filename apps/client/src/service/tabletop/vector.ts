@@ -87,4 +87,7 @@ export class Vector3 {
     const converter = Math.PI / 180;
     return new Vector3(x * converter, y * converter, z * converter);
   }
+  static fromObject(value: { x: number; y: number; z: number }) {
+    return new Vector3(value.x, value.y, value.z);
+  }
 }

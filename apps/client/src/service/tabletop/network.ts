@@ -3,15 +3,23 @@ import { API_URL, getSocketHeaders } from "../api";
 import {
   AddObjectMessage,
   AllMessageTypes,
+  BoxCollider,
   JoinRoomMessage,
   LeaveRoomMessage,
   MessageType,
+  NetworkEntity,
+  NetworkModule,
+  NetworkModuleType,
   RemoveObjectMessage,
   SendNotificationMessage,
   UpdateObjectMessage,
 } from "@impact/shared";
-import { clearScene } from "./scene";
+import { clearScene, Entity, Module, scene } from "./scene";
 import { ref } from "vue";
+import { Vector3 } from "./vector";
+import { BoxRendererModule, ImageRendererModule } from "./renderer";
+import { LineRendererModule } from "./renderer/modules/LineRenderer";
+import * as Physics from "./physics";
 
 export type ErrorListner = (code: number, message: string) => void;
 export type NotificationListener = (message: string) => void;
@@ -65,7 +73,13 @@ function leaveRoomResponse(data: LeaveRoomMessage) {
     room.value = null;
   }
 }
-function addObjectResponse(data: AddObjectMessage) {}
+function addObjectResponse(data: AddObjectMessage) {
+  const entity = new Entity(data.object.uuid);
+  entity.uuid = data.object.uuid;
+  entity.position = Vector3.fromObject(data.object.position);
+  entity.rotation = Vector3.fromObject(data.object.rotation);
+  entity.scale = Vector3.fromObject(data.object.scale);
+}
 function removeObjectResponse(data: RemoveObjectMessage) {}
 function updateObjectResponse(data: UpdateObjectMessage) {}
 
@@ -92,7 +106,123 @@ export function sendNotification(message: string) {
   socket.emit("event", new SendNotificationMessage(message));
 }
 export function addObject(data: AddObjectMessage) {
-  
+  if (!socket) {
+    throw new Error("Not connected to server");
+  }
+  socket.emit("event", data);
 }
-export function removeObject(data: RemoveObjectMessage) {}
-export function updateObject(data: UpdateObjectMessage) {}
+export function removeObject(data: RemoveObjectMessage) {
+  if (!socket) {
+    throw new Error("Not connected to server");
+  }
+  socket.emit("event", data);
+}
+export function updateObject(data: UpdateObjectMessage) {
+  if (!socket) {
+    throw new Error("Not connected to server");
+  }
+  socket.emit("event", data);
+}
+
+export function convertToNetworkModule<T extends Module<any>>(
+  module: T
+): NetworkModule | null {
+  if (module instanceof ImageRendererModule) {
+    return {
+      type: NetworkModuleType.ImageRenderer,
+      image: module.getImage(),
+    };
+  } else if (module instanceof LineRendererModule) {
+    return {
+      type: NetworkModuleType.LineRenderer,
+      points: module.getPoints(),
+    };
+  } else if (module instanceof BoxRendererModule) {
+    return {
+      type: NetworkModuleType.BoxRenderer,
+      size: module.bounds,
+    };
+  } else if (module instanceof Physics.DynamicBodyModule) {
+    return {
+      type: NetworkModuleType.DynamicBody,
+      colliders: module.colliders.map((collider) => {
+        const col = collider as unknown as BoxCollider;
+        return {
+          type: col.type,
+          offset: col.offset,
+          size: col.size,
+          rotation: col.rotation,
+        };
+      }),
+    };
+  } else if (module instanceof Physics.StaticBodyModule) {
+    return {
+      type: NetworkModuleType.StaticBody,
+      colliders: module.colliders.map((collider) => {
+        const col = collider as unknown as BoxCollider;
+        return {
+          type: col.type,
+          offset: col.offset,
+          size: col.size,
+          rotation: col.rotation,
+        };
+      }),
+    };
+  }
+
+  return null;
+}
+
+export function convertToModule<T extends Module<any>>(
+  networkModule: NetworkModule
+): T | null {
+  switch (networkModule.type) {
+    case NetworkModuleType.ImageRenderer:
+      return new ImageRendererModule(networkModule.image) as unknown as T;
+    case NetworkModuleType.BoxRenderer:
+      return new BoxRendererModule(
+        Vector3.fromObject(networkModule.size)
+      ) as unknown as T;
+    case NetworkModuleType.LineRenderer:
+      const lineRenderer = new LineRendererModule();
+      lineRenderer.setPoints(
+        networkModule.points.map((point) => Vector3.fromObject(point))
+      );
+      return lineRenderer as unknown as T;
+    case NetworkModuleType.DynamicBody:
+      const dynamicBody = new Physics.DynamicBodyModule(
+        networkModule.colliders.map((collider) => {
+          return new Physics.BoxCollider(
+            Vector3.fromObject(collider.size),
+            Vector3.fromObject(collider.offset),
+            Vector3.fromObject(collider.rotation)
+          );
+        })
+      );
+      return dynamicBody as unknown as T;
+    case NetworkModuleType.StaticBody:
+      const staticBody = new Physics.StaticBodyModule(
+        networkModule.colliders.map((collider) => {
+          return new Physics.BoxCollider(
+            Vector3.fromObject(collider.size),
+            Vector3.fromObject(collider.offset),
+            Vector3.fromObject(collider.rotation)
+          );
+        })
+      );
+      return staticBody as unknown as T;
+  }
+}
+
+export function entityToNetworkEntity(entity: Entity): NetworkEntity {
+  const modules = Object.values(entity.modules)
+    .map((module) => convertToNetworkModule(module))
+    .filter((module) => module !== null);
+  return {
+    uuid: entity.uuid,
+    position: entity.position,
+    rotation: entity.rotation,
+    scale: entity.scale,
+    modules,
+  };
+}

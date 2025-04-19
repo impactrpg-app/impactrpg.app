@@ -17,10 +17,13 @@ export class BaseBodyModule extends Module<PhysicsBodyType> {
     super();
   }
 
+  get colliders() {
+    return this._colliders;
+  }
+
   setActive(value: boolean) {
     this.data.body.setEnabled(value);
   }
-
   async init() {
     this.type = "Module::Physics";
   }

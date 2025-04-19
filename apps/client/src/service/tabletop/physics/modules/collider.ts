@@ -40,6 +40,9 @@ export class BoxCollider extends Collider {
   set size(value: Vector3) {
     this._size = new Vector3(value.x, value.y, value.z);
   }
+  get rotation() {
+    return this._rotation;
+  }
 
   init(entityUuid: string, parent: Rapier.RigidBody) {
     const rot = new Three.Quaternion().setFromEuler(

@@ -1,4 +1,4 @@
-import { TabletopObject } from "./tabletopObject";
+import { NetworkEntity } from "./networkEntity";
 
 export enum MessageType {
   Error = "error",
@@ -45,9 +45,9 @@ export class LeaveRoomMessage {
 
 export class AddObjectMessage {
   type: MessageType.AddObject;
-  object: TabletopObject;
+  object: NetworkEntity;
 
-  constructor(object: TabletopObject) {
+  constructor(object: NetworkEntity) {
     this.type = MessageType.AddObject;
     this.object = object;
   }
@@ -66,9 +66,9 @@ export class RemoveObjectMessage {
 export class UpdateObjectMessage {
   type: MessageType.UpdateObject;
   objectId: string;
-  object: Partial<TabletopObject>;
+  object: Partial<NetworkEntity>;
 
-  constructor(objectId: string, object: Partial<TabletopObject>) {
+  constructor(objectId: string, object: Partial<NetworkEntity>) {
     this.type = MessageType.UpdateObject;
     this.objectId = objectId;
     this.object = object;

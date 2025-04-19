@@ -6,6 +6,8 @@ import { Vector3 } from "../../vector";
 export class LineRendererModule extends Module<
   Three.Line<Three.BufferGeometry, Three.LineBasicMaterial>
 > {
+  private points: Vector3[] = [];
+
   constructor(lineWidth: number = 5) {
     super();
     const geometry = new Three.BufferGeometry();
@@ -41,6 +43,7 @@ export class LineRendererModule extends Module<
   }
 
   setPoints(points: Vector3[]) {
+    this.points = points;
     const positions = new Float32Array(points.length * 3);
     for (let i = 0; i < points.length; i++) {
       const point = points[i]!;
@@ -53,5 +56,8 @@ export class LineRendererModule extends Module<
       new Three.BufferAttribute(positions, 3)
     );
     this.data.geometry.computeBoundingSphere();
+  }
+  getPoints() {
+    return this.points;
   }
 }

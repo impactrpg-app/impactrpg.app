@@ -56,7 +56,6 @@ export class DrawTool extends BaseTool {
             ])
           )
           .then((body) => {
-            body.autoUpdateTransform = false;
             body.getData().body.setTranslation(
               {
                 x: entity.position.x,

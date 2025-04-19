@@ -10,6 +10,9 @@ export class ImageRendererModule extends Module<Three.Object3D> {
     super();
   }
 
+  getImage() {
+    return this.image;
+  }
   get texture() {
     return this._texture;
   }

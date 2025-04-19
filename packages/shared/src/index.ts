@@ -1,4 +1,4 @@
 export * from './messages';
 export * from './vector';
-export * from './tabletopObject';
+export * from './networkEntity';
 export * from './dtos';
