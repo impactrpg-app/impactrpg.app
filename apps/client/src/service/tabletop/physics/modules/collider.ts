@@ -65,25 +65,4 @@ export class BoxCollider extends Collider {
       colliderToEntity.delete(this._data);
     }
   }
-
-  physicsUpdate() {
-    // if (!this._data) return;
-    // this._data.setShape(
-    //   new Rapier.Cuboid(this._size.x, this._size.y, this._size.z)
-    // );
-    // this._data.setTranslation({
-    //   x: this._offset.x,
-    //   y: this._offset.y,
-    //   z: this._offset.z,
-    // });
-    // const rot = new Three.Quaternion().setFromEuler(
-    //   new Three.Euler(this._rotation.x, this._rotation.y, this._rotation.z)
-    // );
-    // this._data.setRotation({
-    //   x: rot.x,
-    //   y: rot.y,
-    //   z: rot.z,
-    //   w: rot.w,
-    // });
-  }
 }

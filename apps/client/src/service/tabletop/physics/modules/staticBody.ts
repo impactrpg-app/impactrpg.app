@@ -10,6 +10,8 @@ export type StaticBodyType = {
 };
 
 export class StaticBodyModule extends Module<StaticBodyType> {
+  public autoUpdateTransform = true;
+
   constructor(private colliders: Collider[]) {
     super();
   }
@@ -40,9 +42,7 @@ export class StaticBodyModule extends Module<StaticBodyType> {
     }
   }
   physicsUpdate() {
-    for (const collider of this.colliders) {
-      collider.physicsUpdate();
-    }
+    if (!this.autoUpdateTransform) return;
     this.data.body.setTranslation(
       {
         x: this.entity.position.x,

@@ -134,6 +134,7 @@ export class Entity {
       throw new Error(`Module ${data.type} not found`);
     }
     await module.destroy();
+    data.entity = this;
     this.modules[data.type] = data;
     return data;
   }
