@@ -24,6 +24,7 @@ export class Entity {
   modules: {
     [key: string]: Module<any>;
   };
+  tags: string[];
 
   private _position: Vector3;
   private _rotation: Vector3;
@@ -60,6 +61,7 @@ export class Entity {
     this.isDirty = true;
     this.isInteractable = true;
     this.modules = {};
+    this.tags = [];
     scene.set(this.uuid, this);
   }
 
@@ -84,7 +86,14 @@ export class Entity {
     module.entity = this;
     await module.init();
     this.modules[module.type] = module;
-    scene.set(this.uuid, this);
+    if (moduleToEntity.has(module.type)) {
+      moduleToEntity.set(module.type, [
+        ...moduleToEntity.get(module.type)!,
+        this.uuid,
+      ]);
+    } else {
+      moduleToEntity.set(module.type, [this.uuid]);
+    }
     return module;
   }
 
@@ -95,6 +104,10 @@ export class Entity {
   async removeModule(type: string) {
     await this.modules[type]?.destroy();
     delete this.modules[type];
+    moduleToEntity.set(
+      type,
+      moduleToEntity.get(type)!.filter((uuid) => uuid !== this.uuid)
+    );
     scene.set(this.uuid, this);
   }
 
@@ -111,9 +124,28 @@ export class Entity {
   update() {
     scene.set(this.uuid, this);
   }
+
+  static findModule<T extends Module<any>>(type: string): T[] | null {
+    const uuids = moduleToEntity.get(type);
+    if (!uuids) {
+      return null;
+    }
+    const entities = uuids.map((uuid) => scene.get(uuid)!);
+    const modules = entities.map((entity) => entity.getModule<T>(type)!);
+    return modules;
+  }
+  static findWithTag(tag: string): Entity | null {
+    for (const entity of scene.values()) {
+      if (entity.tags.includes(tag)) {
+        return entity;
+      }
+    }
+    return null;
+  }
 }
 
 export const scene = new Map<string, Entity>();
+export const moduleToEntity = new Map<string, string[]>();
 export const selectedObjects = new Set<string>();
 export function clearScene() {
   for (const entity of scene.values()) {

@@ -100,7 +100,7 @@ export class CameraModule extends Module<Three.Camera> {
       if (this._cameraType === CameraType.Perspective) {
         const camera = this.data as Three.PerspectiveCamera;
         camera.aspect = this._perspectiveProperties.aspectRatio;
-        camera.updateMatrix();
+        camera.updateProjectionMatrix();
       }
     }
   }
