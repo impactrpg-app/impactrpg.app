@@ -31,5 +31,7 @@ export class StaticBodyModule extends BaseBodyModule {
         .map((collider) => collider.data)
         .filter((collider) => collider !== null),
     };
+    this.autoUpdateTransform = false;
+    this.entity.isDirty = true;
   }
 }

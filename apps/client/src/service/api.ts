@@ -1,5 +1,6 @@
 import { ref } from "vue";
 import { decode, JwtPayload } from "jsonwebtoken";
+import { ImageUploadResponse } from "@impact/shared";
 
 export type Claims = JwtPayload & {
   displayName: string;
@@ -79,4 +80,21 @@ export async function makeRequest<T>(
   }
 
   return response.json();
+}
+
+export async function uploadImage(imageSource: Uint8Array) {
+  const formData = new FormData();
+  formData.append("image", new Blob([imageSource]));
+  const resp = await fetch(API_URL + "/image", {
+    method: "POST",
+    body: formData,
+    headers: {
+      Authorization: `Bearer ${accessToken.value}`,
+    },
+  });
+  if (!resp.ok) {
+    return;
+  }
+  const data: ImageUploadResponse = await resp.json();
+  return data;
 }

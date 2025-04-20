@@ -21,6 +21,7 @@ import { BoxRendererModule, ImageRendererModule } from "./renderer";
 import { LineRendererModule } from "./renderer/modules/LineRenderer";
 import * as Physics from "./physics";
 import * as Network from "./modules/network";
+import { createDefaultScene } from "./defaultScene";
 
 export type ErrorListner = (code: number, message: string) => void;
 export type NotificationListener = (message: string) => void;
@@ -73,15 +74,18 @@ socket.on("event", (data: AllMessageTypes) => {
 // private
 function joinRoomResponse(data: JoinRoomMessage) {
   clearScene();
+  createDefaultScene();
   room.value = data.roomId;
 }
 function leaveRoomResponse(data: LeaveRoomMessage) {
   if (data.roomId === room.value) {
     clearScene();
+    createDefaultScene();
     room.value = null;
   }
 }
 function addObjectResponse(data: AddObjectMessage) {
+  if (scene.has(data.object.uuid)) return;
   toEntity(data.object);
 }
 function removeObjectResponse(data: RemoveObjectMessage) {
@@ -217,28 +221,20 @@ export function toModule<T extends Module<any>>(
     case NetworkModuleType.DynamicBody:
       const dynamicBody = new Physics.DynamicBodyModule(
         networkModule.colliders.map((collider) => {
-          return new Physics.BoxCollider(
-            Vector3.fromObject(collider.size),
-            Vector3.fromObject(collider.offset),
-            Vector3.fromObject(collider.rotation)
-          );
+          return new Physics.BoxCollider(Vector3.fromObject(collider.size));
         })
       );
       return dynamicBody as unknown as T;
     case NetworkModuleType.StaticBody:
       const staticBody = new Physics.StaticBodyModule(
         networkModule.colliders.map((collider) => {
-          return new Physics.BoxCollider(
-            Vector3.fromObject(collider.size),
-            Vector3.fromObject(collider.offset),
-            Vector3.fromObject(collider.rotation)
-          );
+          return new Physics.BoxCollider(Vector3.fromObject(collider.size));
         })
       );
       return staticBody as unknown as T;
     case NetworkModuleType.Network:
       const net = new Network.NetworkModule();
-      net.isReady = true;
+      net.isInitialized = true;
       return net as unknown as T;
     default:
       return null;
@@ -248,24 +244,29 @@ export function toNetworkEntity(entity: Entity): NetworkEntity {
   const modules = Object.values(entity.modules)
     .map((module) => toNetworkModule(module))
     .filter((module) => module !== null);
-  return {
+
+  const data = {
     uuid: entity.uuid,
-    position: entity.position,
-    rotation: entity.rotation,
-    scale: entity.scale,
+    position: entity.position.toObject(),
+    rotation: entity.rotation.toObject(),
+    scale: entity.scale.toObject(),
     modules,
   };
+  return data;
 }
-export function toEntity(networkEntity: NetworkEntity): Entity {
+export async function toEntity(networkEntity: NetworkEntity): Promise<Entity> {
   const entity = new Entity(networkEntity.uuid);
+  const oldUuid = entity.uuid;
   entity.uuid = networkEntity.uuid;
+  scene.delete(oldUuid);
+  scene.set(entity.uuid, entity);
   entity.position = Vector3.fromObject(networkEntity.position);
   entity.rotation = Vector3.fromObject(networkEntity.rotation);
   entity.scale = Vector3.fromObject(networkEntity.scale);
   for (const module of networkEntity.modules) {
     const convertedModule = toModule(module);
     if (convertedModule) {
-      entity.addModule(convertedModule);
+      await entity.addModule(convertedModule);
     }
   }
   return entity;

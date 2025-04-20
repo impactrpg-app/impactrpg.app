@@ -6,6 +6,10 @@ export class BaseTool extends Module<any> {
   public icon: string = "pi pi-exclamation-triangle";
   protected _camera: CameraModule | null = null;
 
+  constructor() {
+    super();
+  }
+
   async init(): Promise<void> {
     this.type = "Module::Tool";
     const cameraEntity = Entity.findWithTag("Camera");

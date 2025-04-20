@@ -73,6 +73,9 @@ export class Vector3 {
       this.x * other.y - this.y * other.x
     );
   }
+  toObject() {
+    return { x: this.x, y: this.y, z: this.z };
+  }
 
   static zero() {
     return new Vector3(0, 0, 0);

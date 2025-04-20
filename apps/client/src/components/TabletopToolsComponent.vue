@@ -34,6 +34,7 @@ const emits = defineEmits<{
   (e: "update:isRulebookOpen", value: boolean): void;
   (e: "uploadImage"): void;
   (e: "generateImage"): void;
+  (e: "leaveRoom"): void;
 }>();
 
 function changeTool(tool: Tabletop.BaseTool) {
@@ -79,13 +80,13 @@ async function rollDice() {}
       v-tooltip.top="'Rulebook'"
       @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
     />
-    <!-- <Button
+    <Button
       variant="outlined"
       class="rounded-button"
       icon="pi pi-sign-out"
       v-tooltip.top="'Leave Room'"
-      @click="TabletopService.leaveRoomRequest()"
-    /> -->
+      @click="() => emits('leaveRoom')"
+    />
     <Divider layout="vertical" />
     <Button
       variant="outlined"
