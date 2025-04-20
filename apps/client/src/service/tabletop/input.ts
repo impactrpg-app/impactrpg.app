@@ -43,9 +43,11 @@ export function onWheel(e: WheelEvent): void {
   }
 }
 
-window.addEventListener("mousedown", onMouseDown);
-window.addEventListener("mouseup", onMouseUp);
-window.addEventListener("mousemove", onMouseMove);
-window.addEventListener("keydown", onKeyDown);
-window.addEventListener("keyup", onKeyUp);
-window.addEventListener("wheel", onWheel);
+export function init() {
+  window.addEventListener("mousedown", onMouseDown);
+  window.addEventListener("mouseup", onMouseUp);
+  window.addEventListener("mousemove", onMouseMove);
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
+  window.addEventListener("wheel", onWheel);
+}

@@ -1,4 +1,4 @@
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import { API_URL, getSocketHeaders } from "../api";
 import {
   AddObjectMessage,
@@ -33,43 +33,46 @@ export function currentRoom() {
   return room.value;
 }
 
-export const socket = io(API_URL, {
-  auth: getSocketHeaders(),
-  withCredentials: true,
-  transports: ["websocket"],
-});
+const socket = ref<Socket | null>(null);
+export function init() {
+  socket.value = io(API_URL, {
+    auth: getSocketHeaders(),
+    withCredentials: true,
+    transports: ["websocket"],
+  });
 
-socket.on("event", (data: AllMessageTypes) => {
-  switch (data.type) {
-    case MessageType.Error:
-      for (const listener of errorListeners) {
-        listener(data.code, data.message);
-      }
-      break;
-    case MessageType.SendNotification:
-      for (const listener of notificationListeners) {
-        listener(data.message);
-      }
-      break;
-    case MessageType.JoinRoom:
-      joinRoomResponse(data);
-      break;
-    case MessageType.LeaveRoom:
-      leaveRoomResponse(data);
-      break;
-    case MessageType.AddObject:
-      addObjectResponse(data);
-      break;
-    case MessageType.RemoveObject:
-      removeObjectResponse(data);
-      break;
-    case MessageType.UpdateObject:
-      updateObjectResponse(data);
-      break;
-    default:
-      console.error(`Unknown event: ${data}`);
-  }
-});
+  socket.value.on("event", (data: AllMessageTypes) => {
+    switch (data.type) {
+      case MessageType.Error:
+        for (const listener of errorListeners) {
+          listener(data.code, data.message);
+        }
+        break;
+      case MessageType.SendNotification:
+        for (const listener of notificationListeners) {
+          listener(data.message);
+        }
+        break;
+      case MessageType.JoinRoom:
+        joinRoomResponse(data);
+        break;
+      case MessageType.LeaveRoom:
+        leaveRoomResponse(data);
+        break;
+      case MessageType.AddObject:
+        addObjectResponse(data);
+        break;
+      case MessageType.RemoveObject:
+        removeObjectResponse(data);
+        break;
+      case MessageType.UpdateObject:
+        updateObjectResponse(data);
+        break;
+      default:
+        console.error(`Unknown event: ${data}`);
+    }
+  });
+}
 
 // private
 function joinRoomResponse(data: JoinRoomMessage) {
@@ -124,43 +127,43 @@ function updateObjectResponse(data: UpdateObjectMessage) {
 
 // public
 export function joinRoom(roomId: string) {
-  if (!socket) {
+  if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.emit("event", new JoinRoomMessage(roomId));
+  socket.value.emit("event", new JoinRoomMessage(roomId));
 }
 export function leaveRoom() {
-  if (!socket) {
+  if (!socket.value) {
     throw new Error("Not connected to server");
   }
   if (!room.value) {
     throw new Error("Not in a room");
   }
-  socket.emit("event", new LeaveRoomMessage(room.value));
+  socket.value.emit("event", new LeaveRoomMessage(room.value));
 }
 export function sendNotification(message: string) {
-  if (!socket) {
+  if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.emit("event", new SendNotificationMessage(message));
+  socket.value.emit("event", new SendNotificationMessage(message));
 }
 export function addObject(data: AddObjectMessage) {
-  if (!socket) {
+  if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.emit("event", data);
+  socket.value.emit("event", data);
 }
 export function removeObject(data: RemoveObjectMessage) {
-  if (!socket) {
+  if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.emit("event", data);
+  socket.value.emit("event", data);
 }
 export function updateObject(data: UpdateObjectMessage) {
-  if (!socket) {
+  if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.emit("event", data);
+  socket.value.emit("event", data);
 }
 
 // converters

@@ -1,5 +1,7 @@
 import "./input";
 import * as Default from "./defaultScene";
+import * as Network from "./network";
+import * as Input from "./input";
 
 export * from "./scene";
 export * from "./renderer";
@@ -13,5 +15,7 @@ export async function init(enableDebugger: boolean = false) {
     Default.enableDebugger();
   }
 
+  Network.init();
+  Input.init();
   await Default.createDefaultScene();
 }
