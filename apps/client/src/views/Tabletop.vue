@@ -24,13 +24,19 @@ onMounted(async () => {
 });
 
 async function uploadImage() {
+  const camera = TabletopService.Entity.findWithTag("Camera");
+  if (!camera) {
+    console.error("Camera not found");
+    return;
+  }
+
   const imageSource = await loadFromFile("image/*");
   if (!imageSource) return;
   const result = await Api.uploadImage(imageSource);
   if (!result) return;
   const url = `${Api.API_URL}/image/${encodeURIComponent(result.path)}`;
   const entity = new TabletopService.Entity("image");
-  entity.position = new Vector3(0, 0, 0);
+  entity.position = new Vector3(camera.position.x, 0, camera.position.z);
   entity.rotation = Vector3.fromAngles(-90, 0, 0);
   entity.scale = new Vector3(0.01, 0.01, 0.01);
   const imageRenderer = await entity.addModule(
@@ -46,7 +52,7 @@ async function uploadImage() {
   );
   await entity.addModule(new TabletopService.NetworkModule());
 }
-function generateImage() {}
+function uploadObject() {}
 async function createRoomHandler() {
   const resp = await Api.makeRequest<{ id: string }>("/room", {
     method: "POST",
@@ -100,7 +106,7 @@ async function onChangeTool(toolName: string) {
       @update:isRulebookOpen="isRulebookOpen = $event"
       @update:isDiceTrayOpen="isDiceTrayOpen = $event"
       @upload-image="uploadImage"
-      @generate-image="generateImage"
+      @upload-object="uploadObject"
       @leave-room="leaveRoomHandler"
       @change-tool="onChangeTool"
     />
