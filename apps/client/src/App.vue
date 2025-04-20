@@ -67,8 +67,8 @@ div {
 
 .p-dialog,
 .p-toast-message {
-  background-color: rgba(0, 0, 0, 0.7) !important;
-  backdrop-filter: blur(5px) !important;
+  background-color: rgba(10, 10, 10, 0.7) !important;
+  backdrop-filter: blur(8px) !important;
   border: 0 !important;
   border-radius: 10px !important;
 }
