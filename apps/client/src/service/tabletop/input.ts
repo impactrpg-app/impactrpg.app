@@ -53,7 +53,6 @@ export function onWheel(e: WheelEvent): void {
 }
 export function onMouseOver(e: MouseEvent) {
   isMouseOverCanvas = !!(e.target instanceof HTMLCanvasElement);
-  console.log(isMouseOverCanvas);
 }
 export function onContextMenu(e: MouseEvent) {
   e.preventDefault();

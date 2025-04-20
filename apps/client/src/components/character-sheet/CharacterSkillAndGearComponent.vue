@@ -18,7 +18,7 @@ import {
   CharacterGearItemDto,
   CharacterSkillDto,
 } from "@impact/shared";
-import { sendNotificationRequest } from "@/service/tabletop_old";
+import * as TabletopService from "../../service/tabletop";
 
 const NewGearItem: CharacterGearItemDto = {
   name: "",
@@ -300,7 +300,7 @@ function skillShareText(skill: CharacterSkillDto): string {
               <Button
                 icon="pi pi-share-alt"
                 variant="text"
-                @click="sendNotificationRequest(gearShareText(gear))"
+                @click="TabletopService.sendNotification(gearShareText(gear))"
                 v-tooltip.top="'Share with others'"
               />
             </div>
@@ -363,7 +363,7 @@ function skillShareText(skill: CharacterSkillDto): string {
               <Button
                 icon="pi pi-share-alt"
                 variant="text"
-                @click="sendNotificationRequest(skillShareText(skill))"
+                @click="TabletopService.sendNotification(skillShareText(skill))"
                 v-tooltip.top="'Share with others'"
               />
             </div>
