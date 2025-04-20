@@ -1,5 +1,5 @@
 import "./input";
-import { createDefaultScene } from "./defaultScene";
+import * as Default from "./defaultScene";
 
 export * from "./scene";
 export * from "./renderer";
@@ -8,6 +8,10 @@ export * from "./modules";
 export * from "./network";
 export * from "./defaultScene";
 
-export async function init() {
-  await createDefaultScene();
+export async function init(enableDebugger: boolean = false) {
+  if (enableDebugger) {
+    Default.enableDebugger();
+  }
+
+  await Default.createDefaultScene();
 }

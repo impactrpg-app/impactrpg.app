@@ -4,6 +4,7 @@ import { Vector3 } from "../../vector";
 import { BaseTool } from "./base";
 import { LineRendererModule } from "../../renderer/modules/LineRenderer";
 import { Entity } from "../../scene";
+import { NetworkModule } from "../network";
 
 export class DrawTool extends BaseTool {
   public name: string = "Draw (W)";
@@ -64,6 +65,7 @@ export class DrawTool extends BaseTool {
               },
               true
             );
+            body.entity.addModule(new NetworkModule());
           });
       }
     }

@@ -1,51 +1,33 @@
 <script lang="ts" setup>
 import { Button, Divider } from "primevue";
-import * as Tabletop from "../service/tabletop";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 
-function getToolModule() {
-  const cameraEntity = Tabletop.Entity.findWithTag("Camera");
-  if (!cameraEntity) return null;
-  const tool = cameraEntity.getModule<Tabletop.BaseTool>("Module::Tool");
-  return tool ?? null;
-}
-
-onMounted(async () => {
-  const tool = getToolModule();
-  if (tool) {
-    selectedToolName.value = tool.name;
-  }
-});
-
-const ALL_TOOLS: Tabletop.BaseTool[] = [
-  new Tabletop.MoveTool(),
-  new Tabletop.DrawTool(),
-];
-const selectedToolName = ref<string | null>(null);
 const props = defineProps<{
   isCharactersOpen: boolean;
   isEncountersOpen: boolean;
   isRulebookOpen: boolean;
+  isDiceTrayOpen: boolean;
+  tools: { name: string; icon: string }[];
 }>();
+const selectedTool = ref<string>(props.tools[0]?.name ?? "");
 
 const emits = defineEmits<{
   (e: "update:isCharactersOpen", value: boolean): void;
   (e: "update:isEncountersOpen", value: boolean): void;
   (e: "update:isRulebookOpen", value: boolean): void;
+  (e: "update:isDiceTrayOpen", value: boolean): void;
   (e: "uploadImage"): void;
-  (e: "generateImage"): void;
+  (e: "uploadObject"): void;
   (e: "leaveRoom"): void;
+  (e: "changeTool", toolName: string): void;
 }>();
-
-function changeTool(tool: Tabletop.BaseTool) {
-  const module = getToolModule();
-  if (module) {
-    module.entity.updateModule(tool);
-    selectedToolName.value = tool.name;
+function onChangeTool(toolName: string) {
+  const tool = props.tools.find((tool) => tool.name === toolName);
+  if (tool) {
+    emits("changeTool", tool.name);
+    selectedTool.value = tool.name;
   }
 }
-
-async function rollDice() {}
 </script>
 
 <template>
@@ -58,9 +40,10 @@ async function rollDice() {}
       @click="emits('update:isCharactersOpen', !props.isCharactersOpen)"
     />
     <Button
+      :variant="!props.isDiceTrayOpen ? 'outlined' : undefined"
       class="rounded-button"
-      v-tooltip.top="'Roll Dice'"
-      @click="rollDice"
+      v-tooltip.top="'Roll Tray'"
+      @click="emits('update:isDiceTrayOpen', !props.isDiceTrayOpen)"
     >
       <template #icon>
         <span class="material-symbols-outlined">casino</span>
@@ -98,18 +81,22 @@ async function rollDice() {}
     <Button
       variant="outlined"
       class="rounded-button"
-      icon="pi pi-search"
-      v-tooltip.top="'Generate Image'"
-      @click="emits('generateImage')"
-    />
+      v-tooltip.top="'Upload Object'"
+      @click="emits('uploadObject')"
+    >
+      <template #icon>
+        <span class="material-symbols-outlined">deployed_code</span>
+      </template>
+    </Button>
     <Divider layout="vertical" />
-    <template v-for="tool in ALL_TOOLS">
+    <template v-for="tool in props.tools" :key="tool.name">
       <Button
-        :variant="selectedToolName !== tool.name ? 'outlined' : undefined"
+        :variant="selectedTool !== tool.name ? 'outlined' : undefined"
+        :aria-label="tool.name"
         class="rounded-button"
         :icon="tool.icon"
         v-tooltip.top="tool.name"
-        @click="changeTool(tool)"
+        @click="onChangeTool(tool.name)"
       />
     </template>
   </div>

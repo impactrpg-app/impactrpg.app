@@ -11,10 +11,13 @@ const isTabletopReady = ref(false);
 const isCharacterSheetOpen = ref(false);
 const isEncountersOpen = ref(false);
 const isRulebookOpen = ref(false);
+const isDiceTrayOpen = ref(false);
 const rooms = ref<{ id: string; name: string }[]>([]);
 
+const TOOLS = [new TabletopService.MoveTool(), new TabletopService.DrawTool()];
+
 onMounted(async () => {
-  await TabletopService.init();
+  await TabletopService.init(true);
   isTabletopReady.value = true;
   await fetchRooms();
 });
@@ -70,21 +73,31 @@ async function fetchRooms() {
     }
   );
 }
+async function onChangeTool(toolName: string) {
+  const camera = TabletopService.Entity.findWithTag("Camera");
+  if (!camera) return;
+  const tool = TOOLS.find((tool) => tool.name === toolName);
+  if (!tool) return;
+  await camera.updateModule(tool);
+}
 </script>
 
 <template>
-  <template v-if="TabletopService.currentRoom()">
+  <template v-if="TabletopService.currentRoom() && isTabletopReady">
     <TabletopToolsComponent
       :is-characters-open="isCharacterSheetOpen"
       :is-encounters-open="isEncountersOpen"
       :is-rulebook-open="isRulebookOpen"
+      :is-dice-tray-open="isDiceTrayOpen"
+      :tools="TOOLS"
       @update:isCharactersOpen="isCharacterSheetOpen = $event"
       @update:isEncountersOpen="isEncountersOpen = $event"
       @update:isRulebookOpen="isRulebookOpen = $event"
+      @update:isDiceTrayOpen="isDiceTrayOpen = $event"
       @upload-image="uploadImage"
       @generate-image="generateImage"
       @leave-room="leaveRoomHandler"
-      v-if="isTabletopReady"
+      @change-tool="onChangeTool"
     />
   </template>
   <RoomSelector

@@ -1,9 +1,15 @@
-import { CameraControllsModule, MoveTool } from "./modules";
+import { CameraControllsModule, DebuggerModule, MoveTool } from "./modules";
 import { BoxCollider, StaticBodyModule } from "./physics";
 import { CameraModule, CameraType } from "./renderer";
 import { LightModule, LightType } from "./renderer/modules/light";
 import { Entity } from "./scene";
 import { Vector3 } from "./vector";
+
+let isDebuggerEnabled = false;
+
+export function enableDebugger() {
+  isDebuggerEnabled = true;
+}
 
 export async function createDefaultScene() {
   // camera
@@ -30,4 +36,8 @@ export async function createDefaultScene() {
     new StaticBodyModule([new BoxCollider(new Vector3(1000, 0.01, 1000))])
   );
   ground.isInteractable = false;
+
+  if (isDebuggerEnabled) {
+    new Entity("Debugger").addModule(new DebuggerModule());
+  }
 }

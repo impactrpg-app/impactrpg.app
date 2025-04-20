@@ -59,12 +59,12 @@ const emits = defineEmits<{
           style="border-radius: 40px"
         />
       </div>
-      <Divider v-if="rooms.length > 0" />
+      <Divider v-if="props.rooms.length > 0" />
       <div
         class="column gap20"
         style="max-height: 350px; overflow-y: auto; padding-right: 20px"
       >
-        <div class="row gap20" v-for="room in rooms" :key="room.id">
+        <div class="row gap20" v-for="room in props.rooms" :key="room.id">
           <Button
             variant="text"
             severity="secondary"
