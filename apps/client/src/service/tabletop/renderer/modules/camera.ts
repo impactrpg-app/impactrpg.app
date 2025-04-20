@@ -2,7 +2,7 @@ import { Module } from "@/service/tabletop/scene";
 import { Vector3 } from "@/service/tabletop/vector";
 import * as Three from "three";
 import { threeScene } from "../scene";
-import { renderer } from "../renderer";
+import { setRendererSize, renderCamera } from "../renderer";
 
 export enum CameraType {
   Perspective = "perspective",
@@ -92,7 +92,7 @@ export class CameraModule extends Module<Three.Camera> {
   }
 
   private onResize() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    setRendererSize(window.innerWidth, window.innerHeight);
     if (this._perspectiveProperties.autoUpdateAspectRatio) {
       this._perspectiveProperties.aspectRatio =
         window.innerWidth / window.innerHeight;
@@ -177,6 +177,6 @@ export class CameraModule extends Module<Three.Camera> {
         this.entity.rotation.z
       )
     );
-    renderer.render(threeScene, this.data);
+    renderCamera(this.data);
   }
 }

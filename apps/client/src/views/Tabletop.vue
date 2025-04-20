@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 import * as TabletopService from "../service/tabletop";
 import TabletopToolsComponent from "../components/TabletopToolsComponent.vue";
 import RoomSelector from "@/components/RoomSelector.vue";
@@ -17,7 +17,7 @@ const rooms = ref<{ id: string; name: string }[]>([]);
 const TOOLS = [new TabletopService.MoveTool(), new TabletopService.DrawTool()];
 
 onMounted(async () => {
-  await TabletopService.init(true);
+  await TabletopService.init(document.body, true);
   isTabletopReady.value = true;
   await fetchRooms();
 });
