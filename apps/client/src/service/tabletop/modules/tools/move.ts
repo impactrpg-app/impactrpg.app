@@ -7,6 +7,7 @@ export class MoveTool extends BaseTool {
   public name = "Move (Q)";
   public icon = "pi pi-arrows-alt";
   private _isDragging = false;
+  private _objectOffset: Vector3[] = [];
 
   async init() {
     await super.init();
@@ -22,6 +23,9 @@ export class MoveTool extends BaseTool {
       if (rayResult && rayResult.entity.isInteractable) {
         selectedObjects.clear();
         selectedObjects.add(rayResult.entity.uuid);
+        this._objectOffset = [
+          rayResult.entity.position.subtract(rayResult.point),
+        ];
       } else {
         selectedObjects.clear();
       }
@@ -36,8 +40,10 @@ export class MoveTool extends BaseTool {
   }
   public onMouseMove(e: MouseEvent) {
     if (!this._camera) return;
-    for (const uuid of selectedObjects) {
-      const entity = scene.get(uuid);
+    const uuids = [...selectedObjects.values()];
+    for (let i = 0; i < uuids.length; i++) {
+      const entity = scene.get(uuids[i]!);
+      const offset = this._objectOffset[i]!;
       if (!entity) continue;
       const body = entity.getModule<Physics.BaseBodyModule>("Module::Physics");
       if (body) body.setActive(!this._isDragging);
@@ -46,9 +52,13 @@ export class MoveTool extends BaseTool {
       const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
       if (rayResult) {
         if (body instanceof Physics.DynamicBodyModule) {
-          entity.position = rayResult.point.add(new Vector3(0, 1, 0));
+          entity.position = rayResult.point
+            .add(offset)
+            .add(new Vector3(0, 1, 0));
         } else {
-          entity.position = rayResult.point.add(new Vector3(0, 0.1, 0));
+          entity.position = rayResult.point
+            .add(offset)
+            .add(new Vector3(0, 0.1, 0));
         }
       }
     }
