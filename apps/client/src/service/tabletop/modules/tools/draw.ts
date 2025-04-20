@@ -5,6 +5,8 @@ import { BaseTool } from "./base";
 import { LineRendererModule } from "../../renderer/modules/LineRenderer";
 import { Entity } from "../../scene";
 import { NetworkModule } from "../network";
+import { toNetworkEntity, updateObject } from "../../network";
+import { UpdateObjectMessage } from "@impact/shared";
 
 export class DrawTool extends BaseTool {
   public name: string = "Draw (W)";
@@ -37,6 +39,7 @@ export class DrawTool extends BaseTool {
       .getData()
       .position.set(startPosition.x, startPosition.y, startPosition.z);
     this._entity.addModule(this._renderer!);
+    this._entity.addModule(new NetworkModule());
   }
   onMouseUp(e: MouseEvent): void {
     if (this.points.length <= 2) {
@@ -46,7 +49,6 @@ export class DrawTool extends BaseTool {
       this.points = this.points.map((line) => line.subtract(center));
       this._renderer?.setPoints(this.points);
       if (this._entity) {
-        const entity = this._entity;
         this._entity.position = this._entity.position.add(center);
         this._entity
           .addModule(
@@ -57,15 +59,12 @@ export class DrawTool extends BaseTool {
             ])
           )
           .then((body) => {
-            body.getData().body.setTranslation(
-              {
-                x: entity.position.x,
-                y: entity.position.y,
-                z: entity.position.z,
-              },
-              true
+            updateObject(
+              new UpdateObjectMessage(
+                body.entity.uuid,
+                toNetworkEntity(body.entity)
+              )
             );
-            body.entity.addModule(new NetworkModule());
           });
       }
     }
@@ -89,6 +88,9 @@ export class DrawTool extends BaseTool {
     this.points.push(point);
     this.lastPoint = point;
     this._renderer!.setPoints(this.points);
+    updateObject(
+      new UpdateObjectMessage(this._entity.uuid, toNetworkEntity(this._entity))
+    );
   }
 
   private getBounds() {

@@ -106,6 +106,20 @@ function updateObjectResponse(data: UpdateObjectMessage) {
   if (data.object.scale) {
     entity.scale = Vector3.fromObject(data.object.scale);
   }
+  if (data.object.modules) {
+    for (const module of data.object.modules) {
+      const convertedModule = toModule(module);
+      if (convertedModule) {
+        const existingModule = entity.modules[module.type];
+        console.log(module);
+        if (!existingModule) {
+          entity.addModule(convertedModule);
+        } else {
+          entity.updateModule(convertedModule);
+        }
+      }
+    }
+  }
 }
 
 // public
