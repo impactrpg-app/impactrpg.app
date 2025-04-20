@@ -4,6 +4,7 @@ let isMouseOverCanvas = false;
 
 export function onMouseDown(e: MouseEvent): void {
   if (!isMouseOverCanvas) return;
+
   for (const entity of scene.values()) {
     for (const module of Object.values(entity.modules)) {
       module.onMouseDown(e);
@@ -54,6 +55,12 @@ export function onMouseOver(e: MouseEvent) {
   isMouseOverCanvas = !!(e.target instanceof HTMLCanvasElement);
   console.log(isMouseOverCanvas);
 }
+export function onContextMenu(e: MouseEvent) {
+  e.preventDefault();
+}
+export function onDropItem(e: DragEvent) {
+  console.warn("drag events are not currently supported");
+}
 
 export function init() {
   window.addEventListener("mousedown", onMouseDown);
@@ -63,4 +70,6 @@ export function init() {
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
   window.addEventListener("wheel", onWheel);
+  window.addEventListener("contextmenu", onContextMenu);
+  window.addEventListener("drop", onDropItem);
 }
