@@ -8,6 +8,7 @@ import { Vector3 } from "@/service/tabletop/vector";
 import { onMounted, ref } from "vue";
 import * as TabletopService from "../service/tabletop";
 import * as Api from "@/service/api";
+import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
 
 const isTabletopReady = ref(false);
 const isCharacterSheetOpen = ref(false);
@@ -94,6 +95,7 @@ async function onChangeTool(toolName: string) {
   <template v-if="TabletopService.currentRoom() && isTabletopReady">
     <TabletopCharacterDialogComponent v-model:is-open="isCharacterSheetOpen" />
     <TabletopRulesComponent v-model:is-open="isRulebookOpen" />
+    <TabletopDiceTrayComponent v-model:is-open="isDiceTrayOpen" />
     <TabletopToolsComponent
       :is-characters-open="isCharacterSheetOpen"
       :is-encounters-open="isEncountersOpen"

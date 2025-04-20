@@ -160,14 +160,7 @@ async function deleteCharacter(characterId: string) {
         />
       </div>
     </template>
-    <div
-      class="column gap20"
-      style="
-        max-height: calc(750px - 120px);
-        padding-bottom: 20px;
-        padding-right: 20px;
-      "
-    >
+    <div class="column gap20">
       <template v-if="selectedCharacter">
         <CharacterInfoComponent v-model="selectedCharacter" />
         <CharacterStatsComponent v-model="selectedCharacter" />

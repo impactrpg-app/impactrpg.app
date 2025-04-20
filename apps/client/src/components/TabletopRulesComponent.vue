@@ -351,7 +351,7 @@ const emits = defineEmits<{
   </Dialog>
   <Dialog
     :modal="false"
-    position="top"
+    position="right"
     header="Rulebook"
     :visible="props.isOpen"
     @update:visible="(value) => emits('update:isOpen', value)"
