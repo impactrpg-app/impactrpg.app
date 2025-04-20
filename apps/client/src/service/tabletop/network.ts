@@ -20,6 +20,7 @@ import { Vector3 } from "./vector";
 import { BoxRendererModule, ImageRendererModule } from "./renderer";
 import { LineRendererModule } from "./renderer/modules/LineRenderer";
 import * as Physics from "./physics";
+import * as Network from "./modules/network";
 
 export type ErrorListner = (code: number, message: string) => void;
 export type NotificationListener = (message: string) => void;
@@ -56,6 +57,13 @@ socket.on("event", (data: AllMessageTypes) => {
       leaveRoomResponse(data);
       break;
     case MessageType.AddObject:
+      addObjectResponse(data);
+      break;
+    case MessageType.RemoveObject:
+      removeObjectResponse(data);
+      break;
+    case MessageType.UpdateObject:
+      updateObjectResponse(data);
       break;
     default:
       console.error(`Unknown event: ${data}`);
@@ -74,14 +82,27 @@ function leaveRoomResponse(data: LeaveRoomMessage) {
   }
 }
 function addObjectResponse(data: AddObjectMessage) {
-  const entity = new Entity(data.object.uuid);
-  entity.uuid = data.object.uuid;
-  entity.position = Vector3.fromObject(data.object.position);
-  entity.rotation = Vector3.fromObject(data.object.rotation);
-  entity.scale = Vector3.fromObject(data.object.scale);
+  toEntity(data.object);
 }
-function removeObjectResponse(data: RemoveObjectMessage) {}
-function updateObjectResponse(data: UpdateObjectMessage) {}
+function removeObjectResponse(data: RemoveObjectMessage) {
+  scene.get(data.objectId)?.destroy();
+}
+function updateObjectResponse(data: UpdateObjectMessage) {
+  const entity = scene.get(data.objectId);
+  if (!entity) {
+    console.error(`Entity ${data.objectId} not found`);
+    return;
+  }
+  if (data.object.position) {
+    entity.position = Vector3.fromObject(data.object.position);
+  }
+  if (data.object.rotation) {
+    entity.rotation = Vector3.fromObject(data.object.rotation);
+  }
+  if (data.object.scale) {
+    entity.scale = Vector3.fromObject(data.object.scale);
+  }
+}
 
 // public
 export function joinRoom(roomId: string) {
@@ -124,7 +145,8 @@ export function updateObject(data: UpdateObjectMessage) {
   socket.emit("event", data);
 }
 
-export function convertToNetworkModule<T extends Module<any>>(
+// converters
+export function toNetworkModule<T extends Module<any>>(
   module: T
 ): NetworkModule | null {
   if (module instanceof ImageRendererModule) {
@@ -168,12 +190,15 @@ export function convertToNetworkModule<T extends Module<any>>(
         };
       }),
     };
+  } else if (module instanceof Network.NetworkModule) {
+    return {
+      type: NetworkModuleType.Network,
+    };
   }
 
   return null;
 }
-
-export function convertToModule<T extends Module<any>>(
+export function toModule<T extends Module<any>>(
   networkModule: NetworkModule
 ): T | null {
   switch (networkModule.type) {
@@ -211,12 +236,17 @@ export function convertToModule<T extends Module<any>>(
         })
       );
       return staticBody as unknown as T;
+    case NetworkModuleType.Network:
+      const net = new Network.NetworkModule();
+      net.isReady = true;
+      return net as unknown as T;
+    default:
+      return null;
   }
 }
-
-export function entityToNetworkEntity(entity: Entity): NetworkEntity {
+export function toNetworkEntity(entity: Entity): NetworkEntity {
   const modules = Object.values(entity.modules)
-    .map((module) => convertToNetworkModule(module))
+    .map((module) => toNetworkModule(module))
     .filter((module) => module !== null);
   return {
     uuid: entity.uuid,
@@ -225,4 +255,18 @@ export function entityToNetworkEntity(entity: Entity): NetworkEntity {
     scale: entity.scale,
     modules,
   };
+}
+export function toEntity(networkEntity: NetworkEntity): Entity {
+  const entity = new Entity(networkEntity.uuid);
+  entity.uuid = networkEntity.uuid;
+  entity.position = Vector3.fromObject(networkEntity.position);
+  entity.rotation = Vector3.fromObject(networkEntity.rotation);
+  entity.scale = Vector3.fromObject(networkEntity.scale);
+  for (const module of networkEntity.modules) {
+    const convertedModule = toModule(module);
+    if (convertedModule) {
+      entity.addModule(convertedModule);
+    }
+  }
+  return entity;
 }

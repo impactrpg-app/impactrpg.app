@@ -149,10 +149,6 @@ export class Entity {
     scene.delete(this.uuid);
   }
 
-  update() {
-    scene.set(this.uuid, this);
-  }
-
   static findModule<T extends Module<any>>(type: string): T[] | null {
     const uuids = moduleToEntity.get(type);
     if (!uuids) {

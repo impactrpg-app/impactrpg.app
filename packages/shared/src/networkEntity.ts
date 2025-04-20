@@ -6,6 +6,7 @@ export enum NetworkModuleType {
   BoxRenderer = "BoxRenderer",
   DynamicBody = "DynamicBody",
   StaticBody = "StaticBody",
+  Network = "Network",
 }
 
 export type ImageRenderer = {
@@ -37,12 +38,16 @@ export type StaticBody = {
   type: NetworkModuleType.StaticBody;
   colliders: BoxCollider[];
 };
+export type Network = {
+  type: NetworkModuleType.Network;
+};
 export type NetworkModule =
   | ImageRenderer
   | LineRenderer
   | BoxRenderer
   | DynamicBody
-  | StaticBody;
+  | StaticBody
+  | Network;
 
 export class NetworkEntity {
   uuid: string;
