@@ -54,6 +54,9 @@ export class BaseBodyModule extends Module<PhysicsBodyType> {
         new Rapier.Quaternion(rot.x, rot.y, rot.z, rot.w),
         true
       );
+      for (const collider of this._colliders) {
+        collider.resize(this.entity.scale);
+      }
       return;
     }
     if (!this.autoUpdateTransform) return;

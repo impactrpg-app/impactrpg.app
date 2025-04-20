@@ -9,6 +9,7 @@ import { onMounted, ref } from "vue";
 import * as TabletopService from "../service/tabletop";
 import * as Api from "@/service/api";
 import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
+import TabletopContextMenuComponent from "@/components/TabletopContextMenuComponent.vue";
 
 const isTabletopReady = ref(false);
 const isCharacterSheetOpen = ref(false);
@@ -40,7 +41,6 @@ async function uploadImage() {
   const entity = new TabletopService.Entity("image");
   entity.position = new Vector3(camera.position.x, 0, camera.position.z);
   entity.rotation = Vector3.fromAngles(-90, 0, 0);
-  entity.scale = new Vector3(0.01, 0.01, 0.01);
   const imageRenderer = await entity.addModule(
     new TabletopService.ImageRendererModule(url)
   );
@@ -96,6 +96,14 @@ async function onChangeTool(toolName: string) {
     <TabletopCharacterDialogComponent v-model:is-open="isCharacterSheetOpen" />
     <TabletopRulesComponent v-model:is-open="isRulebookOpen" />
     <TabletopDiceTrayComponent v-model:is-open="isDiceTrayOpen" />
+    <TabletopContextMenuComponent
+      v-model:is-open="TabletopService.isContextMenuOpen.value"
+      :selected-objects="
+        [...TabletopService.selectedObjects.values()].map(
+          (obj) => TabletopService.scene.get(obj)!
+        )
+      "
+    />
     <TabletopToolsComponent
       :is-characters-open="isCharacterSheetOpen"
       :is-encounters-open="isEncountersOpen"

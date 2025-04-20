@@ -1,5 +1,6 @@
 import * as Uuid from "uuid";
 import { Vector3 } from "./vector";
+import { ref } from "vue";
 
 export class Module<T> {
   entity: Entity = null as any;
@@ -171,12 +172,13 @@ export class Entity {
 export const scene = new Map<string, Entity>();
 export const moduleToEntity = new Map<string, string[]>();
 export const selectedObjects = new Set<string>();
+export const isContextMenuOpen = ref(false);
+
 export function clearScene() {
   for (const entity of scene.values()) {
     entity.destroy();
   }
 }
-
 export function clearDirtyEntities() {
   for (const entity of scene.values()) {
     if (entity.isDirty) {

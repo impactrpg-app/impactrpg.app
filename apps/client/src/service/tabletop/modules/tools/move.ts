@@ -1,11 +1,12 @@
 import * as Physics from "../../physics";
 import { BaseTool } from "./base";
-import { scene, selectedObjects } from "../../scene";
+import { Entity, isContextMenuOpen, scene, selectedObjects } from "../../scene";
 import { Vector3 } from "../../vector";
 
 export class MoveTool extends BaseTool {
   public name = "Move (Q)";
   public icon = "pi pi-arrows-alt";
+  private _isShiftDown = false;
   private _isDragging = false;
   private _objectOffset: Vector3[] = [];
 
@@ -13,32 +14,61 @@ export class MoveTool extends BaseTool {
     await super.init();
   }
 
-  public onMouseDown(e: MouseEvent): void {
-    if (!this._camera) return;
+  private getClickedObject(e: MouseEvent): {
+    entity: Entity;
+    point: Vector3;
+  } | null {
+    if (!this._camera) return null;
+    const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
+    const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
+    if (!rayResult || !rayResult.entity.isInteractable) {
+      return null;
+    }
+    return rayResult;
+  }
+
+  onMouseDown(e: MouseEvent): void {
     if (e.button === 0) {
       this._isDragging = true;
       // Left mouse button down
-      const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
-      const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
-      if (rayResult && rayResult.entity.isInteractable) {
+      const result = this.getClickedObject(e);
+      if (!this._isShiftDown) {
         selectedObjects.clear();
-        selectedObjects.add(rayResult.entity.uuid);
-        this._objectOffset = [
-          rayResult.entity.position.subtract(rayResult.point),
-        ];
-      } else {
-        selectedObjects.clear();
+        this._objectOffset = [];
+      }
+      if (result) {
+        if (!selectedObjects.has(result.entity.uuid)) {
+          selectedObjects.add(result.entity.uuid);
+          this._objectOffset.push(
+            result.entity.position.subtract(result.point)
+          );
+        }
+        this._isDragging = true;
       }
     } else if (e.button === 2) {
       // Right mouse button down
+      const result = this.getClickedObject(e);
+      if (!this._isShiftDown) {
+        selectedObjects.clear();
+        this._objectOffset = [];
+      }
+      if (result) {
+        if (!selectedObjects.has(result.entity.uuid)) {
+          selectedObjects.add(result.entity.uuid);
+          this._objectOffset.push(
+            result.entity.position.subtract(result.point)
+          );
+        }
+      }
+      isContextMenuOpen.value = !!result;
     }
   }
-  public onMouseUp(e: MouseEvent): void {
+  onMouseUp(e: MouseEvent): void {
     if (e.button === 0) {
       this._isDragging = false;
     }
   }
-  public onMouseMove(e: MouseEvent) {
+  onMouseMove(e: MouseEvent) {
     if (!this._camera) return;
     const uuids = [...selectedObjects.values()];
     for (let i = 0; i < uuids.length; i++) {
@@ -61,6 +91,16 @@ export class MoveTool extends BaseTool {
             .add(new Vector3(0, 0.1, 0));
         }
       }
+    }
+  }
+  onKeyDown(e: KeyboardEvent): void {
+    if (e.key === "Shift") {
+      this._isShiftDown = true;
+    }
+  }
+  onKeyUp(e: KeyboardEvent): void {
+    if (e.key === "Shift") {
+      this._isShiftDown = false;
     }
   }
 }

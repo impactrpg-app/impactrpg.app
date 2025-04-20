@@ -1,6 +1,10 @@
 import { Module } from "../scene";
 import * as Network from "../network";
-import { AddObjectMessage, UpdateObjectMessage } from "@impact/shared";
+import {
+  AddObjectMessage,
+  RemoveObjectMessage,
+  UpdateObjectMessage,
+} from "@impact/shared";
 
 export class NetworkModule extends Module<any> {
   public isInitialized = false;
@@ -38,5 +42,11 @@ export class NetworkModule extends Module<any> {
       Network.updateObject(this._lastUpdate);
       this._lastUpdate = null;
     }
+  }
+
+  despawn() {
+    const removeObjectMessage = new RemoveObjectMessage(this.entity.uuid);
+    Network.removeObject(removeObjectMessage);
+    this.entity.destroy();
   }
 }
