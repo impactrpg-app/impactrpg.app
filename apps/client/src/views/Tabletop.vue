@@ -16,12 +16,7 @@ const rooms = ref<{ id: string; name: string }[]>([]);
 onMounted(async () => {
   await TabletopService.init();
   isTabletopReady.value = true;
-  rooms.value = await Api.makeRequest<{ id: string; name: string }[]>(
-    "/rooms",
-    {
-      method: "GET",
-    }
-  );
+  await fetchRooms();
 });
 
 async function uploadImage() {
@@ -53,6 +48,7 @@ async function createRoomHandler() {
     method: "POST",
   });
   TabletopService.joinRoom(resp.id);
+  await fetchRooms();
 }
 async function deleteRoomHandler(roomId: string) {
   await Api.makeRequest(`/room/${roomId}`, {
@@ -65,6 +61,14 @@ function joinRoomHandler(roomId: string) {
 }
 function leaveRoomHandler() {
   TabletopService.leaveRoom();
+}
+async function fetchRooms() {
+  rooms.value = await Api.makeRequest<{ id: string; name: string }[]>(
+    "/rooms",
+    {
+      method: "GET",
+    }
+  );
 }
 </script>
 

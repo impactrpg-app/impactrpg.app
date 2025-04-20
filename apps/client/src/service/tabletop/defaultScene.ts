@@ -1,4 +1,4 @@
-import { CameraControllsModule, MoveTool, DebuggerModule } from "./modules";
+import { CameraControllsModule, MoveTool } from "./modules";
 import { BoxCollider, StaticBodyModule } from "./physics";
 import { CameraModule, CameraType } from "./renderer";
 import { LightModule, LightType } from "./renderer/modules/light";
@@ -30,6 +30,4 @@ export async function createDefaultScene() {
     new StaticBodyModule([new BoxCollider(new Vector3(1000, 0.01, 1000))])
   );
   ground.isInteractable = false;
-
-  new Entity("debugger").addModule(new DebuggerModule());
 }
