@@ -172,7 +172,7 @@ const data: RulesContent[] = [
       },
       {
         title: "Insanity",
-        content: InsanityComponent
+        content: InsanityComponent,
       },
       {
         title: "Resurrection",
@@ -183,7 +183,7 @@ const data: RulesContent[] = [
         content: TravelingComponent,
         props: {
           openTravelingEventsDialog,
-        }
+        },
       },
       {
         title: "Resting",
@@ -212,7 +212,7 @@ const data: RulesContent[] = [
       },
       {
         title: "Attacking",
-        content: AttackingComponent
+        content: AttackingComponent,
       },
       {
         title: "Unarmed Combat",
@@ -255,7 +255,7 @@ const data: RulesContent[] = [
       {
         title: "Ailments",
         content: AilmentComponent,
-        rows: 2
+        rows: 2,
       },
     ],
   },
@@ -302,7 +302,10 @@ const data: RulesContent[] = [
 ];
 
 const props = defineProps<{
-  container?: HTMLDivElement | null;
+  isOpen: boolean;
+}>();
+const emits = defineEmits<{
+  (e: "update:isOpen", value: boolean): void;
 }>();
 </script>
 
@@ -319,18 +322,24 @@ const props = defineProps<{
       </div>
     </div>
   </Dialog>
-  <Dialog modal v-model:visible="isTravelingEventsDialogOpen" header="Travel Events">
+  <Dialog
+    modal
+    v-model:visible="isTravelingEventsDialogOpen"
+    header="Travel Events"
+  >
     <div class="dialog-popup">
       <div class="item" v-for="(travelEvent, index) in travelEvents">
         <p>
-          <b class="text-contrast">{{index + 1}}. {{ travelEvent.name }}</b>
+          <b class="text-contrast">{{ index + 1 }}. {{ travelEvent.name }}</b>
         </p>
         <p>
           {{ travelEvent.description }}
         </p>
         <template v-for="(option, optionIndex) in travelEvent.options">
           <p>
-            <b class="text-contrast">{{ String.fromCharCode(65 + optionIndex) }}. </b>
+            <b class="text-contrast"
+              >{{ String.fromCharCode(65 + optionIndex) }}.
+            </b>
             {{ option.description }}
           </p>
           <p>
@@ -340,7 +349,16 @@ const props = defineProps<{
       </div>
     </div>
   </Dialog>
-  <RulesComponent show-contents :data="data" :container="props.container" />
+  <Dialog
+    :modal="false"
+    position="top"
+    header="Rulebook"
+    :visible="props.isOpen"
+    @update:visible="(value) => emits('update:isOpen', value)"
+    style="width: 1000px; height: 800px"
+  >
+    <RulesComponent show-contents :data="data" />
+  </Dialog>
 </template>
 
 <style lang="css">
@@ -350,7 +368,7 @@ const props = defineProps<{
   flex-wrap: wrap;
   width: 800px;
   gap: 20px;
-  
+
   .item {
     display: flex;
     flex-direction: column;

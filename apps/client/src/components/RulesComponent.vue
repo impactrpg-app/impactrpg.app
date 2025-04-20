@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from "primevue";
-import { defineComponent } from "vue";
+import { defineComponent, useTemplateRef } from "vue";
 
 export type RulesContent = {
   title?: string;
@@ -17,22 +17,19 @@ const props = defineProps<{
   showContents?: boolean;
   title?: string;
   data: RulesContent[];
-  container?: HTMLDivElement | null;
 }>();
+const rules = useTemplateRef<HTMLDivElement>("rules");
 
 function scrollToTop() {
-  props.container?.scrollTo({ top: 0, behavior: "smooth" });
+  if (!rules.value) return;
+  if (!rules.value.parentElement) return;
+  rules.value.parentElement.scrollTo({ top: 0, behavior: "smooth" });
 }
 </script>
 
 <template>
-  <div class="rules">
-    <Button
-      v-if="props.container"
-      class="back-button"
-      icon="pi pi-chevron-up"
-      @click="scrollToTop"
-    />
+  <div class="rules" ref="rules">
+    <Button class="back-button" icon="pi pi-chevron-up" @click="scrollToTop" />
     <h1 v-if="title">{{ title }}</h1>
     <div class="contents" v-if="props.showContents">
       <div class="section" v-for="section in props.data">
@@ -62,7 +59,11 @@ function scrollToTop() {
           >
             {{ block.title }}
           </component>
-          <component v-if="block.content" :is="block.content" v-bind="block.props" />
+          <component
+            v-if="block.content"
+            :is="block.content"
+            v-bind="block.props"
+          />
         </div>
       </div>
     </template>

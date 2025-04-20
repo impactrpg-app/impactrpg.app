@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import TabletopToolsComponent from "../components/TabletopToolsComponent.vue";
 import RoomSelector from "@/components/RoomSelector.vue";
-import TabletopCharacterDialogComponent from "@/components/TabletopCharacterDialogComponent.vue";
+import TabletopCharacterDialogComponent from "@/components/TabletopCharacterComponent.vue";
+import TabletopRulesComponent from "@/components/TabletopRulesComponent.vue";
 import { loadFromFile } from "@/service/io";
 import { Vector3 } from "@/service/tabletop/vector";
 import { onMounted, ref } from "vue";
@@ -91,10 +92,8 @@ async function onChangeTool(toolName: string) {
 
 <template>
   <template v-if="TabletopService.currentRoom() && isTabletopReady">
-    <TabletopCharacterDialogComponent
-      :is-open="isCharacterSheetOpen"
-      @update:is-open="isCharacterSheetOpen = $event"
-    />
+    <TabletopCharacterDialogComponent v-model:is-open="isCharacterSheetOpen" />
+    <TabletopRulesComponent v-model:is-open="isRulebookOpen" />
     <TabletopToolsComponent
       :is-characters-open="isCharacterSheetOpen"
       :is-encounters-open="isEncountersOpen"
