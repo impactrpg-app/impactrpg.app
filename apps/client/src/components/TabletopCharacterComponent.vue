@@ -126,10 +126,10 @@ async function deleteCharacter(characterId: string) {
   </Dialog>
   <Dialog
     :modal="false"
-    position="left"
+    position="top"
     :visible="props.isOpen"
     @update:visible="emits('update:isOpen', $event)"
-    style="width: 700px; height: 750px"
+    style="width: 700px; height: 600px"
   >
     <template #header>
       <div class="row gap20 align-items-center" style="margin-right: 10px">

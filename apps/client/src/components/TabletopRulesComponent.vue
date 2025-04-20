@@ -310,7 +310,12 @@ const emits = defineEmits<{
 </script>
 
 <template>
-  <Dialog modal v-model:visible="isSkillsDialogOpen" header="Skills">
+  <Dialog
+    :modal="false"
+    v-model:visible="isSkillsDialogOpen"
+    header="Skills"
+    style="width: 800px; height: 700px"
+  >
     <div class="dialog-popup">
       <div class="item" v-for="skill in skills">
         <p>
@@ -323,9 +328,10 @@ const emits = defineEmits<{
     </div>
   </Dialog>
   <Dialog
-    modal
+    :modal="false"
     v-model:visible="isTravelingEventsDialogOpen"
     header="Travel Events"
+    style="width: 800px; height: 700px"
   >
     <div class="dialog-popup">
       <div class="item" v-for="(travelEvent, index) in travelEvents">
@@ -351,11 +357,11 @@ const emits = defineEmits<{
   </Dialog>
   <Dialog
     :modal="false"
-    position="right"
+    position="top"
     header="Rulebook"
     :visible="props.isOpen"
     @update:visible="(value) => emits('update:isOpen', value)"
-    style="width: 1000px; height: 800px"
+    style="width: 1000px; height: 700px"
   >
     <RulesComponent show-contents :data="data" />
   </Dialog>
@@ -366,8 +372,9 @@ const emits = defineEmits<{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  width: 800px;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: space-between;
+  gap: 40px;
 
   .item {
     display: flex;
