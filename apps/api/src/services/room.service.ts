@@ -3,6 +3,7 @@ import {
   ErrorMessage,
   JoinRoomMessage,
   LeaveRoomMessage,
+  NetworkModuleType,
   RemoveObjectMessage,
   SendNotificationMessage,
   UpdateObjectMessage,
@@ -220,6 +221,15 @@ export class RoomService {
     const object = room.tabletopObjects.find(
       (object) => object.uuid === objectId
     );
+    for (const module of object.modules) {
+      if (module.type === NetworkModuleType.ImageRenderer) {
+        const imageId = module.image.replace(
+          new RegExp("http[s]*://[a-zA-Z0-9\:\.]+/image/"),
+          ""
+        );
+        await this.storageService.delete(decodeURIComponent(imageId));
+      }
+    }
     if (!object) {
       client.emit("event", {
         type: MessageType.Error,
