@@ -72,6 +72,9 @@ div {
   border: 0 !important;
   border-radius: 10px !important;
 }
+.p-dialog-content {
+  scroll-behavior: smooth;
+}
 
 /** HEADINGS */
 h1,
