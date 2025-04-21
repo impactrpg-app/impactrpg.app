@@ -15,17 +15,20 @@ export class Collider {
     return this._data;
   }
 
-  resize(scale: Vector3) {}
+  setScale(scale: Vector3) {}
   init(entityUuid: string, parent: Rapier.RigidBody) {}
   destroy() {}
   physicsUpdate() {}
 }
 
 export class BoxCollider extends Collider {
-  constructor(private _size: Vector3 = Vector3.one()) {
+  constructor(private _size = Vector3.one()) {
     super(ColliderType.Box);
   }
-  resize(scale: Vector3) {
+  get size() {
+    return this._size;
+  }
+  setScale(scale: Vector3) {
     if (!this.data) return;
     this.data.setShape(
       new Rapier.Cuboid(

@@ -27,8 +27,6 @@ export enum NetworkColliderType {
 export type BoxCollider = {
   type: NetworkColliderType.Box;
   size: Vector3;
-  offset: Vector3;
-  rotation: Vector3;
 };
 export type DynamicBody = {
   type: NetworkModuleType.DynamicBody;

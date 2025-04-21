@@ -55,7 +55,7 @@ export class BaseBodyModule extends Module<PhysicsBodyType> {
         true
       );
       for (const collider of this._colliders) {
-        collider.resize(this.entity.scale);
+        collider.setScale(this.entity.scale);
       }
       return;
     }

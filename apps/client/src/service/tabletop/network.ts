@@ -192,9 +192,7 @@ export function toNetworkModule<T extends Module<any>>(
         const col = collider as unknown as BoxCollider;
         return {
           type: col.type,
-          offset: col.offset,
           size: col.size,
-          rotation: col.rotation,
         };
       }),
     };
@@ -205,9 +203,7 @@ export function toNetworkModule<T extends Module<any>>(
         const col = collider as unknown as BoxCollider;
         return {
           type: col.type,
-          offset: col.offset,
           size: col.size,
-          rotation: col.rotation,
         };
       }),
     };
