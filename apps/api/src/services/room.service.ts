@@ -1,5 +1,6 @@
 import {
   AddObjectMessage,
+  DiceRollMessage,
   ErrorMessage,
   JoinRoomMessage,
   LeaveRoomMessage,
@@ -295,6 +296,19 @@ export class RoomService {
         message: message,
         image: image,
       } as SendNotificationMessage)
+    );
+  }
+  async diceRoll(client: Socket, payload: DiceRollMessage) {
+    const { userId, room, error } = this.verifyUser(client);
+    if (error) {
+      return;
+    }
+
+    this.triggerForAllUsersInRoom(
+      room.id,
+      (_userId, socket) =>
+        socket.emit("event", new DiceRollMessage(payload.props)),
+      [userId]
     );
   }
 

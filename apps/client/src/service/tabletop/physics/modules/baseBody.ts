@@ -72,4 +72,18 @@ export class BaseBodyModule extends Module<PhysicsBodyType> {
     );
     this.entity.rotation = new Vector3(rot.x, rot.y, rot.z);
   }
+  setLinearVelocity(vec: Vector3) {
+    this.data.body.setLinvel(new Rapier.Vector3(vec.x, vec.y, vec.z), false);
+  }
+  setAngularVelocity(vec: Vector3) {
+    this.data.body.setAngvel(new Rapier.Vector3(vec.x, vec.y, vec.z), false);
+  }
+  getLinearVelocity(): Vector3 {
+    const vec = this.data.body.linvel();
+    return new Vector3(vec.x, vec.y, vec.z);
+  }
+  getAngularVelocity(): Vector3 {
+    const vec = this.data.body.angvel();
+    return new Vector3(vec.x, vec.y, vec.z);
+  }
 }

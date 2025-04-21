@@ -7,10 +7,12 @@ import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vu
 import TabletopContextMenuComponent from "@/components/TabletopContextMenuComponent.vue";
 import { loadFromFile } from "@/service/io";
 import { onMounted, ref } from "vue";
-import { ProgressSpinner } from "primevue";
+import { ProgressSpinner, useToast } from "primevue";
 import * as TabletopService from "../service/tabletop";
 import * as Api from "@/service/api";
 import * as Task from "@/service/task";
+
+const toast = useToast();
 
 const isTabletopReady = ref(false);
 const isCharacterSheetOpen = ref(false);
@@ -27,6 +29,12 @@ onMounted(() => {
     isTabletopReady.value = true;
     await fetchRooms();
   });
+  TabletopService.notificationListeners.add((message) => {
+    toast.add({
+      severity: "info",
+      summary: message,
+    });
+  });
 });
 
 async function uploadImage() {
@@ -40,10 +48,9 @@ async function uploadImage() {
     await TabletopService.createImage(url);
   });
 }
-function uploadObject() {
-  Task.runTask(async () => {
-    await TabletopService.createObject("/dice.glb");
-  });
+function uploadObject() {}
+function rollDice(amount: number) {
+  TabletopService.rollNetworkDice(amount);
 }
 function createRoomHandler() {
   Task.runTask(async () => {
@@ -91,7 +98,10 @@ async function onChangeTool(toolName: string) {
   <template v-if="TabletopService.currentRoom() && isTabletopReady">
     <TabletopCharacterDialogComponent v-model:is-open="isCharacterSheetOpen" />
     <TabletopRulesComponent v-model:is-open="isRulebookOpen" />
-    <TabletopDiceTrayComponent v-model:is-open="isDiceTrayOpen" />
+    <TabletopDiceTrayComponent
+      v-model:is-open="isDiceTrayOpen"
+      @roll-dice="rollDice"
+    />
     <TabletopContextMenuComponent
       v-model:is-open="TabletopService.isContextMenuOpen.value"
       :selected-objects="

@@ -4,6 +4,7 @@ import {
   AddObjectMessage,
   AllMessageTypes,
   BoxCollider,
+  DiceRollMessage,
   JoinRoomMessage,
   LeaveRoomMessage,
   MessageType,
@@ -26,6 +27,7 @@ import { LineRendererModule } from "./renderer/modules/LineRenderer";
 import * as Physics from "./physics";
 import * as Network from "./modules/network";
 import { createDefaultScene } from "./defaultScene";
+import { clearDice, rollDiceWithProps } from "./diceRoller";
 
 export type ErrorListner = (code: number, message: string) => void;
 export type NotificationListener = (message: string) => void;
@@ -71,6 +73,9 @@ export function init() {
         break;
       case MessageType.UpdateObject:
         updateObjectResponse(data);
+        break;
+      case MessageType.DiceRoll:
+        diceRollResponse(data);
         break;
       default:
         console.error(`Unknown event: ${data}`);
@@ -128,6 +133,15 @@ function updateObjectResponse(data: UpdateObjectMessage) {
     }
   }
 }
+function diceRollResponse(data: DiceRollMessage) {
+  rollDiceWithProps(
+    data.props.map((prop) => ({
+      force: Vector3.fromObject(prop.force),
+      torque: Vector3.fromObject(prop.torque),
+      startingPosition: Vector3.fromObject(prop.startingPosition),
+    }))
+  ).then((diceRoll) => clearDice(diceRoll));
+}
 
 // public
 export function joinRoom(roomId: string) {
@@ -164,6 +178,12 @@ export function removeObject(data: RemoveObjectMessage) {
   socket.value.emit("event", data);
 }
 export function updateObject(data: UpdateObjectMessage) {
+  if (!socket.value) {
+    throw new Error("Not connected to server");
+  }
+  socket.value.emit("event", data);
+}
+export function sendDiceRoll(data: DiceRollMessage) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }

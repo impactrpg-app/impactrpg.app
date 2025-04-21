@@ -47,6 +47,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       case MessageType.SendNotification:
         this.roomService.sendNotification(client, payload.message);
         break;
+      case MessageType.DiceRoll:
+        this.roomService.diceRoll(client, payload);
+        break;
       default:
         console.error(`Unknown event: ${JSON.stringify(payload)}`);
     }

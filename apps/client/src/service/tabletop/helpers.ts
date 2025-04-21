@@ -4,11 +4,14 @@ import { ImageRendererModule, ObjectRenderer } from "./renderer";
 import { BoxCollider, DynamicBodyModule, StaticBodyModule } from "./physics";
 import { NetworkModule } from "./modules";
 
-export async function createImage(url: string, enableNetworking = true) {
+export async function createImage(
+  url: string,
+  enableNetworking = true
+): Promise<Entity | null> {
   const camera = Entity.findWithTag("Camera");
   if (!camera) {
     console.error("Camera not found");
-    return;
+    return null;
   }
   const entity = new Entity("image");
   entity.position = new Vector3(camera.position.x, 0, camera.position.z);
@@ -25,12 +28,16 @@ export async function createImage(url: string, enableNetworking = true) {
   if (enableNetworking) {
     await entity.addModule(new NetworkModule());
   }
+  return entity;
 }
-export async function createObject(url: string, enableNetworking = true) {
+export async function createObject(
+  url: string,
+  enableNetworking = true
+): Promise<Entity | null> {
   const camera = Entity.findWithTag("Camera");
   if (!camera) {
     console.error("Camera not found");
-    return;
+    return null;
   }
   const entity = new Entity("object");
   entity.position = new Vector3(camera.position.x, 1, camera.position.z);
@@ -43,4 +50,5 @@ export async function createObject(url: string, enableNetworking = true) {
   if (enableNetworking) {
     await entity.addModule(new NetworkModule());
   }
+  return entity;
 }

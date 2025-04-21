@@ -10,6 +10,7 @@ export enum MessageType {
   ImageChunk = "imageChunk",
   ImageChunkEnd = "imageChunkEnd",
   SendNotification = "sendNotification",
+  DiceRoll = "diceRoll",
 }
 
 export class ErrorMessage {
@@ -85,6 +86,26 @@ export class SendNotificationMessage {
   }
 }
 
+export class DiceRollMessage {
+  type: MessageType.DiceRoll;
+  props: {
+    force: { x: number; y: number; z: number };
+    torque: { x: number; y: number; z: number };
+    startingPosition: { x: number; y: number; z: number };
+  }[];
+
+  constructor(
+    props: {
+      force: { x: number; y: number; z: number };
+      torque: { x: number; y: number; z: number };
+      startingPosition: { x: number; y: number; z: number };
+    }[]
+  ) {
+    this.type = MessageType.DiceRoll;
+    this.props = props;
+  }
+}
+
 export const AllMessages = [
   ErrorMessage,
   JoinRoomMessage,
@@ -93,6 +114,7 @@ export const AllMessages = [
   RemoveObjectMessage,
   UpdateObjectMessage,
   SendNotificationMessage,
+  DiceRollMessage,
 ];
 
 export type AllMessageTypes =
@@ -102,4 +124,5 @@ export type AllMessageTypes =
   | AddObjectMessage
   | RemoveObjectMessage
   | UpdateObjectMessage
-  | SendNotificationMessage;
+  | SendNotificationMessage
+  | DiceRollMessage;
