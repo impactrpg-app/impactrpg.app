@@ -144,7 +144,12 @@ async function onChangeTool(toolName: string) {
     @delete-room="deleteRoomHandler"
     @join-room="joinRoomHandler"
   />
-  <ProgressSpinner v-if="Task.isRunningTask.value" class="spinner" />
+  <ProgressSpinner
+    v-if="Task.isRunningTask.value"
+    aria-label="Loading"
+    stroke-width="6"
+    class="spinner"
+  />
 </template>
 
 <style lang="css" scoped>
@@ -153,5 +158,7 @@ async function onChangeTool(toolName: string) {
   bottom: 10px;
   left: 10px;
   z-index: 1000;
+  width: 50px;
+  height: 50px;
 }
 </style>
