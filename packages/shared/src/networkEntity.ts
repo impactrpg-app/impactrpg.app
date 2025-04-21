@@ -2,6 +2,7 @@ import { Vector3 } from "./vector";
 
 export enum NetworkModuleType {
   ImageRenderer = "ImageRenderer",
+  ObjectRenderer = "ObjectRenderer",
   LineRenderer = "LineRenderer",
   BoxRenderer = "BoxRenderer",
   DynamicBody = "DynamicBody",
@@ -12,6 +13,10 @@ export enum NetworkModuleType {
 export type ImageRenderer = {
   type: NetworkModuleType.ImageRenderer;
   image: string;
+};
+export type ObjectRenderer = {
+  type: NetworkModuleType.ObjectRenderer;
+  url: string;
 };
 export type LineRenderer = {
   type: NetworkModuleType.LineRenderer;
@@ -41,6 +46,7 @@ export type Network = {
 };
 export type NetworkModule =
   | ImageRenderer
+  | ObjectRenderer
   | LineRenderer
   | BoxRenderer
   | DynamicBody

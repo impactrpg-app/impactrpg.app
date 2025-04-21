@@ -17,7 +17,11 @@ import {
 import { clearScene, Entity, Module, scene } from "./scene";
 import { ref } from "vue";
 import { Vector3 } from "./vector";
-import { BoxRendererModule, ImageRendererModule } from "./renderer";
+import {
+  BoxRendererModule,
+  ImageRendererModule,
+  ObjectRenderer,
+} from "./renderer";
 import { LineRendererModule } from "./renderer/modules/LineRenderer";
 import * as Physics from "./physics";
 import * as Network from "./modules/network";
@@ -175,6 +179,11 @@ export function toNetworkModule<T extends Module<any>>(
       type: NetworkModuleType.ImageRenderer,
       image: module.getImage(),
     };
+  } else if (module instanceof ObjectRenderer) {
+    return {
+      type: NetworkModuleType.ObjectRenderer,
+      url: module.getFilePath(),
+    };
   } else if (module instanceof LineRendererModule) {
     return {
       type: NetworkModuleType.LineRenderer,
@@ -221,6 +230,8 @@ export function toModule<T extends Module<any>>(
   switch (networkModule.type) {
     case NetworkModuleType.ImageRenderer:
       return new ImageRendererModule(networkModule.image) as unknown as T;
+    case NetworkModuleType.ObjectRenderer:
+      return new ObjectRenderer(networkModule.url) as unknown as T;
     case NetworkModuleType.BoxRenderer:
       return new BoxRendererModule(
         Vector3.fromObject(networkModule.size)

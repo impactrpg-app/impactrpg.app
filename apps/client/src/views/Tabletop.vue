@@ -6,7 +6,6 @@ import TabletopRulesComponent from "@/components/TabletopRulesComponent.vue";
 import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
 import TabletopContextMenuComponent from "@/components/TabletopContextMenuComponent.vue";
 import { loadFromFile } from "@/service/io";
-import { Vector3 } from "@/service/tabletop/vector";
 import { onMounted, ref } from "vue";
 import { ProgressSpinner } from "primevue";
 import * as TabletopService from "../service/tabletop";
@@ -35,37 +34,17 @@ async function uploadImage() {
   if (!imageSource) return;
 
   Task.runTask(async () => {
-    const camera = TabletopService.Entity.findWithTag("Camera");
-    if (!camera) {
-      console.error("Camera not found");
-      return;
-    }
-
     const result = await Api.uploadImage(imageSource);
     if (!result) return;
     const url = `${Api.API_URL}/image/${encodeURIComponent(result.path)}`;
-    const entity = new TabletopService.Entity("image");
-    entity.position = new Vector3(camera.position.x, 0, camera.position.z);
-    entity.rotation = Vector3.fromAngles(-90, 0, 0);
-    const imageRenderer = await entity.addModule(
-      new TabletopService.ImageRendererModule(url)
-    );
-    const tex = imageRenderer.texture!.image as HTMLImageElement;
-    await entity.addModule(
-      new TabletopService.StaticBodyModule([
-        new TabletopService.BoxCollider(
-          new Vector3(
-            (tex.width / 2) * 0.01,
-            (tex.height / 2) * 0.01,
-            0.1 * 0.01
-          )
-        ),
-      ])
-    );
-    await entity.addModule(new TabletopService.NetworkModule());
+    await TabletopService.createImage(url);
   });
 }
-function uploadObject() {}
+function uploadObject() {
+  Task.runTask(async () => {
+    await TabletopService.createObject("/dice.glb");
+  });
+}
 function createRoomHandler() {
   Task.runTask(async () => {
     const resp = await Api.makeRequest<{ id: string }>("/room", {

@@ -10,6 +10,7 @@ export * from "./physics";
 export * from "./modules";
 export * from "./network";
 export * from "./defaultScene";
+export * from "./helpers";
 
 export async function init(
   parent?: HTMLElement,

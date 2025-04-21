@@ -26,6 +26,11 @@ export class MoveTool extends BaseTool {
     }
     return rayResult;
   }
+  private addSelectedObject(entity: Entity, point: Vector3) {
+    selectedObjects.add(entity.uuid);
+    const pos = entity.position.subtract(point);
+    this._objectOffset.push(new Vector3(pos.x, 0, pos.y));
+  }
 
   onMouseDown(e: MouseEvent): void {
     if (e.button === 0) {
@@ -38,10 +43,7 @@ export class MoveTool extends BaseTool {
       }
       if (result) {
         if (!selectedObjects.has(result.entity.uuid)) {
-          selectedObjects.add(result.entity.uuid);
-          this._objectOffset.push(
-            result.entity.position.subtract(result.point)
-          );
+          this.addSelectedObject(result.entity, result.point);
         }
         this._isDragging = true;
       }
@@ -54,10 +56,7 @@ export class MoveTool extends BaseTool {
       }
       if (result) {
         if (!selectedObjects.has(result.entity.uuid)) {
-          selectedObjects.add(result.entity.uuid);
-          this._objectOffset.push(
-            result.entity.position.subtract(result.point)
-          );
+          this.addSelectedObject(result.entity, result.point);
         }
       }
       isContextMenuOpen.value = !!result;
