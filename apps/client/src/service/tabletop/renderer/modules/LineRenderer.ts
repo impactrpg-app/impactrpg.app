@@ -17,6 +17,9 @@ export class LineRendererModule extends Module<
     });
     this.data = new Three.Line(geometry, material);
   }
+  clone(): LineRendererModule {
+    return new LineRendererModule();
+  }
   async init(): Promise<void> {
     this.type = "Module::Renderer";
     threeScene.add(this.data);

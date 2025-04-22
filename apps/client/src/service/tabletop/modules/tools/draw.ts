@@ -21,6 +21,9 @@ export class DrawTool extends BaseTool {
   private _entity: Entity | null = null;
   private _renderer: LineRendererModule | null = null;
 
+  clone(): DrawTool {
+    return new DrawTool();
+  }
   onMouseDown(e: MouseEvent): void {
     const ray = this._camera?.getRayFromScreenPoint(e.clientX, e.clientY);
     if (!ray) return;

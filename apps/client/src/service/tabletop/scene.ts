@@ -7,12 +7,17 @@ export class Module<T> {
   type: string = "error";
   protected data: T = null as any;
 
+  constructor() {}
+
   getData() {
     return this.data;
   }
 
   async init(): Promise<void> {}
   async destroy(): Promise<void> {}
+  clone(): Module<T> {
+    throw new Error('"clone" method not implemented');
+  }
   update(): void {}
   physicsUpdate(): void {}
 

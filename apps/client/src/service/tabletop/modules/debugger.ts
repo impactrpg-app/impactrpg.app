@@ -26,6 +26,9 @@ export class DebuggerModule extends Module<any> {
     threeScene.remove(this.mesh);
   }
 
+  clone(): DebuggerModule {
+    return new DebuggerModule();
+  }
   update() {
     const { vertices, colors } = this.world.debugRender();
     this.mesh.geometry.setAttribute(

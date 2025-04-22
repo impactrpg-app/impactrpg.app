@@ -18,6 +18,9 @@ export class BoxRendererModule extends Module<Three.Object3D> {
     threeScene.remove(oldData);
   }
 
+  clone(): BoxRendererModule {
+    return new BoxRendererModule(this._bounds.clone());
+  }
   async init() {
     this.type = "Module::Renderer";
     const geometry = new Three.BoxGeometry(

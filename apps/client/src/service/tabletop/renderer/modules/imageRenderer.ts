@@ -22,6 +22,9 @@ export class ImageRendererModule extends Module<Three.Object3D> {
     return this._height;
   }
 
+  clone(): ImageRendererModule {
+    return new ImageRendererModule(this.image);
+  }
   async init(): Promise<void> {
     this.type = "Module::Renderer";
     this._texture = await loadImage(this.image);

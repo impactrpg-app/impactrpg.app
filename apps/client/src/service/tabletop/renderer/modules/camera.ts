@@ -125,6 +125,12 @@ export class CameraModule extends Module<Three.Camera> {
     );
   }
 
+  clone(): CameraModule {
+    const clone = new CameraModule(this._cameraType);
+    clone.perspectiveProperties = { ...this._perspectiveProperties };
+    clone.orthographicProperties = { ...this._orthographicProperties };
+    return clone;
+  }
   async init() {
     this.type = CAMERA_MODULE;
     window.addEventListener("resize", () => this.onResize());

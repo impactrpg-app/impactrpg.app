@@ -70,6 +70,9 @@ export class LightModule extends Module<Three.Light> {
     light.position.set(lightPos.x, lightPos.y, lightPos.z);
   }
 
+  clone(): LightModule {
+    return new LightModule(this._lightType);
+  }
   update(): void {
     if (this._lightType === LightType.Directional) {
       this.updateShadowCamera();

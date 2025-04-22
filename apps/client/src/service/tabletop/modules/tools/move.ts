@@ -14,6 +14,9 @@ export class MoveTool extends BaseTool {
     await super.init();
   }
 
+  clone(): MoveTool {
+    return new MoveTool();
+  }
   private getClickedObject(
     e: MouseEvent,
     allowLockedObjects: boolean = false

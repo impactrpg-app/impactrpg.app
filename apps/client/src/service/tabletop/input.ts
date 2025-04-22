@@ -1,3 +1,4 @@
+import { ref } from "vue";
 import { scene } from "./scene";
 
 let isMouseOverCanvas = false;
@@ -20,6 +21,7 @@ export function onMouseUp(e: MouseEvent): void {
   }
 }
 export function onMouseMove(e: MouseEvent): void {
+  mousePosition.value = { x: e.clientX, y: e.clientY };
   if (!isMouseOverCanvas) return;
   for (const entity of scene.values()) {
     for (const module of Object.values(entity.modules)) {
@@ -82,3 +84,5 @@ export function init() {
   window.addEventListener("contextmenu", onContextMenu);
   window.addEventListener("drop", onDropItem);
 }
+
+export const mousePosition = ref<{ x: number; y: number }>({ x: 0, y: 0 });

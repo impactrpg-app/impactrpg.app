@@ -15,6 +15,9 @@ export class NetworkModule extends Module<any> {
     super();
   }
 
+  clone(): NetworkModule {
+    return new NetworkModule();
+  }
   async init(): Promise<void> {
     this.type = "Module::Network";
     this.data = {};

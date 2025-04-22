@@ -7,6 +7,9 @@ export class CameraControllsModule extends Module<any> {
   private readonly minZoom = 0.5;
   private readonly maxZoom = 20;
 
+  clone() {
+    return new CameraControllsModule();
+  }
   async init() {
     this.type = "Module::CameraControlls";
     this.data = {};

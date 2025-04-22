@@ -2,13 +2,17 @@ import * as Rapier from "@dimforge/rapier3d";
 import * as Three from "three";
 import { world } from "../world";
 import { Collider } from "./collider";
-import { BaseBodyModule } from "./baseBody";
+import { BaseBodyModule, PhysicsBodyType } from "./baseBody";
+import { Module } from "../../scene";
 
 export class DynamicBodyModule extends BaseBodyModule {
   constructor(colliders: Collider[]) {
     super(colliders);
   }
 
+  clone(): DynamicBodyModule {
+    return new DynamicBodyModule(this._colliders);
+  }
   async init() {
     this.type = "Module::Physics";
     const rot = new Three.Quaternion().setFromEuler(

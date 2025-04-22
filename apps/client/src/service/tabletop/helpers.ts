@@ -1,5 +1,5 @@
 import { Vector3 } from "./vector";
-import { Entity } from "./scene";
+import { Entity, scene } from "./scene";
 import { ImageRendererModule, ObjectRenderer } from "./renderer";
 import { BoxCollider, DynamicBodyModule, StaticBodyModule } from "./physics";
 import { NetworkModule } from "./modules";
@@ -54,4 +54,29 @@ export async function createObject(
     await entity.addModule(new NetworkModule());
   }
   return entity;
+}
+export async function destroyNetworkEntity(uuid: string) {
+  const obj = scene.get(uuid);
+  if (!obj) return;
+  const net = obj.getModule<NetworkModule>("Module::Network");
+  if (net) {
+    net.despawn();
+  } else {
+    obj.destroy();
+  }
+}
+export async function cloneEntity(uuid: string) {
+  const obj = scene.get(uuid);
+  if (!obj) return;
+  const clone = new Entity(`${obj.name} clone`);
+  clone.position = obj.position.clone();
+  clone.rotation = obj.rotation.clone();
+  clone.scale = obj.scale.clone();
+  clone.isLocked = obj.isLocked;
+  clone.tags = [...obj.tags];
+  for (const module of Object.values(obj.modules)) {
+    await clone.addModule(module.clone());
+  }
+  scene.set(clone.uuid, clone);
+  return clone;
 }

@@ -4,24 +4,68 @@ import RoomSelector from "@/components/RoomSelector.vue";
 import TabletopCharacterComponent from "@/components/TabletopCharacterComponent.vue";
 import TabletopRulesComponent from "@/components/TabletopRulesComponent.vue";
 import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
-import TabletopContextMenuComponent from "@/components/TabletopContextMenuComponent.vue";
+import TabletopPropertiesComponent from "@/components/TabletopPropertiesComponent.vue";
 import { loadFromFile } from "@/service/io";
 import { onMounted, onUnmounted, ref, watch } from "vue";
-import { ProgressSpinner, useToast } from "primevue";
+import { ProgressSpinner, useToast, ContextMenu } from "primevue";
 import * as TabletopService from "../service/tabletop";
 import * as Api from "@/service/api";
 import * as Task from "@/service/task";
+import { MenuItem } from "primevue/menuitem";
 
 const toast = useToast();
 
+const contextMenu = ref();
 const isTabletopReady = ref(false);
 const isCharacterSheetOpen = ref(false);
 const isEncountersOpen = ref(false);
 const isRulebookOpen = ref(false);
 const isDiceTrayOpen = ref(false);
+const isPropertiesOpen = ref(false);
 const rooms = ref<{ id: string; name: string }[]>([]);
+watch(TabletopService.isContextMenuOpen, (value) => {
+  if (value) {
+    const mousePosition = TabletopService.mousePosition.value;
+    contextMenu.value.show(
+      new MouseEvent("click", {
+        clientX: mousePosition.x,
+        clientY: mousePosition.y,
+      })
+    );
+  } else {
+    contextMenu.value.hide();
+  }
+});
 
 const TOOLS = [new TabletopService.MoveTool(), new TabletopService.DrawTool()];
+const contextMenuItems: MenuItem[] = [
+  {
+    label: "Clone",
+    icon: "pi pi-clone",
+    command: () => {
+      for (const entity of TabletopService.selectedObjects.values()) {
+        TabletopService.cloneEntity(entity);
+      }
+    },
+  },
+  {
+    label: "Delete",
+    icon: "pi pi-trash",
+    command: () => {
+      for (const entity of TabletopService.selectedObjects.values()) {
+        TabletopService.destroyNetworkEntity(entity);
+      }
+      TabletopService.selectedObjects.clear();
+    },
+  },
+  {
+    label: "Properties",
+    icon: "pi pi-cog",
+    command: () => {
+      isPropertiesOpen.value = true;
+    },
+  },
+];
 
 onMounted(() => {
   Task.runTask(async () => {
@@ -113,6 +157,9 @@ async function onChangeTool(toolName: string) {
   if (!tool) return;
   await camera.updateModule(tool);
 }
+async function onCloseContextMenu() {
+  TabletopService.isContextMenuOpen.value = false;
+}
 </script>
 
 <template>
@@ -126,8 +173,13 @@ async function onChangeTool(toolName: string) {
       v-model:is-open="isDiceTrayOpen"
       @roll-dice="rollDice"
     />
-    <TabletopContextMenuComponent
-      v-model:is-open="TabletopService.isContextMenuOpen.value"
+    <ContextMenu
+      ref="contextMenu"
+      :model="contextMenuItems"
+      @hide="onCloseContextMenu"
+    />
+    <TabletopPropertiesComponent
+      v-model:is-open="isPropertiesOpen"
       :selected-objects="
         [...TabletopService.selectedObjects.values()].map(
           (obj) => TabletopService.scene.get(obj)!

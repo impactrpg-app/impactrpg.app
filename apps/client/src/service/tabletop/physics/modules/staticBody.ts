@@ -13,6 +13,9 @@ export class StaticBodyModule extends BaseBodyModule {
     super(colliders);
   }
 
+  clone(): StaticBodyModule {
+    return new StaticBodyModule(this._colliders);
+  }
   async init() {
     this.type = "Module::Physics";
     const body = world.createRigidBody(

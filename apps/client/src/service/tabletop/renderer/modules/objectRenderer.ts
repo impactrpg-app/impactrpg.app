@@ -33,6 +33,9 @@ export class ObjectRenderer extends Module<Three.Object3D> {
     return { center, size };
   }
 
+  clone(): ObjectRenderer {
+    return new ObjectRenderer(this.glbFile);
+  }
   async init(): Promise<void> {
     this.type = "Module::Renderer";
     const gltf = await loadGltf(this.glbFile);
