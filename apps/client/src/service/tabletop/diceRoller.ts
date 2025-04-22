@@ -96,40 +96,40 @@ export async function getDiceResults(diceRolls: DiceRoll[]) {
   const results: number[] = [];
   for (const dice of diceRolls) {
     // use rotation to figure out up face
-    const rotation = dice.entity.rotation;
-    const upVector = new Vector3(0, 1, 0);
+    const rotation = dice.entity.rotation; // Assuming this is {x, y, z} Euler angles
 
+    // Create a Quaternion from the dice's Euler rotation
     const q = new Three.Quaternion().setFromEuler(
       new Three.Euler(rotation.x, rotation.y, rotation.z)
     );
 
-    // Apply the quaternion to the up vector
-    const transformedUp = new Vector3(
-      upVector.x * (1 - 2 * (q.y * q.y + q.z * q.z)) +
-        upVector.y * (2 * (q.x * q.y - q.w * q.z)) +
-        upVector.z * (2 * (q.x * q.z + q.w * q.y)),
-      upVector.x * (2 * (q.x * q.y + q.w * q.z)) +
-        upVector.y * (1 - 2 * (q.x * q.x + q.z * q.z)) +
-        upVector.z * (2 * (q.y * q.z - q.w * q.x)),
-      upVector.x * (2 * (q.x * q.z - q.w * q.y)) +
-        upVector.y * (2 * (q.y * q.z + q.w * q.x)) +
-        upVector.z * (1 - 2 * (q.x * q.x + q.y * q.y))
-    );
-
+    // Define face normals in the dice's LOCAL coordinate system
+    // IMPORTANT: This mapping depends on how your dice model (dice.glb) is oriented.
+    // Adjust the vectors if your model's faces correspond to different axes.
+    // This assumes a standard d6 layout: 1 opposite 6, 2 opposite 5, 3 opposite 4
+    // And assumes: +Y is 6, -Y is 1, +X is 3, -X is 4, +Z is 2, -Z is 5
     const faces = [
-      { face: 6, vector: new Vector3(0, 1, 0) },
-      { face: 5, vector: new Vector3(-1, 0, 0) },
-      { face: 4, vector: new Vector3(0, -1, 0) },
-      { face: 3, vector: new Vector3(1, 0, 0) },
-      { face: 2, vector: new Vector3(0, 0, 1) },
-      { face: 1, vector: new Vector3(0, 0, -1) },
+      { face: 6, normal: new Three.Vector3(0, 1, 0) }, // Local +Y
+      { face: 4, normal: new Three.Vector3(0, -1, 0) }, // Local -Y
+      { face: 5, normal: new Three.Vector3(1, 0, 0) }, // Local +X
+      { face: 3, normal: new Three.Vector3(-1, 0, 0) }, // Local -X
+      { face: 1, normal: new Three.Vector3(0, 0, 1) }, // Local +Z
+      { face: 2, normal: new Three.Vector3(0, 0, -1) }, // Local -Z
     ];
 
-    let topFace = 1;
+    const worldUp = new Three.Vector3(0, 1, 0); // World's Up direction
+
+    let topFace = 1; // Default guess
     let maxDot = -Infinity;
 
     for (const face of faces) {
-      const dot = transformedUp.dot(face.vector);
+      // Transform the local face normal vector to world space using the dice's rotation
+      const worldNormal = face.normal.clone().applyQuaternion(q);
+
+      // Calculate the dot product between the world-space face normal and the world's Up vector.
+      // The face whose normal points most upwards (highest dot product) is the top face.
+      const dot = worldNormal.dot(worldUp);
+
       if (dot > maxDot) {
         maxDot = dot;
         topFace = face.face;
