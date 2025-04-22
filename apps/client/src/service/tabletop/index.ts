@@ -13,11 +13,8 @@ export * from "./defaultScene";
 export * from "./helpers";
 export * from "./diceRoller";
 
-export async function init(
-  parent?: HTMLElement,
-  enableDebugger: boolean = false
-) {
-  if (enableDebugger) {
+export async function init(parent?: HTMLElement) {
+  if (window.localStorage.getItem("DEBUGGER") === "true") {
     Default.enableDebugger();
   }
 

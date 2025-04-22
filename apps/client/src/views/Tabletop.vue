@@ -25,7 +25,7 @@ const TOOLS = [new TabletopService.MoveTool(), new TabletopService.DrawTool()];
 
 onMounted(() => {
   Task.runTask(async () => {
-    await TabletopService.init(document.body, true);
+    await TabletopService.init(document.body);
     isTabletopReady.value = true;
     await fetchRooms();
   });
