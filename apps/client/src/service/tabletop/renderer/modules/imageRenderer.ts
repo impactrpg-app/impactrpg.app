@@ -5,6 +5,8 @@ import { threeScene } from "../scene";
 
 export class ImageRendererModule extends Module<Three.Object3D> {
   private _texture: Three.Texture | null = null;
+  private _width: number = 0;
+  private _height: number = 0;
 
   constructor(private image: string) {
     super();
@@ -13,13 +15,18 @@ export class ImageRendererModule extends Module<Three.Object3D> {
   getImage() {
     return this.image;
   }
-  get texture() {
-    return this._texture;
+  get width() {
+    return this._width;
+  }
+  get height() {
+    return this._height;
   }
 
   async init(): Promise<void> {
     this.type = "Module::Renderer";
     this._texture = await loadImage(this.image);
+    this._width = this._texture.image.width;
+    this._height = this._texture.image.height;
     const geometry = new Three.PlaneGeometry(
       this._texture.image.width * 0.01,
       this._texture.image.height * 0.01

@@ -17,11 +17,14 @@ export async function createImage(
   entity.position = new Vector3(camera.position.x, 0, camera.position.z);
   entity.rotation = Vector3.fromAngles(-90, 0, 0);
   const imageRenderer = await entity.addModule(new ImageRendererModule(url));
-  const tex = imageRenderer.texture!.image as HTMLImageElement;
   await entity.addModule(
     new StaticBodyModule([
       new BoxCollider(
-        new Vector3((tex.width / 2) * 0.01, (tex.height / 2) * 0.01, 0.1 * 0.01)
+        new Vector3(
+          (imageRenderer.width / 2) * 0.01,
+          (imageRenderer.height / 2) * 0.01,
+          0.1 * 0.01
+        )
       ),
     ])
   );
