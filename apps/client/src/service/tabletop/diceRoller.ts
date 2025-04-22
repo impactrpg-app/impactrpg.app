@@ -6,6 +6,7 @@ import { Vector3 } from "./vector";
 import { sendDiceRoll, sendNotification } from "./network";
 import { DiceRollMessage } from "@impact/shared";
 import * as Api from "../api";
+import * as Audio from "./audio";
 
 function randomRange(min: number, max: number) {
   return Math.random() * (max - min) + min;
@@ -57,6 +58,8 @@ export async function rollDice(amount: number): Promise<DiceRoll[]> {
     console.error("Camera not found");
     return [];
   }
+
+  Audio.play("/dice-roll.mp3");
 
   const forces: DiceRoll[] = [];
   for (let i = 0; i < amount; i++) {
@@ -146,6 +149,7 @@ export type DiceRollProps = DiceForces & { startingPosition: Vector3 };
 export async function rollDiceWithProps(
   props: DiceRollProps[]
 ): Promise<DiceRoll[]> {
+  Audio.play("/dice-roll.mp3");
   const diceRoll: DiceRoll[] = [];
   for (const prop of props) {
     const startingPosition = prop.startingPosition.clone();

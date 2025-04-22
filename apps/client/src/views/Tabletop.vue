@@ -6,7 +6,7 @@ import TabletopRulesComponent from "@/components/TabletopRulesComponent.vue";
 import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
 import TabletopContextMenuComponent from "@/components/TabletopContextMenuComponent.vue";
 import { loadFromFile } from "@/service/io";
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import { ProgressSpinner, useToast } from "primevue";
 import * as TabletopService from "../service/tabletop";
 import * as Api from "@/service/api";
@@ -30,12 +30,14 @@ onMounted(() => {
     await fetchRooms();
   });
   TabletopService.notificationListeners.add((message) => {
+    TabletopService.play("notify.mp3");
     toast.add({
       severity: "info",
       summary: message,
     });
   });
   TabletopService.errorListeners.add((code, message) => {
+    TabletopService.play("error.mp3");
     toast.add({
       severity: "error",
       summary: `${code}: ${message}`,

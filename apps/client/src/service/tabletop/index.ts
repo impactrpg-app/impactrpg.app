@@ -12,6 +12,7 @@ export * from "./network";
 export * from "./defaultScene";
 export * from "./helpers";
 export * from "./diceRoller";
+export * from './audio';
 
 export async function init(parent?: HTMLElement) {
   if (window.localStorage.getItem("DEBUGGER") === "true") {
