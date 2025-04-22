@@ -27,7 +27,7 @@ import { LineRendererModule } from "./renderer/modules/LineRenderer";
 import * as Physics from "./physics";
 import * as Network from "./modules/network";
 import { createDefaultScene } from "./defaultScene";
-import { clearDice, rollDiceWithProps } from "./diceRoller";
+import { clearDice, getDiceResults, rollDiceWithProps } from "./diceRoller";
 
 export type ErrorListner = (code: number, message: string) => void;
 export type NotificationListener = (message: string) => void;
@@ -133,14 +133,16 @@ function updateObjectResponse(data: UpdateObjectMessage) {
     }
   }
 }
-function diceRollResponse(data: DiceRollMessage) {
-  rollDiceWithProps(
+async function diceRollResponse(data: DiceRollMessage) {
+  const result = await rollDiceWithProps(
     data.props.map((prop) => ({
       force: Vector3.fromObject(prop.force),
       torque: Vector3.fromObject(prop.torque),
       startingPosition: Vector3.fromObject(prop.startingPosition),
     }))
-  ).then((diceRoll) => clearDice(diceRoll));
+  );
+  await getDiceResults(result);
+  await clearDice(result);
 }
 
 // public
