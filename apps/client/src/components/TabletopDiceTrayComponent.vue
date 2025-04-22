@@ -13,6 +13,10 @@ const emits = defineEmits<{
 }>();
 
 const diceAmount = ref(1);
+function rollDice() {
+  emits("rollDice", diceAmount.value);
+  emits("update:isOpen", false);
+}
 </script>
 
 <template>
@@ -32,7 +36,7 @@ const diceAmount = ref(1);
         :min="1"
         :step="1"
       />
-      <Button label="Roll Dice" @click="() => emits('rollDice', diceAmount)" />
+      <Button label="Roll Dice" @click="rollDice" />
     </div>
   </Dialog>
 </template>

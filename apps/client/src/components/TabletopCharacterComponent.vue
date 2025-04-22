@@ -15,6 +15,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: "update:isOpen", value: boolean): void;
+  (e: "rollDice", amount: number): void;
 }>();
 
 const toast = useToast();
@@ -163,7 +164,10 @@ async function deleteCharacter(characterId: string) {
     <div class="column gap20">
       <template v-if="selectedCharacter">
         <CharacterInfoComponent v-model="selectedCharacter" />
-        <CharacterStatsComponent v-model="selectedCharacter" />
+        <CharacterStatsComponent
+          v-model="selectedCharacter"
+          @roll-dice="emits('rollDice', $event)"
+        />
         <CharacterSkillAndGearComponent v-model="selectedCharacter" />
       </template>
       <template v-else>

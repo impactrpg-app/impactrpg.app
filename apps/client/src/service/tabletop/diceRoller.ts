@@ -33,12 +33,13 @@ export function computeDiceForces(): DiceForces {
     torque,
   };
 }
-export async function rollADice(
+async function rollADice(
   startingPosition: Vector3,
   forces: DiceForces
 ): Promise<Entity | null> {
   const dice = await createObject("/dice.glb", false);
   if (!dice) return null;
+  dice.isInteractable = false;
   dice.position = startingPosition;
   const body = dice.getModule<DynamicBodyModule>("Module::Physics");
   if (!body) return null;

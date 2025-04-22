@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TabletopToolsComponent from "../components/TabletopToolsComponent.vue";
 import RoomSelector from "@/components/RoomSelector.vue";
-import TabletopCharacterDialogComponent from "@/components/TabletopCharacterComponent.vue";
+import TabletopCharacterComponent from "@/components/TabletopCharacterComponent.vue";
 import TabletopRulesComponent from "@/components/TabletopRulesComponent.vue";
 import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
 import TabletopContextMenuComponent from "@/components/TabletopContextMenuComponent.vue";
@@ -96,7 +96,10 @@ async function onChangeTool(toolName: string) {
 
 <template>
   <template v-if="TabletopService.currentRoom() && isTabletopReady">
-    <TabletopCharacterDialogComponent v-model:is-open="isCharacterSheetOpen" />
+    <TabletopCharacterComponent
+      v-model:is-open="isCharacterSheetOpen"
+      @roll-dice="rollDice"
+    />
     <TabletopRulesComponent v-model:is-open="isRulebookOpen" />
     <TabletopDiceTrayComponent
       v-model:is-open="isDiceTrayOpen"

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
+import { Button } from "primevue";
 import { CharacterDto } from "@impact/shared";
 import CustomRatingComponent from "../CustomRatingComponent.vue";
 import CustomResourceComponent from "../CustomResourceComponent.vue";
@@ -9,6 +10,7 @@ const props = defineProps<{
 }>();
 const emits = defineEmits<{
   (e: "update:modelValue", data: CharacterDto): void;
+  (e: "rollDice", amount: number): void;
 }>();
 
 const value = computed({
@@ -25,7 +27,13 @@ const value = computed({
   <div class="row gap20 w100" style="padding-right: 20px">
     <div class="column gap10">
       <div class="stat">
-        <span>Strength</span>
+        <Button
+          variant="text"
+          v-tooltip.top="'Strength Roll'"
+          @click="() => emits('rollDice', value.abilities.strength)"
+        >
+          <span>Strength</span>
+        </Button>
         <CustomRatingComponent
           material-icons
           icon="swords"
@@ -34,7 +42,13 @@ const value = computed({
         />
       </div>
       <div class="stat">
-        <span>Agility</span>
+        <Button
+          variant="text"
+          v-tooltip.top="'Agility Roll'"
+          @click="() => emits('rollDice', value.abilities.agility)"
+        >
+          <span>Agility</span>
+        </Button>
         <CustomRatingComponent
           icon="pi-bolt"
           :stars="6"
@@ -42,7 +56,13 @@ const value = computed({
         />
       </div>
       <div class="stat">
-        <span>Intelligence</span>
+        <Button
+          variant="text"
+          v-tooltip.top="'Intelligence Roll'"
+          @click="() => emits('rollDice', value.abilities.intelligence)"
+        >
+          <span>Intelligence</span>
+        </Button>
         <CustomRatingComponent
           material-icons
           icon="neurology"
@@ -51,7 +71,13 @@ const value = computed({
         />
       </div>
       <div class="stat">
-        <span>Progression</span>
+        <Button
+          variant="text"
+          v-tooltip.top="'Train'"
+          @click="() => emits('rollDice', 1)"
+        >
+          <span>Progression</span>
+        </Button>
         <CustomRatingComponent
           icon="pi-sparkles"
           :stars="6"
@@ -59,7 +85,15 @@ const value = computed({
         />
       </div>
       <div class="stat">
-        <span>Armor</span>
+        <Button
+          variant="text"
+          v-tooltip.top="'Defense Roll'"
+          @click="
+            () => emits('rollDice', value.armor + value.abilities.agility)
+          "
+        >
+          <span>Armor</span>
+        </Button>
         <CustomRatingComponent
           icon="pi-shield"
           :stars="6"
@@ -67,7 +101,15 @@ const value = computed({
         />
       </div>
       <div class="stat">
-        <span>Attack</span>
+        <Button
+          variant="text"
+          v-tooltip.top="'Attack Roll'"
+          @click="
+            () => emits('rollDice', value.attack + value.abilities.strength)
+          "
+        >
+          <span>Attack</span>
+        </Button>
         <CustomRatingComponent
           material-icons
           icon="swords"
@@ -93,7 +135,13 @@ const value = computed({
         />
       </div>
       <div class="stat">
-        <span>Mana</span>
+        <Button
+          variant="text"
+          v-tooltip.top="'Mana Roll'"
+          @click="() => emits('rollDice', value.abilities.intelligence)"
+        >
+          <span>Mana</span>
+        </Button>
         <CustomResourceComponent
           v-model:model-value="value.resources.mana"
           :min="0"
@@ -124,8 +172,19 @@ const value = computed({
   gap: 20px;
   align-items: center;
 
+  button {
+    justify-content: start;
+    padding: 0;
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
   span {
     width: 140px;
+    text-align: left;
+    font-size: 20px;
   }
 }
 </style>
