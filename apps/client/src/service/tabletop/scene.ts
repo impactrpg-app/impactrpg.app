@@ -28,8 +28,12 @@ export class Module<T> {
 export class Entity {
   uuid: string;
   name: string;
+  // dirty entity is automatically set as false at the end of the scene
   isDirty: boolean;
+  // used internally to ignore player interactions with certain objects
   isInteractable: boolean;
+  // used by the player to lock movement for a entity
+  isLocked: boolean;
   modules: {
     [key: string]: Module<any>;
   };
@@ -69,6 +73,7 @@ export class Entity {
     this._scale = new Vector3(1, 1, 1);
     this.isDirty = true;
     this.isInteractable = true;
+    this.isLocked = false;
     this.modules = {};
     this.tags = [];
     scene.set(this.uuid, this);

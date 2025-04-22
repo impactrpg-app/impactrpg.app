@@ -14,16 +14,19 @@ export class MoveTool extends BaseTool {
     await super.init();
   }
 
-  private getClickedObject(e: MouseEvent): {
+  private getClickedObject(
+    e: MouseEvent,
+    allowLockedObjects: boolean = false
+  ): {
     entity: Entity;
     point: Vector3;
   } | null {
     if (!this._camera) return null;
     const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
     const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
-    if (!rayResult || !rayResult.entity.isInteractable) {
-      return null;
-    }
+    if (!rayResult || !rayResult.entity.isInteractable) return null;
+    if (!allowLockedObjects && rayResult.entity.isLocked) return null;
+
     return rayResult;
   }
   private addSelectedObject(entity: Entity, point: Vector3) {
@@ -49,7 +52,7 @@ export class MoveTool extends BaseTool {
       }
     } else if (e.button === 2) {
       // Right mouse button down
-      const result = this.getClickedObject(e);
+      const result = this.getClickedObject(e, true);
       if (!this._isShiftDown) {
         selectedObjects.clear();
         this._objectOffset = [];

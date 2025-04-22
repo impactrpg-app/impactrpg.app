@@ -43,9 +43,16 @@ const scale = computed({
 });
 const lockObject = computed({
   get() {
+    for (const obj of props.selectedObjects) {
+      return obj.isLocked;
+    }
     return false;
   },
-  set(value: boolean) {},
+  set(value: boolean) {
+    for (const obj of props.selectedObjects) {
+      obj.isLocked = value;
+    }
+  },
 });
 
 function deleteSelectedObjects() {
