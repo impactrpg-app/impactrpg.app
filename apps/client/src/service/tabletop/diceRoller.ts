@@ -154,14 +154,15 @@ export async function rollDiceWithProps(
   Audio.play("/dice-roll.mp3");
   const diceRoll: DiceRoll[] = [];
   for (const prop of props) {
-    const startingPosition = prop.startingPosition.clone();
-    const force = computeDiceForces();
-    const entity = await rollADice(startingPosition, force);
+    const entity = await rollADice(prop.startingPosition, {
+      force: prop.force,
+      torque: prop.torque,
+    });
     if (!entity) continue;
     diceRoll.push({
-      ...force,
+      ...prop,
       entity,
-      startingPosition,
+      startingPosition: prop.startingPosition,
     });
   }
   return diceRoll;
