@@ -6,7 +6,7 @@ import TabletopRulesComponent from "@/components/TabletopRulesComponent.vue";
 import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
 import TabletopContextMenuComponent from "@/components/TabletopContextMenuComponent.vue";
 import { loadFromFile } from "@/service/io";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { ProgressSpinner, useToast } from "primevue";
 import * as TabletopService from "../service/tabletop";
 import * as Api from "@/service/api";
@@ -35,6 +35,16 @@ onMounted(() => {
       summary: message,
     });
   });
+  TabletopService.errorListeners.add((code, message) => {
+    toast.add({
+      severity: "error",
+      summary: `${code}: ${message}`,
+    });
+  });
+});
+onUnmounted(() => {
+  TabletopService.notificationListeners.clear();
+  TabletopService.errorListeners.clear();
 });
 
 async function uploadImage() {
@@ -42,13 +52,22 @@ async function uploadImage() {
   if (!imageSource) return;
 
   Task.runTask(async () => {
-    const result = await Api.uploadImage(imageSource);
+    const result = await Api.uploadFile("/image", imageSource);
     if (!result) return;
     const url = `${Api.API_URL}/image/${encodeURIComponent(result.path)}`;
     await TabletopService.createImage(url);
   });
 }
-function uploadObject() {}
+async function uploadObject() {
+  const objectSource = await loadFromFile(".glb");
+  if (!objectSource) return;
+  Task.runTask(async () => {
+    const result = await Api.uploadFile("/object", objectSource);
+    if (!result) return;
+    const url = `${Api.API_URL}/object/${encodeURIComponent(result.path)}`;
+    await TabletopService.createObject(url);
+  });
+}
 function rollDice(amount: number) {
   TabletopService.rollNetworkDice(amount);
 }

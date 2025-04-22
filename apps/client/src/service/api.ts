@@ -82,10 +82,10 @@ export async function makeRequest<T>(
   return response.json();
 }
 
-export async function uploadImage(imageSource: Uint8Array) {
+export async function uploadFile(path: string, blob: Uint8Array) {
   const formData = new FormData();
-  formData.append("image", new Blob([imageSource]));
-  const resp = await fetch(API_URL + "/image", {
+  formData.append("file", new Blob([blob]));
+  const resp = await fetch(API_URL + path, {
     method: "POST",
     body: formData,
     headers: {

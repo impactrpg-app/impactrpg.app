@@ -21,13 +21,12 @@ import { AuthRequest } from "src/middleware/auth.guard";
 import { AuthGuard } from "src/middleware/auth.guard";
 import { v4 as uuidv4 } from "uuid";
 import { ImageUploadResponse } from "@impact/shared";
-import Sharp from "sharp";
 
 @Controller()
-export class ImageController {
+export class ObjectController {
   constructor(private readonly storageService: StorageService) {}
 
-  @ApiOperation({ summary: "Upload an image" })
+  @ApiOperation({ summary: "Upload a gltf object" })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
@@ -38,58 +37,43 @@ export class ImageController {
     },
   })
   @ApiOkResponse({ type: ImageUploadResponse })
-  @Post("image")
+  @Post("object")
   @UseInterceptors(
     FileInterceptor("file", {
       limits: {
-        fileSize: 1024 * 1024 * 10, // 10MB
+        fileSize: 1024 * 1024 * 50, // 50MB
       },
     })
   )
   @UseGuards(AuthGuard)
-  async uploadImage(
+  async uploadObject(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: AuthRequest
   ): Promise<ImageUploadResponse> {
     try {
-      // convert to webp
-      const webpBuffer = await Sharp(file.buffer)
-        .webp({ quality: 80 })
-        .toBuffer();
-
-      const uuid = `${uuidv4()}.webp`;
-      await this.storageService.put(webpBuffer, `${req.user.id}/${uuid}`);
+      const uuid = `${uuidv4()}.glb`;
+      await this.storageService.put(file.buffer, `${req.user.id}/${uuid}`);
       return { path: `${req.user.id}/${uuid}` };
     } catch (error) {
       console.error(error);
-      throw new InternalServerErrorException("Failed to upload image");
+      throw new InternalServerErrorException("Failed to upload glft object");
     }
   }
 
-  @ApiOperation({ summary: "Get an image" })
-  @Get("image/:imagePath")
-  @Header("Content-Type", "image/webp")
-  async getImage(@Param("imagePath") imagePath: string, @Res() res: Response) {
-    res.setHeader("Content-Type", "image/webp");
+  @ApiOperation({ summary: "Get a  gltf object" })
+  @Get("object/:path")
+  @Header("Content-Type", "model/gltf-binary")
+  async getObject(@Param("path") path: string, @Res() res: Response) {
+    res.setHeader("Content-Type", "model/gltf-binary");
     res.shouldKeepAlive = true;
     try {
-      const response = await this.storageService.get(
-        decodeURIComponent(imagePath)
-      );
+      const response = await this.storageService.get(decodeURIComponent(path));
       res.setHeader("Content-Length", response.ContentLength);
       res.setHeader("Cache-Control", "public, max-age=31536000");
       const data = await response.Body.transformToByteArray();
       res.write(data);
     } catch (e) {
       console.error(e);
-      const redPixelBase64 =
-        "UklGRiIAAABXRUJQVlA4IC4AAACwAQCdASoIAAgAAkA4JaQAA3AA/vuUAAA=";
-      res.setHeader(
-        "Content-Length",
-        Buffer.byteLength(redPixelBase64, "base64")
-      );
-      res.setHeader("Cache-Control", "no-cache");
-      res.write(Buffer.from(redPixelBase64, "base64"));
     } finally {
       res.end();
     }

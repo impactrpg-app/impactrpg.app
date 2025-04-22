@@ -11,6 +11,7 @@ import { ImageController } from "./controllers/image.controller";
 import { ConfigModule } from "@nestjs/config";
 import { StorageService } from "./services/storage.service";
 import { ScheduleModule } from "@nestjs/schedule";
+import { ObjectController } from "./controllers/object.controller";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,6 +27,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     RoomController,
     HealthCheckController,
     ImageController,
+    ObjectController,
   ],
   providers: [JwtService, EventsGateway, RoomService, StorageService],
 })

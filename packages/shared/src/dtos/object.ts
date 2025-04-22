@@ -1,8 +1,8 @@
 import { ApiProperty, IsString } from "../nestjs-imports";
 
-export class ImageUploadResponse {
+export class ObjectUploadResponse {
   @ApiProperty({
-    description: "The path of the uploaded image",
+    description: "The path of the uploaded object",
   })
   @IsString()
   path: string;
