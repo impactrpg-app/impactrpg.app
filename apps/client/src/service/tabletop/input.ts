@@ -28,6 +28,16 @@ export function onMouseMove(e: MouseEvent): void {
   }
 }
 export function onKeyDown(e: KeyboardEvent): void {
+  if (e.key === " ") {
+    e.preventDefault();
+  }
+  if (e.key.toLowerCase() === "z" && e.ctrlKey) {
+    e.preventDefault();
+  }
+  if (e.key.toLowerCase() === "Y" && e.ctrlKey) {
+    e.preventDefault();
+  }
+
   if (!isMouseOverCanvas) return;
   for (const entity of scene.values()) {
     for (const module of Object.values(entity.modules)) {
