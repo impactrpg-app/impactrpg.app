@@ -37,13 +37,13 @@ export function computeDiceForces(): DiceForces {
 const forcesTest = {
   force: new Vector3(0, 0, 1),
   torque: new Vector3(4, 2, 0),
-}
+};
 async function rollADice(
-  // startingPosition: Vector3,
-  // forces: DiceForces
+  startingPosition: Vector3,
+  forces: DiceForces
 ): Promise<Entity | null> {
-  const startingPosition = new Vector3(0, 3, 0);
-  const forces = forcesTest;
+  startingPosition = new Vector3(0, 3, 0);
+  forces = forcesTest;
 
   const dice = await createObject("/dice.glb", false);
   if (!dice) return null;
