@@ -1,6 +1,7 @@
 import * as Three from "three";
 import { scene } from "../scene";
 import { threeScene } from "./scene";
+import { WebGPURenderer } from "three/webgpu";
 
 function animate() {
   for (const entity of scene.values()) {
@@ -10,9 +11,9 @@ function animate() {
   }
 }
 
-let renderer: Three.WebGLRenderer;
+let renderer: WebGPURenderer;
 export function init(parent?: HTMLElement) {
-  renderer = new Three.WebGLRenderer({
+  renderer = new WebGPURenderer({
     antialias: true,
   });
   renderer.setClearColor(0x000000, 0);
@@ -20,7 +21,6 @@ export function init(parent?: HTMLElement) {
   renderer.toneMappingExposure = 1;
 
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.autoUpdate = true;
   renderer.shadowMap.type = Three.PCFSoftShadowMap;
 
   renderer.setSize(window.innerWidth, window.innerHeight);
