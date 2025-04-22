@@ -34,17 +34,12 @@ export function computeDiceForces(): DiceForces {
     torque,
   };
 }
-const forcesTest = {
-  force: new Vector3(0, 0, 1),
-  torque: new Vector3(4, 2, 0),
-};
 async function rollADice(
   startingPosition: Vector3,
   forces: DiceForces
 ): Promise<Entity | null> {
-  startingPosition = new Vector3(0, 3, 0);
-  forces = forcesTest;
-
+  console.log(startingPosition);
+  console.log(forces);
   const dice = await createObject("/dice.glb", false);
   if (!dice) return null;
   dice.isInteractable = false;
