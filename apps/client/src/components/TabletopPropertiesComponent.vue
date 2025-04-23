@@ -2,7 +2,7 @@
 import CustomResourceComponent from "./CustomResourceComponent.vue";
 import * as TabletopService from "@/service/tabletop";
 import { Button, Dialog, ToggleSwitch } from "primevue";
-import { Vector3 } from "@/service/tabletop/vector";
+import { Vector3, Vector4 } from "@/service/tabletop/vector";
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -15,17 +15,9 @@ const emits = defineEmits<{
 
 const rotation = computed({
   get() {
-    for (const obj of props.selectedObjects) {
-      return obj.rotation.z * (180 / Math.PI);
-    }
     return 0;
   },
-  set(val: number) {
-    for (const obj of props.selectedObjects) {
-      obj.rotation.z = (val * Math.PI) / 180;
-      obj.isDirty = true;
-    }
-  },
+  set(val: number) {},
 });
 const scale = computed({
   get() {

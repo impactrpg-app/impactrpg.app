@@ -2,6 +2,7 @@ import * as Three from "three";
 import { Module } from "../../scene";
 import { loadImage } from "../loader";
 import { threeScene } from "../scene";
+import { updateThreeObject } from "./helper";
 
 export class ImageRendererModule extends Module<Three.Object3D> {
   private _texture: Three.Texture | null = null;
@@ -41,6 +42,7 @@ export class ImageRendererModule extends Module<Three.Object3D> {
     this.data.castShadow = false;
     this.data.receiveShadow = true;
     threeScene.add(this.data);
+    updateThreeObject(this.entity, this.data, true);
   }
   async destroy(): Promise<void> {
     if (this._texture) {
@@ -50,22 +52,6 @@ export class ImageRendererModule extends Module<Three.Object3D> {
     threeScene.remove(this.data);
   }
   update(): void {
-    this.data.position.set(
-      this.entity.position.x,
-      this.entity.position.y,
-      this.entity.position.z
-    );
-    this.data.setRotationFromEuler(
-      new Three.Euler(
-        this.entity.rotation.x,
-        this.entity.rotation.y,
-        this.entity.rotation.z
-      )
-    );
-    this.data.scale.set(
-      this.entity.scale.x,
-      this.entity.scale.y,
-      this.entity.scale.z
-    );
+    updateThreeObject(this.entity, this.data);
   }
 }

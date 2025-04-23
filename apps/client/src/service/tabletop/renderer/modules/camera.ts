@@ -3,6 +3,7 @@ import { Vector3 } from "@/service/tabletop/vector";
 import * as Three from "three";
 import { threeScene } from "../scene";
 import { setRendererSize, renderCamera } from "../renderer";
+import { updateThreeObject } from "./helper";
 
 export enum CameraType {
   Perspective = "perspective",
@@ -142,6 +143,7 @@ export class CameraModule extends Module<Three.Camera> {
         this.data = this.createOrthographicCamera();
         break;
     }
+    updateThreeObject(this.entity, this.data, true);
   }
 
   async destroy() {
@@ -171,18 +173,7 @@ export class CameraModule extends Module<Three.Camera> {
   }
 
   update(): void {
-    this.data.position.set(
-      this.entity.position.x,
-      this.entity.position.y,
-      this.entity.position.z
-    );
-    this.data.setRotationFromEuler(
-      new Three.Euler(
-        this.entity.rotation.x,
-        this.entity.rotation.y,
-        this.entity.rotation.z
-      )
-    );
+    updateThreeObject(this.entity, this.data);
     renderCamera(this.data);
   }
 }

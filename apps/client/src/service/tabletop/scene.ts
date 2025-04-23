@@ -1,5 +1,5 @@
 import * as Uuid from "uuid";
-import { Vector3 } from "./vector";
+import { Vector3, Vector4 } from "./vector";
 import { ref } from "vue";
 
 export class Module<T> {
@@ -33,8 +33,6 @@ export class Module<T> {
 export class Entity {
   uuid: string;
   name: string;
-  // dirty entity is automatically set as false at the end of the scene
-  isDirty: boolean;
   // used internally to ignore player interactions with certain objects
   isInteractable: boolean;
   // used by the player to lock movement for a entity
@@ -44,39 +42,16 @@ export class Entity {
   };
   tags: string[];
 
-  private _position: Vector3;
-  private _rotation: Vector3;
-  private _scale: Vector3;
-
-  get position() {
-    return this._position;
-  }
-  set position(value: Vector3) {
-    this._position = value;
-    this.isDirty = true;
-  }
-  get rotation() {
-    return this._rotation;
-  }
-  set rotation(value: Vector3) {
-    this._rotation = value;
-    this.isDirty = true;
-  }
-  get scale() {
-    return this._scale;
-  }
-  set scale(value: Vector3) {
-    this._scale = value;
-    this.isDirty = true;
-  }
+  position: Vector3;
+  rotation: Vector4;
+  scale: Vector3;
 
   constructor(name: string) {
     this.uuid = Uuid.v7();
     this.name = name;
-    this._position = new Vector3(0, 0, 0);
-    this._rotation = new Vector3(0, 0, 0);
-    this._scale = new Vector3(1, 1, 1);
-    this.isDirty = true;
+    this.position = new Vector3(0, 0, 0);
+    this.rotation = new Vector4(0, 0, 0, 1);
+    this.scale = new Vector3(1, 1, 1);
     this.isInteractable = true;
     this.isLocked = false;
     this.modules = {};
@@ -189,10 +164,18 @@ export function clearScene() {
     entity.destroy();
   }
 }
-export function clearDirtyEntities() {
+export function clearPhysicsDirty() {
   for (const entity of scene.values()) {
-    if (entity.isDirty) {
-      entity.isDirty = false;
-    }
+    entity.position.isPhysicsDirty = false;
+    entity.rotation.isPhysicsDirty = false;
+    entity.scale.isPhysicsDirty = false;
+  }
+}
+
+export function clearRenderDirty() {
+  for (const entity of scene.values()) {
+    entity.position.isRenderDirty = false;
+    entity.rotation.isRenderDirty = false;
+    entity.scale.isRenderDirty = false;
   }
 }

@@ -1,9 +1,9 @@
 import * as Rapier from "@dimforge/rapier3d";
 import * as Three from "three";
-import { Module } from "../../scene";
+import { Module, scene } from "../../scene";
 import { world } from "../world";
 import { Collider } from "./collider";
-import { Vector3 } from "../../vector";
+import { Vector3, Vector4 } from "../../vector";
 
 export type PhysicsBodyType = {
   body: Rapier.RigidBody;
@@ -33,8 +33,10 @@ export class BaseBodyModule extends Module<PhysicsBodyType> {
       collider.destroy();
     }
   }
-  physicsUpdate(): void {
-    if (this.entity.isDirty) {
+  protected updatePhysicsObject(force: boolean = false) {
+    let updated = false;
+    if (this.entity.position.isPhysicsDirty || force) {
+      updated = true;
       this.data.body.setTranslation(
         new Rapier.Vector3(
           this.entity.position.x,
@@ -43,22 +45,29 @@ export class BaseBodyModule extends Module<PhysicsBodyType> {
         ),
         false
       );
-      const rot = new Three.Quaternion().setFromEuler(
-        new Three.Euler(
+    }
+    if (this.entity.rotation.isPhysicsDirty || force) {
+      updated = true;
+      this.data.body.setRotation(
+        new Rapier.Quaternion(
           this.entity.rotation.x,
           this.entity.rotation.y,
-          this.entity.rotation.z
-        )
+          this.entity.rotation.z,
+          this.entity.rotation.w
+        ),
+        false
       );
-      this.data.body.setRotation(
-        new Rapier.Quaternion(rot.x, rot.y, rot.z, rot.w),
-        true
-      );
+    }
+    if (this.entity.scale.isPhysicsDirty || force) {
+      updated = true;
       for (const collider of this._colliders) {
         collider.setScale(this.entity.scale);
       }
-      return;
     }
+    return updated;
+  }
+  physicsUpdate(): void {
+    if (this.updatePhysicsObject()) return;
     if (!this.autoUpdateTransform) return;
     const translation = this.data.body.translation();
     this.entity.position = new Vector3(
@@ -67,10 +76,12 @@ export class BaseBodyModule extends Module<PhysicsBodyType> {
       translation.z
     );
     const rotation = this.data.body.rotation();
-    const rot = new Three.Euler().setFromQuaternion(
-      new Three.Quaternion(rotation.x, rotation.y, rotation.z, rotation.w)
+    this.entity.rotation = new Vector4(
+      rotation.x,
+      rotation.y,
+      rotation.z,
+      rotation.w
     );
-    this.entity.rotation = new Vector3(rot.x, rot.y, rot.z);
   }
   setLinearVelocity(vec: Vector3) {
     this.data.body.setLinvel(new Rapier.Vector3(vec.x, vec.y, vec.z), false);

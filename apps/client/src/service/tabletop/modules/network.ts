@@ -33,9 +33,9 @@ export class NetworkModule extends Module<any> {
     }
     if (this.entity.isDirty) {
       const updateObjectMessage = new UpdateObjectMessage(this.entity.uuid, {
-        position: this.entity.position,
-        rotation: this.entity.rotation,
-        scale: this.entity.scale,
+        position: this.entity.position.toObject(),
+        rotation: this.entity.rotation.toObject(),
+        scale: this.entity.scale.toObject(),
       });
       this._lastUpdate = updateObjectMessage;
       if (Date.now() - this._lastUpdateTimestamp < 100) return;

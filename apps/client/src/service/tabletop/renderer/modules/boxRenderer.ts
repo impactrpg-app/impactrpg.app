@@ -2,6 +2,7 @@ import * as Three from "three";
 import { Module } from "../../scene";
 import { threeScene, threeToEntity } from "../scene";
 import { Vector3 } from "../../vector";
+import { updateThreeObject } from "./helper";
 
 export class BoxRendererModule extends Module<Three.Object3D> {
   constructor(private _bounds: Vector3) {
@@ -41,22 +42,6 @@ export class BoxRendererModule extends Module<Three.Object3D> {
   }
 
   update(): void {
-    this.data.position.set(
-      this.entity.position.x,
-      this.entity.position.y,
-      this.entity.position.z
-    );
-    this.data.setRotationFromEuler(
-      new Three.Euler(
-        this.entity.rotation.x,
-        this.entity.rotation.y,
-        this.entity.rotation.z
-      )
-    );
-    this.data.scale.set(
-      this.entity.scale.x,
-      this.entity.scale.y,
-      this.entity.scale.z
-    );
+    updateThreeObject(this.entity, this.data);
   }
 }

@@ -8,6 +8,7 @@ import {
   JoinRoomMessage,
   LeaveRoomMessage,
   MessageType,
+  NetworkColliderType,
   NetworkEntity,
   NetworkModule,
   NetworkModuleType,
@@ -17,7 +18,7 @@ import {
 } from "@impact/shared";
 import { clearScene, Entity, Module, scene } from "./scene";
 import { ref } from "vue";
-import { Vector3 } from "./vector";
+import { Vector3, Vector4 } from "./vector";
 import {
   BoxRendererModule,
   ImageRendererModule,
@@ -113,7 +114,7 @@ function updateObjectResponse(data: UpdateObjectMessage) {
     entity.position = Vector3.fromObject(data.object.position);
   }
   if (data.object.rotation) {
-    entity.rotation = Vector3.fromObject(data.object.rotation);
+    entity.rotation = Vector4.fromObject(data.object.rotation);
   }
   if (data.object.scale) {
     entity.scale = Vector3.fromObject(data.object.scale);
@@ -220,22 +221,22 @@ export function toNetworkModule<T extends Module<any>>(
     return {
       type: NetworkModuleType.DynamicBody,
       colliders: module.colliders.map((collider) => {
-        const col = collider as unknown as BoxCollider;
+        const col = collider as Physics.BoxCollider;
         return {
-          type: col.type,
-          size: col.size,
-        };
+          type: NetworkColliderType.Box,
+          size: col.size.toObject(),
+        } as BoxCollider;
       }),
     };
   } else if (module instanceof Physics.StaticBodyModule) {
     return {
       type: NetworkModuleType.StaticBody,
       colliders: module.colliders.map((collider) => {
-        const col = collider as unknown as BoxCollider;
+        const col = collider as Physics.BoxCollider;
         return {
-          type: col.type,
-          size: col.size,
-        };
+          type: NetworkColliderType.Box,
+          size: col.size.toObject(),
+        } as BoxCollider;
       }),
     };
   } else if (module instanceof Network.NetworkModule) {
@@ -307,7 +308,7 @@ export async function toEntity(networkEntity: NetworkEntity): Promise<Entity> {
   scene.delete(oldUuid);
   scene.set(entity.uuid, entity);
   entity.position = Vector3.fromObject(networkEntity.position);
-  entity.rotation = Vector3.fromObject(networkEntity.rotation);
+  entity.rotation = Vector4.fromObject(networkEntity.rotation);
   entity.scale = Vector3.fromObject(networkEntity.scale);
   for (const module of networkEntity.modules) {
     const convertedModule = toModule(module);

@@ -35,6 +35,6 @@ export class StaticBodyModule extends BaseBodyModule {
         .filter((collider) => collider !== null),
     };
     this.autoUpdateTransform = false;
-    this.entity.isDirty = true;
+    this.updatePhysicsObject(true);
   }
 }

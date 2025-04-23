@@ -45,6 +45,6 @@ export class DynamicBodyModule extends BaseBodyModule {
         .map((collider) => collider.data)
         .filter((collider) => collider !== null),
     };
-    this.entity.isDirty = true;
+    this.updatePhysicsObject(true);
   }
 }

@@ -4,6 +4,7 @@ import { loadGltf } from "../loader";
 import { threeScene } from "../scene";
 import { GLTF } from "three/examples/jsm/Addons.js";
 import { Vector3 } from "../../vector";
+import { updateThreeObject } from "./helper";
 
 export class ObjectRenderer extends Module<Three.Object3D> {
   private gltf: GLTF | null = null;
@@ -44,24 +45,12 @@ export class ObjectRenderer extends Module<Three.Object3D> {
     this.data.castShadow = true;
     this.data.receiveShadow = true;
     threeScene.add(this.data);
+    updateThreeObject(this.entity, this.data, true);
   }
   async destroy(): Promise<void> {
     threeScene.remove(this.data);
   }
   update(): void {
-    const pos = this.entity.position.subtract(this._center);
-    this.data.position.set(pos.x, pos.y, pos.z);
-    this.data.setRotationFromEuler(
-      new Three.Euler(
-        this.entity.rotation.x,
-        this.entity.rotation.y,
-        this.entity.rotation.z
-      )
-    );
-    this.data.scale.set(
-      this.entity.scale.x,
-      this.entity.scale.y,
-      this.entity.scale.z
-    );
+    updateThreeObject(this.entity, this.data);
   }
 }

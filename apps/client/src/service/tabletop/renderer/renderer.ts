@@ -1,5 +1,5 @@
 import * as Three from "three";
-import { scene } from "../scene";
+import { clearRenderDirty, scene } from "../scene";
 import { threeScene } from "./scene";
 
 function animate() {
@@ -8,6 +8,7 @@ function animate() {
       module.update();
     }
   }
+  clearRenderDirty();
 }
 
 let renderer: Three.WebGLRenderer;

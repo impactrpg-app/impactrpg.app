@@ -17,6 +17,12 @@ export class Vector3 {
   y: number;
   z: number;
 }
+export class Vector4 {
+  x: number;
+  y: number;
+  z: number;
+  w: number;
+}
 
 export class TabletopObject {
   @Prop({ required: true })
@@ -26,7 +32,7 @@ export class TabletopObject {
   position: Vector3;
 
   @Prop({ required: true })
-  rotation: Vector3;
+  rotation: Vector4;
 
   @Prop({ required: true })
   scale: Vector3;

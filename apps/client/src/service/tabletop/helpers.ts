@@ -1,4 +1,4 @@
-import { Vector3 } from "./vector";
+import { Vector3, Vector4 } from "./vector";
 import { Entity, scene } from "./scene";
 import { ImageRendererModule, ObjectRenderer } from "./renderer";
 import { BoxCollider, DynamicBodyModule, StaticBodyModule } from "./physics";
@@ -15,7 +15,7 @@ export async function createImage(
   }
   const entity = new Entity("image");
   entity.position = new Vector3(camera.position.x, 0, camera.position.z);
-  entity.rotation = Vector3.fromAngles(-90, 0, 0);
+  entity.rotation = Vector4.fromEulerAngles(-90, 0, 0);
   const imageRenderer = await entity.addModule(new ImageRendererModule(url));
   await entity.addModule(
     new StaticBodyModule([
@@ -44,7 +44,6 @@ export async function createObject(
   }
   const entity = new Entity("object");
   entity.position = new Vector3(camera.position.x, 1, camera.position.z);
-  entity.rotation = Vector3.fromAngles(-90, 0, 0);
   const renderer = await entity.addModule(new ObjectRenderer(url));
   const { size } = renderer.getBoundingBox();
   await entity.addModule(

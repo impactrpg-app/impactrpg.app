@@ -2,6 +2,7 @@ import * as Three from "three";
 import { Module } from "../../scene";
 import { threeScene, threeToEntity } from "../scene";
 import { Vector3 } from "../../vector";
+import { updateThreeObject } from "./helper";
 
 export class LineRendererModule extends Module<
   Three.Line<Three.BufferGeometry, Three.LineBasicMaterial>
@@ -24,25 +25,14 @@ export class LineRendererModule extends Module<
     this.type = "Module::Renderer";
     threeScene.add(this.data);
     threeToEntity.set(this.data, this.entity.uuid);
-    const pos = this.entity.position;
-    const rot = this.entity.rotation;
-    const scale = this.entity.scale;
-    this.data.position.set(pos.x, pos.y, pos.z);
-    this.data.rotation.set(rot.x, rot.y, rot.z);
-    this.data.scale.set(scale.x, scale.y, scale.z);
+    updateThreeObject(this.entity, this.data, true);
   }
   async destroy() {
     threeScene.remove(this.data);
     threeToEntity.delete(this.data);
   }
   update(): void {
-    if (!this.entity.isDirty) return;
-    const pos = this.entity.position;
-    const rot = this.entity.rotation;
-    const scale = this.entity.scale;
-    this.data.position.set(pos.x, pos.y, pos.z);
-    this.data.rotation.set(rot.x, rot.y, rot.z);
-    this.data.scale.set(scale.x, scale.y, scale.z);
+    updateThreeObject(this.entity, this.data);
   }
 
   setPoints(points: Vector3[]) {

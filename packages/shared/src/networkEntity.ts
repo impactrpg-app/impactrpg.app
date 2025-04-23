@@ -1,4 +1,4 @@
-import { Vector3 } from "./vector";
+import { Vector3, Vector4 } from "./vector";
 
 export enum NetworkModuleType {
   ImageRenderer = "ImageRenderer",
@@ -56,14 +56,14 @@ export type NetworkModule =
 export class NetworkEntity {
   uuid: string;
   position: Vector3;
-  rotation: Vector3;
+  rotation: Vector4;
   scale: Vector3;
   modules: NetworkModule[];
 
   constructor(
     uuid: string,
     position: Vector3,
-    rotation: Vector3,
+    rotation: Vector4,
     scale: Vector3,
     modules: NetworkModule[]
   ) {

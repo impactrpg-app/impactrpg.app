@@ -38,8 +38,6 @@ async function rollADice(
   startingPosition: Vector3,
   forces: DiceForces
 ): Promise<Entity | null> {
-  console.log(startingPosition);
-  console.log(forces);
   const dice = await createObject("/dice.glb", false);
   if (!dice) return null;
   dice.isInteractable = false;
@@ -99,8 +97,11 @@ export async function getDiceResults(diceRolls: DiceRoll[]) {
     const rotation = dice.entity.rotation; // Assuming this is {x, y, z} Euler angles
 
     // Create a Quaternion from the dice's Euler rotation
-    const q = new Three.Quaternion().setFromEuler(
-      new Three.Euler(rotation.x, rotation.y, rotation.z)
+    const q = new Three.Quaternion(
+      rotation.x,
+      rotation.y,
+      rotation.z,
+      rotation.w
     );
 
     // Define face normals in the dice's LOCAL coordinate system
