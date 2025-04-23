@@ -112,12 +112,15 @@ function updateObjectResponse(data: UpdateObjectMessage) {
   }
   if (data.object.position) {
     entity.position = Vector3.fromObject(data.object.position);
+    entity.position.isNetworkDirty = false;
   }
   if (data.object.rotation) {
     entity.rotation = Vector4.fromObject(data.object.rotation);
+    entity.rotation.isNetworkDirty = false;
   }
   if (data.object.scale) {
     entity.scale = Vector3.fromObject(data.object.scale);
+    entity.scale.isNetworkDirty = false;
   }
   if (data.object.modules) {
     for (const module of data.object.modules) {

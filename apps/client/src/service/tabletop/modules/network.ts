@@ -2,6 +2,7 @@ import { Module } from "../scene";
 import * as Network from "../network";
 import {
   AddObjectMessage,
+  NetworkEntity,
   RemoveObjectMessage,
   UpdateObjectMessage,
 } from "@impact/shared";
@@ -25,18 +26,29 @@ export class NetworkModule extends Module<any> {
 
   update(): void {
     if (!this.isInitialized) {
-      const addObjectMessage = new AddObjectMessage(
-        Network.toNetworkEntity(this.entity)
-      );
-      Network.addObject(addObjectMessage);
-      this.isInitialized = true;
+      this.spawn();
     }
-    if (this.entity.isDirty) {
-      const updateObjectMessage = new UpdateObjectMessage(this.entity.uuid, {
-        position: this.entity.position.toObject(),
-        rotation: this.entity.rotation.toObject(),
-        scale: this.entity.scale.toObject(),
-      });
+
+    let hasUpdated = false;
+    let updates: Partial<NetworkEntity> = {};
+    if (this.entity.position.isNetworkDirty) {
+      updates.position = this.entity.position.toObject();
+      hasUpdated = true;
+    }
+    if (this.entity.rotation.isNetworkDirty) {
+      updates.rotation = this.entity.rotation.toObject();
+      hasUpdated = true;
+    }
+    if (this.entity.scale.isNetworkDirty) {
+      updates.scale = this.entity.scale.toObject();
+      hasUpdated = true;
+    }
+
+    if (hasUpdated) {
+      const updateObjectMessage = new UpdateObjectMessage(
+        this.entity.uuid,
+        updates
+      );
       this._lastUpdate = updateObjectMessage;
       if (Date.now() - this._lastUpdateTimestamp < 100) return;
       Network.updateObject(updateObjectMessage);
@@ -47,9 +59,26 @@ export class NetworkModule extends Module<any> {
     }
   }
 
+  spawn() {
+    const addObjectMessage = new AddObjectMessage(
+      Network.toNetworkEntity(this.entity)
+    );
+    Network.addObject(addObjectMessage);
+    this.isInitialized = true;
+  }
   despawn() {
     const removeObjectMessage = new RemoveObjectMessage(this.entity.uuid);
     Network.removeObject(removeObjectMessage);
     this.entity.destroy();
+  }
+  updateEntityModules() {
+    const modules = Object.values(this.entity.modules).map((module) =>
+      Network.toNetworkModule(module)
+    );
+    const updates: Partial<NetworkEntity> = {
+      uuid: this.entity.uuid,
+      modules: modules.filter((module) => !!module),
+    };
+    Network.updateObject(new UpdateObjectMessage(this.entity.uuid, updates));
   }
 }

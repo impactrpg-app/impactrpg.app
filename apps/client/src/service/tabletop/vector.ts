@@ -3,15 +3,18 @@ import * as Three from "three";
 export class Dirtyable {
   public isPhysicsDirty: boolean;
   public isRenderDirty: boolean;
+  public isNetworkDirty: boolean;
 
   constructor() {
     this.isPhysicsDirty = true;
     this.isRenderDirty = true;
+    this.isNetworkDirty = true;
   }
 
   setDirty(boolean = true) {
     this.isPhysicsDirty = boolean;
     this.isRenderDirty = boolean;
+    this.isNetworkDirty = boolean;
   }
 }
 
