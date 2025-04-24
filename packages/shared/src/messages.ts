@@ -1,3 +1,4 @@
+import { Vector3 } from "vector";
 import { NetworkEntity } from "./networkEntity";
 
 export enum MessageType {
@@ -7,10 +8,9 @@ export enum MessageType {
   AddObject = "addObject",
   RemoveObject = "removeObject",
   UpdateObject = "updateObject",
-  ImageChunk = "imageChunk",
-  ImageChunkEnd = "imageChunkEnd",
   SendNotification = "sendNotification",
   DiceRoll = "diceRoll",
+  roomInfo = "roomInfo",
 }
 
 export class ErrorMessage {
@@ -86,21 +86,16 @@ export class SendNotificationMessage {
   }
 }
 
+export type DiceRollProperties = {
+  force: Vector3;
+  torque: Vector3;
+  startingPosition: Vector3;
+};
 export class DiceRollMessage {
   type: MessageType.DiceRoll;
-  props: {
-    force: { x: number; y: number; z: number };
-    torque: { x: number; y: number; z: number };
-    startingPosition: { x: number; y: number; z: number };
-  }[];
+  props: DiceRollProperties[];
 
-  constructor(
-    props: {
-      force: { x: number; y: number; z: number };
-      torque: { x: number; y: number; z: number };
-      startingPosition: { x: number; y: number; z: number };
-    }[]
-  ) {
+  constructor(props: DiceRollProperties[]) {
     this.type = MessageType.DiceRoll;
     this.props = props;
   }
