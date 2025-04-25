@@ -6,7 +6,7 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { User } from "src/db/user";
 import { hash, compare } from "bcryptjs";
 import { JwtService } from "src/services/jwt.service";
@@ -21,6 +21,16 @@ export class AuthController {
     @InjectModel(User.name) private readonly userService: Model<User>,
     private readonly jwtService: JwtService
   ) {}
+
+  private sinUserAccessToken(
+    user: User & { _id: Types.ObjectId }
+  ): Promise<string> {
+    return this.jwtService.sign({
+      id: user._id.toString(),
+      displayName: user.displayName,
+      email: user.email,
+    });
+  }
 
   @ApiOperation({ summary: "Login a user" })
   @ApiOkResponse({ type: LoginResponseDto })
@@ -40,11 +50,7 @@ export class AuthController {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    const accessToken = await this.jwtService.sign({
-      id: user._id,
-      displayName: user.displayName,
-      email: user.email,
-    });
+    const accessToken = await this.sinUserAccessToken(user);
 
     return { accessToken };
   }
@@ -71,9 +77,7 @@ export class AuthController {
       throw new BadRequestException("Failed to register user");
     }
 
-    const accessToken = await this.jwtService.sign({
-      id: user._id,
-    });
+    const accessToken = await this.sinUserAccessToken(user);
 
     return {
       accessToken,

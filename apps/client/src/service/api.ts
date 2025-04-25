@@ -4,6 +4,7 @@ import { ImageUploadResponse } from "@impact/shared";
 
 export type Claims = {
   id: string;
+  displayName: string;
   exp: number;
   iat: number;
 };
