@@ -1,11 +1,18 @@
 <script lang="ts" setup>
 import PackageJson from "../../package.json";
 import { Button } from "primevue";
-import { logout } from '../service/api';
+import { logout } from "../service/api";
+import { onMounted } from "vue";
 
 function signOut() {
   logout();
 }
+onMounted(() => {
+  const canvas = document.getElementById("tabletop");
+  if (canvas) {
+    canvas.remove();
+  }
+});
 </script>
 
 <template>
@@ -16,7 +23,13 @@ function signOut() {
     <div class="spacer"></div>
     <p>A Free Tabletop Role Playing game.</p>
     <Button as="router-link" label="Play" icon="pi pi-play" to="/tabletop" />
-    <Button as="a" label="Donate" icon="pi pi-dollar" href="https://github.com/sponsors/zeeshan595" target="_blank" />
+    <Button
+      as="a"
+      label="Donate"
+      icon="pi pi-dollar"
+      href="https://github.com/sponsors/zeeshan595"
+      target="_blank"
+    />
     <Button label="Sign Out" icon="pi pi-sign-out" @click="signOut" />
   </div>
 </template>

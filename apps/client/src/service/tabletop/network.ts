@@ -197,6 +197,11 @@ export function sendNotification(message: string) {
   }
   socket.value.emit("event", new SendNotificationMessage(message));
 }
+export function notifySelf(message: string) {
+  for (const listener of notificationListeners) {
+    listener(message);
+  }
+}
 export function addObject(data: AddObjectMessage) {
   if (!socket.value) {
     throw new Error("Not connected to server");

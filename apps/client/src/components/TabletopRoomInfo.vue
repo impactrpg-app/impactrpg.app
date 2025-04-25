@@ -2,8 +2,9 @@
 import { Room } from "@/service/tabletop";
 import { Dialog, Button, Divider, FloatLabel, InputText } from "primevue";
 import { computed, ref, onMounted } from "vue";
-import CustomResourceComponent from "./CustomResourceComponent.vue";
 import { getUserClaims } from "@/service/api";
+import CustomResourceComponent from "./CustomResourceComponent.vue";
+import * as TabletopService from "@/service/tabletop";
 
 const showRoomSettings = ref(false);
 
@@ -25,6 +26,7 @@ onMounted(() => {
 function copyRoomLink() {
   const roomLink = `${window.location.origin}/join/${props.room.id}`;
   navigator.clipboard.writeText(roomLink);
+  TabletopService.notifySelf("Room link copied to clipboard");
 }
 function updateSettings(updatedRoom: Partial<Room>) {
   emits("update:room", {
