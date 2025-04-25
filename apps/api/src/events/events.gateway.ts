@@ -8,7 +8,13 @@ import { Socket } from "socket.io";
 import { JwtService } from "src/services/jwt.service";
 import { connectedUsers } from "./users";
 import { RoomService } from "../services/room.service";
-import { AllMessageTypes, ErrorMessage, MessageType } from "@impact/shared";
+import {
+  AllMessageTypes,
+  ErrorMessage,
+  MessageType,
+  createClassObject,
+} from "@impact/shared";
+import { validate } from "class-validator";
 
 @WebSocketGateway({
   transports: ["websocket"],
@@ -25,8 +31,19 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   @SubscribeMessage("event")
-  handleEvent(client: Socket, payload: AllMessageTypes) {
+  async handleEvent(client: Socket, payload: AllMessageTypes) {
     console.log(`handleEvent ${payload.type} by ${client.id}`);
+
+    const result = await validate(createClassObject(payload));
+    if (result.length > 0) {
+      const issues = result
+        .map((err) =>
+          Object.values(err.constraints).map((constraint) => `- ${constraint}`)
+        )
+        .flat();
+      client.emit("event", new ErrorMessage(400, `\n${issues.join("\n")}`));
+      return;
+    }
 
     switch (payload.type) {
       case MessageType.JoinRoom:

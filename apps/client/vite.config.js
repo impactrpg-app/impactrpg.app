@@ -17,7 +17,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ["@nestjs/swagger", "class-validator"],
+    exclude: ["@nestjs/swagger"],
   },
   server: {
     hmr: {

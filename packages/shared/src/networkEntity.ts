@@ -1,3 +1,4 @@
+import { IsArray, IsEnum, IsObject, IsString } from "class-validator";
 import { Vector3, Vector4 } from "./vector";
 
 export enum NetworkModuleType {
@@ -10,40 +11,55 @@ export enum NetworkModuleType {
   Network = "Network",
 }
 
-export type ImageRenderer = {
+export class ImageRenderer {
+  @IsEnum(NetworkModuleType)
   type: NetworkModuleType.ImageRenderer;
+  @IsString()
   image: string;
-};
-export type ObjectRenderer = {
+}
+export class ObjectRenderer {
+  @IsEnum(NetworkModuleType)
   type: NetworkModuleType.ObjectRenderer;
+  @IsString()
   url: string;
-};
-export type LineRenderer = {
+}
+export class LineRenderer {
+  @IsEnum(NetworkModuleType)
   type: NetworkModuleType.LineRenderer;
+  @IsArray()
   points: Vector3[];
-};
-export type BoxRenderer = {
+}
+export class BoxRenderer {
+  @IsEnum(NetworkModuleType)
   type: NetworkModuleType.BoxRenderer;
+  @IsObject()
   size: Vector3;
-};
+}
 export enum NetworkColliderType {
   Box = "box",
 }
-export type BoxCollider = {
+export class BoxCollider {
+  @IsEnum(NetworkModuleType)
   type: NetworkColliderType.Box;
+  @IsObject()
   size: Vector3;
-};
-export type DynamicBody = {
+}
+export class DynamicBody {
+  @IsEnum(NetworkModuleType)
   type: NetworkModuleType.DynamicBody;
+  @IsArray()
   colliders: BoxCollider[];
-};
-export type StaticBody = {
+}
+export class StaticBody {
+  @IsEnum(NetworkModuleType)
   type: NetworkModuleType.StaticBody;
+  @IsArray()
   colliders: BoxCollider[];
-};
-export type Network = {
+}
+export class Network {
+  @IsEnum(NetworkModuleType)
   type: NetworkModuleType.Network;
-};
+}
 export type NetworkModule =
   | ImageRenderer
   | ObjectRenderer
@@ -54,10 +70,15 @@ export type NetworkModule =
   | Network;
 
 export class NetworkEntity {
+  @IsString()
   uuid: string;
+  @IsObject()
   position: Vector3;
+  @IsObject()
   rotation: Vector4;
+  @IsObject()
   scale: Vector3;
+  @IsArray()
   modules: NetworkModule[];
 
   constructor(
