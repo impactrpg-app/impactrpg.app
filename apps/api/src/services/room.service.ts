@@ -6,6 +6,7 @@ import {
   LeaveRoomMessage,
   NetworkModuleType,
   RemoveObjectMessage,
+  RoomInfoMessage,
   SendNotificationMessage,
   UpdateObjectMessage,
 } from "@impact/shared";
@@ -20,11 +21,13 @@ import { TabletopObject } from "src/db/room";
 import { StorageService } from "src/services/storage.service";
 import { CronExpression } from "@nestjs/schedule";
 import { Cron } from "@nestjs/schedule";
+import { UserService } from "./user.service";
 
 export type Room = {
   id: string;
   users: Map<string, Socket>; // userId -> Socket
   owner: string;
+  rollTarget: number;
   tabletopObjects: TabletopObject[];
 };
 
@@ -35,7 +38,8 @@ export class RoomService {
   constructor(
     @InjectModel(RoomSchema.name)
     private readonly roomModel: Model<RoomSchema>,
-    private readonly storageService: StorageService
+    private readonly storageService: StorageService,
+    private readonly userService: UserService
   ) {}
 
   private async saveRoom(roomId: string) {
@@ -134,6 +138,19 @@ export class RoomService {
     return { userId, room, error: false };
   }
 
+  private async updateRoomInfo(client: Socket) {
+    const { room, error } = this.verifyUser(client);
+    if (error) {
+      return;
+    }
+    const userIds = [...room.users.keys()];
+    const users = await this.userService.getUsersById(userIds);
+    const displayNames = users.map((user) => user.displayName);
+    const message = new RoomInfoMessage(room.rollTarget, displayNames);
+    this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
+      socket.emit("event", message)
+    );
+  }
   async joinRoom(client: Socket, roomId: string) {
     const userId = connectedUsers.get(client);
     if (!userId) {
@@ -162,6 +179,7 @@ export class RoomService {
         users: new Map([[userId, client]]),
         owner: userId,
         tabletopObjects: query.objects,
+        rollTarget: query.rollTarget,
       });
     }
 
@@ -171,6 +189,7 @@ export class RoomService {
       roomId: roomId,
     } as JoinRoomMessage);
     await this.syncAllObjectsToClient(client);
+    await this.updateRoomInfo(client);
   }
   async leaveRoom(client: Socket, roomId: string) {
     const { userId, room, error } = this.verifyUser(client);
@@ -186,6 +205,8 @@ export class RoomService {
     if (room.users.size === 0) {
       await this.saveRoom(roomId);
       this.rooms.delete(roomId);
+    } else {
+      await this.updateRoomInfo(client);
     }
   }
   async leaveAllRooms(client: Socket) {
@@ -197,7 +218,7 @@ export class RoomService {
 
     let roomId = this.findUsersRoom(userId);
     while (roomId) {
-      this.leaveRoom(client, roomId);
+      await this.leaveRoom(client, roomId);
       roomId = this.findUsersRoom(userId);
     }
   }

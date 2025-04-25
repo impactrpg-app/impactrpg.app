@@ -58,9 +58,9 @@ export const goods: Good[] = [
     description: ["Grant's a bonus to stealth checks"],
   },
   {
-    name: "Pouch of Coins",
+    name: "Lockpicks",
     size: GoodsType.Small,
-    description: [],
+    description: ["Can be useful to open locks"],
   },
   {
     name: "Backpack",

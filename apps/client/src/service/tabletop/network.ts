@@ -13,6 +13,7 @@ import {
   NetworkModule,
   NetworkModuleType,
   RemoveObjectMessage,
+  RoomInfoMessage,
   SendNotificationMessage,
   UpdateObjectMessage,
 } from "@impact/shared";
@@ -35,7 +36,19 @@ export type NotificationListener = (message: string) => void;
 export const notificationListeners = new Set<NotificationListener>();
 export const errorListeners = new Set<ErrorListner>();
 
-const room = ref<string | null>(null);
+export class Room {
+  id: string;
+  users: string[];
+  rollTarget: number;
+
+  constructor(id: string) {
+    this.id = id;
+    this.users = [];
+    this.rollTarget = 2;
+  }
+}
+
+const room = ref<Room | null>(null);
 export function currentRoom() {
   return room.value;
 }
@@ -78,6 +91,9 @@ export function init() {
       case MessageType.DiceRoll:
         diceRollResponse(data);
         break;
+      case MessageType.RoomInfo:
+        roomInfoResponse(data);
+        break;
       default:
         console.error(`Unknown event: ${data}`);
     }
@@ -88,14 +104,17 @@ export function init() {
 function joinRoomResponse(data: JoinRoomMessage) {
   clearScene();
   createDefaultScene();
-  room.value = data.roomId;
+  room.value = new Room(data.roomId);
 }
 function leaveRoomResponse(data: LeaveRoomMessage) {
-  if (data.roomId === room.value) {
-    clearScene();
-    createDefaultScene();
-    room.value = null;
-  }
+  clearScene();
+  createDefaultScene();
+  room.value = null;
+}
+function roomInfoResponse(data: RoomInfoMessage) {
+  if (!room.value) return;
+  room.value.users = data.users;
+  room.value.rollTarget = data.rollTarget;
 }
 function addObjectResponse(data: AddObjectMessage) {
   if (scene.has(data.object.uuid)) return;
@@ -163,7 +182,7 @@ export function leaveRoom() {
   if (!room.value) {
     throw new Error("Not in a room");
   }
-  socket.value.emit("event", new LeaveRoomMessage(room.value));
+  socket.value.emit("event", new LeaveRoomMessage(room.value.id));
 }
 export function sendNotification(message: string) {
   if (!socket.value) {

@@ -85,7 +85,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    connectedUsers.delete(client);
     this.roomService.leaveAllRooms(client);
+    connectedUsers.delete(client);
   }
 }

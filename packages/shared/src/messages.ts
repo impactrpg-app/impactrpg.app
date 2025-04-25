@@ -1,4 +1,4 @@
-import { Vector3 } from "vector";
+import { Vector3 } from "./vector";
 import { NetworkEntity } from "./networkEntity";
 
 export enum MessageType {
@@ -10,7 +10,7 @@ export enum MessageType {
   UpdateObject = "updateObject",
   SendNotification = "sendNotification",
   DiceRoll = "diceRoll",
-  roomInfo = "roomInfo",
+  RoomInfo = "roomInfo",
 }
 
 export class ErrorMessage {
@@ -101,6 +101,18 @@ export class DiceRollMessage {
   }
 }
 
+export class RoomInfoMessage {
+  type: MessageType.RoomInfo;
+  users: string[];
+  rollTarget: number;
+
+  constructor(rollTarget: number, users: string[]) {
+    this.type = MessageType.RoomInfo;
+    this.rollTarget = rollTarget;
+    this.users = users;
+  }
+}
+
 export const AllMessages = [
   ErrorMessage,
   JoinRoomMessage,
@@ -110,6 +122,7 @@ export const AllMessages = [
   UpdateObjectMessage,
   SendNotificationMessage,
   DiceRollMessage,
+  RoomInfoMessage,
 ];
 
 export type AllMessageTypes =
@@ -120,4 +133,5 @@ export type AllMessageTypes =
   | RemoveObjectMessage
   | UpdateObjectMessage
   | SendNotificationMessage
-  | DiceRollMessage;
+  | DiceRollMessage
+  | RoomInfoMessage;

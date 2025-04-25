@@ -4,8 +4,8 @@ import { weapons } from "../../../data/weapons";
 
 <template>
   <p>
-    Anything your character carries is considered goods, including weapons, armor, tools,
-    and trinkets.
+    Anything your character carries is considered goods, including weapons,
+    armor, tools, and trinkets.
   </p>
   <p>There are two types of goods: small goods and large goods.</p>
   <p>
@@ -14,11 +14,11 @@ import { weapons } from "../../../data/weapons";
   </p>
   <p>
     <b>Large Goods:</b>
-    Items that require both hands to carry and cannot fit in your pockets or be easily
-    concealed.
+    Items that require both hands to carry and cannot fit in your pockets or be
+    easily concealed.
   </p>
   <p>At character creation, you may choose 2 large goods worth of items.</p>
-  <p>Your character can carry 3 large goods worth of items.</p>
+  <p>Your character can carry 5 large goods worth of items.</p>
   <p>Two small goods can be counted as one large good.</p>
 
   <h3>WEAPONS</h3>

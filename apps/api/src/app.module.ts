@@ -12,6 +12,7 @@ import { ConfigModule } from "@nestjs/config";
 import { StorageService } from "./services/storage.service";
 import { ScheduleModule } from "@nestjs/schedule";
 import { ObjectController } from "./controllers/object.controller";
+import { UserService } from "./services/user.service";
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -29,6 +30,12 @@ import { ObjectController } from "./controllers/object.controller";
     ImageController,
     ObjectController,
   ],
-  providers: [JwtService, EventsGateway, RoomService, StorageService],
+  providers: [
+    JwtService,
+    EventsGateway,
+    RoomService,
+    StorageService,
+    UserService,
+  ],
 })
 export class AppModule {}

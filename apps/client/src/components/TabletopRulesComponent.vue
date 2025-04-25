@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, useTemplateRef } from "vue";
 import { skills } from "../data/skills";
-import { Dialog } from "primevue";
+import { Dialog, Button } from "primevue";
 import { travelEvents } from "../data/travel";
 import RulesComponent, { RulesContent } from "./RulesComponent.vue";
 import AbilityComponent from "./rules/creating-character/AbilityComponent.vue";
@@ -61,7 +61,10 @@ import InsanityComponent from "./rules/playing-the-game/InsanityComponent.vue";
 import HealingSpellComponent from "./rules/casting-spells/spell-resolution/HealingSpellComponent.vue";
 import SummoningSpellComponent from "./rules/casting-spells/spell-resolution/SummoningSpellComponent.vue";
 import IllusionSpellComponent from "./rules/casting-spells/spell-resolution/IllusionSpellComponent.vue";
+import FocusComponent from "./rules/casting-spells/FocusComponent.vue";
+import ClassComponent from "./rules/creating-character/classes/ClassComponent.vue";
 
+const rules = useTemplateRef<HTMLDivElement>("rules");
 const isSkillsDialogOpen = ref<boolean>(false);
 const isTravelingEventsDialogOpen = ref<boolean>(false);
 function openSkillsDialog() {
@@ -118,6 +121,10 @@ const data: RulesContent[] = [
       },
       {
         content: GoodsComponent,
+      },
+      {
+        title: "Classes",
+        content: ClassComponent,
       },
     ],
   },
@@ -283,7 +290,11 @@ const data: RulesContent[] = [
       {
         title: "Rules & Limitations",
         content: SpellRulesComponent,
-        rows: 2,
+        rows: 3,
+      },
+      {
+        title: "Spell Focus",
+        content: FocusComponent,
       },
       {
         title: "Spell Resolution",
@@ -307,13 +318,18 @@ const props = defineProps<{
 const emits = defineEmits<{
   (e: "update:isOpen", value: boolean): void;
 }>();
+function scrollToTop() {
+  if (!rules.value) return;
+  if (!rules.value.parentElement) return;
+  rules.value.parentElement.scrollTo({ top: 0, behavior: "smooth" });
+}
 </script>
 
 <template>
   <Dialog
     :modal="false"
     v-model:visible="isSkillsDialogOpen"
-    header="Skills"
+    header="Skill Examples"
     style="width: 800px; height: 700px"
   >
     <div class="dialog-popup">
@@ -358,12 +374,27 @@ const emits = defineEmits<{
   <Dialog
     :modal="false"
     position="top"
-    header="Rulebook"
     :visible="props.isOpen"
     @update:visible="(value) => emits('update:isOpen', value)"
-    style="width: 1000px; height: 700px"
+    style="height: 700px"
   >
-    <RulesComponent show-contents :data="data" />
+    <template #header>
+      <div class="row gap20 align-items-center" style="margin-right: 10px">
+        <span style="flex-grow: 1">Rulebook</span>
+        <Button
+          variant="outlined"
+          icon="pi pi-chevron-up"
+          style="border-radius: 100%; height: 40px; width: 40px"
+          v-tooltip.top="'Scroll to top'"
+          @click="() => scrollToTop()"
+        />
+      </div>
+    </template>
+    <template #default>
+      <div ref="rules">
+        <RulesComponent show-contents :data="data" />
+      </div>
+    </template>
   </Dialog>
 </template>
 

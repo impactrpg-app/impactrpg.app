@@ -18,18 +18,10 @@ const props = defineProps<{
   title?: string;
   data: RulesContent[];
 }>();
-const rules = useTemplateRef<HTMLDivElement>("rules");
-
-function scrollToTop() {
-  if (!rules.value) return;
-  if (!rules.value.parentElement) return;
-  rules.value.parentElement.scrollTo({ top: 0, behavior: "smooth" });
-}
 </script>
 
 <template>
   <div class="rules" ref="rules">
-    <Button class="back-button" icon="pi pi-chevron-up" @click="scrollToTop" />
     <h1 v-if="title">{{ title }}</h1>
     <div class="contents" v-if="props.showContents">
       <div class="section" v-for="section in props.data">
@@ -87,21 +79,11 @@ li {
 </style>
 
 <style lang="css" scoped>
-.back-button {
-  position: fixed;
-  top: 20px;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  transition: 0.3s;
-}
-
 .rules {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 40px;
-  margin-top: 50px;
   margin-bottom: 200px;
 
   h1 {
