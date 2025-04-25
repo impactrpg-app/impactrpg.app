@@ -12,6 +12,7 @@ import {
   NetworkEntity,
   NetworkModule,
   NetworkModuleType,
+  NetworkUser,
   RemoveObjectMessage,
   RoomInfoMessage,
   SendNotificationMessage,
@@ -39,12 +40,14 @@ export const errorListeners = new Set<ErrorListner>();
 export class Room {
   id: string;
   name: string;
-  users: string[];
+  owner: string | null;
+  users: NetworkUser[];
   rollTarget: number;
 
   constructor(id: string) {
     this.id = id;
     this.name = "New Room";
+    this.owner = null;
     this.users = [];
     this.rollTarget = 2;
   }
@@ -118,6 +121,7 @@ function roomInfoResponse(data: RoomInfoMessage) {
   room.value.users = data.users;
   room.value.rollTarget = data.rollTarget;
   room.value.name = data.roomName;
+  room.value.owner = data.ownerUserId;
 }
 function addObjectResponse(data: AddObjectMessage) {
   if (scene.has(data.object.uuid)) return;

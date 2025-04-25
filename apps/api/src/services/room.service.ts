@@ -5,6 +5,7 @@ import {
   JoinRoomMessage,
   LeaveRoomMessage,
   NetworkModuleType,
+  NetworkUser,
   RemoveObjectMessage,
   RoomInfoMessage,
   SendNotificationMessage,
@@ -146,8 +147,15 @@ export class RoomService {
     }
     const userIds = [...room.users.keys()];
     const users = await this.userService.getUsersById(userIds);
-    const displayNames = users.map((user) => user.displayName);
+    const displayNames = users.map(
+      (user) =>
+        ({
+          displayName: user.displayName,
+          uuid: user._id.toString(),
+        }) as NetworkUser
+    );
     const message = new RoomInfoMessage(
+      room.owner,
       room.name,
       room.rollTarget,
       displayNames
@@ -171,8 +179,9 @@ export class RoomService {
     );
     room.rollTarget = roomInfo.rollTarget;
     room.name = roomInfo.roomName;
+    const userIds = roomInfo.users.map((user) => user.uuid);
     for (const user of room.users) {
-      if (!roomInfo.users.includes(user[0])) {
+      if (!userIds.includes(user[0])) {
         this.leaveRoom(user[1], room.id);
       }
     }

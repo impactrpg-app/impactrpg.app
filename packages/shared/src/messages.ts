@@ -101,14 +101,26 @@ export class DiceRollMessage {
   }
 }
 
+export class NetworkUser {
+  uuid: string;
+  displayName: string;
+}
+
 export class RoomInfoMessage {
   type: MessageType.RoomInfo;
+  ownerUserId: string;
   roomName: string;
-  users: string[];
+  users: NetworkUser[];
   rollTarget: number;
 
-  constructor(roomName: string, rollTarget: number, users: string[]) {
+  constructor(
+    ownerUserId: string,
+    roomName: string,
+    rollTarget: number,
+    users: NetworkUser[]
+  ) {
     this.type = MessageType.RoomInfo;
+    this.ownerUserId = ownerUserId;
     this.roomName = roomName;
     this.rollTarget = rollTarget;
     this.users = users;

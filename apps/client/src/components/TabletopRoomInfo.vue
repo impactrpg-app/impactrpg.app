@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { Room } from "@/service/tabletop";
 import { Dialog, Button, Divider, FloatLabel, InputText } from "primevue";
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import CustomResourceComponent from "./CustomResourceComponent.vue";
+import { getUserClaims } from "@/service/api";
 
 const showRoomSettings = ref(false);
 
@@ -14,6 +15,12 @@ const emits = defineEmits<{
   (e: "leaveRoom"): void;
   (e: "update:room", room: Room): void;
 }>();
+const myUserId = ref<string | null>(null);
+
+onMounted(() => {
+  const claims = getUserClaims();
+  myUserId.value = claims?.id ?? null;
+});
 
 function copyRoomLink() {
   const roomLink = `${window.location.origin}/join/${props.room.id}`;
@@ -25,9 +32,9 @@ function updateSettings(updatedRoom: Partial<Room>) {
     ...updatedRoom,
   });
 }
-function kickUser(user: string) {
+function kickUser(userId: string) {
   updateSettings({
-    users: props.room.users.filter((u) => u !== user),
+    users: props.room.users.filter((u) => u.uuid !== userId),
   });
 }
 const roomName = computed({
@@ -109,19 +116,22 @@ const rollTarget = computed({
         class="column gap20"
         style="padding-top: 10px"
         v-for="user in props.room.users"
-        :key="user"
+        :key="user.uuid"
       >
         <div class="row gap10 align-items-center">
           <span style="flex-grow: 1">
-            {{ user }}
+            {{ user.displayName }}
           </span>
-          <Button
-            variant="outlined"
-            icon="pi pi-times"
-            class="rounded-button"
-            v-tooltip.bottom="'Kick Player'"
-            @click="() => kickUser(user)"
-          />
+          <template v-if="props.room.owner === myUserId">
+            <Button
+              variant="outlined"
+              icon="pi pi-times"
+              class="rounded-button"
+              v-tooltip.bottom="'Kick Player'"
+              @click="() => kickUser(user.uuid)"
+              v-if="myUserId !== user.uuid"
+            />
+          </template>
         </div>
       </div>
     </template>

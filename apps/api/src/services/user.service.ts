@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
-import { User } from "src/db/user";
+import { WithUserId, User } from "src/db";
 
 @Injectable()
 export class UserService {
@@ -10,7 +10,7 @@ export class UserService {
     private readonly userModel: Model<User>
   ) {}
 
-  async getUsersById(ids: string[]): Promise<User[]> {
+  async getUsersById(ids: string[]): Promise<WithUserId<User>[]> {
     const mongodbIds = ids.map((id) => new Types.ObjectId(id));
     const result = await this.userModel.find({ _id: { $in: mongodbIds } });
     return result;

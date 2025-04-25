@@ -30,6 +30,8 @@ export function onMouseMove(e: MouseEvent): void {
   }
 }
 export function onKeyDown(e: KeyboardEvent): void {
+  if (!isMouseOverCanvas) return;
+
   if (e.key === " ") {
     e.preventDefault();
   }
@@ -39,8 +41,6 @@ export function onKeyDown(e: KeyboardEvent): void {
   if (e.key.toLowerCase() === "Y" && e.ctrlKey) {
     e.preventDefault();
   }
-
-  if (!isMouseOverCanvas) return;
   for (const entity of scene.values()) {
     for (const module of Object.values(entity.modules)) {
       module.onKeyDown(e);
@@ -67,6 +67,7 @@ export function onMouseOver(e: MouseEvent) {
   isMouseOverCanvas = !!(e.target instanceof HTMLCanvasElement);
 }
 export function onContextMenu(e: MouseEvent) {
+  if (!isMouseOverCanvas) return;
   e.preventDefault();
 }
 export function onDropItem(e: DragEvent) {
