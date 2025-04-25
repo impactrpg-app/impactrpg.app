@@ -143,10 +143,15 @@ export class RoomService {
     if (error) {
       return;
     }
+    const roomName = await this.roomModel.findById(room.id);
     const userIds = [...room.users.keys()];
     const users = await this.userService.getUsersById(userIds);
     const displayNames = users.map((user) => user.displayName);
-    const message = new RoomInfoMessage(room.rollTarget, displayNames);
+    const message = new RoomInfoMessage(
+      roomName.name,
+      room.rollTarget,
+      displayNames
+    );
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
       socket.emit("event", message)
     );

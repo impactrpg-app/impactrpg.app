@@ -103,11 +103,13 @@ export class DiceRollMessage {
 
 export class RoomInfoMessage {
   type: MessageType.RoomInfo;
+  roomName: string;
   users: string[];
   rollTarget: number;
 
-  constructor(rollTarget: number, users: string[]) {
+  constructor(roomName: string, rollTarget: number, users: string[]) {
     this.type = MessageType.RoomInfo;
+    this.roomName = roomName;
     this.rollTarget = rollTarget;
     this.users = users;
   }

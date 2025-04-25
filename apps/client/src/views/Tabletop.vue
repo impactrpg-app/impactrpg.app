@@ -5,6 +5,7 @@ import TabletopCharacterComponent from "@/components/TabletopCharacterComponent.
 import TabletopRulesComponent from "@/components/TabletopRulesComponent.vue";
 import TabletopDiceTrayComponent from "@/components/TabletopDiceTrayComponent.vue";
 import TabletopPropertiesComponent from "@/components/TabletopPropertiesComponent.vue";
+import TabletopRoomInfo from "@/components/TabletopRoomInfo.vue";
 import { loadFromFile } from "@/service/io";
 import { onMounted, onUnmounted, ref, watch } from "vue";
 import { ProgressSpinner, useToast, ContextMenu } from "primevue";
@@ -164,6 +165,16 @@ async function onCloseContextMenu() {
 
 <template>
   <template v-if="TabletopService.currentRoom() && isTabletopReady">
+    <ContextMenu
+      ref="contextMenu"
+      :model="contextMenuItems"
+      @hide="onCloseContextMenu"
+    />
+    <TabletopRoomInfo
+      v-if="TabletopService.currentRoom()"
+      :room="TabletopService.currentRoom()!"
+      @leave-room="leaveRoomHandler"
+    />
     <TabletopCharacterComponent
       v-model:is-open="isCharacterSheetOpen"
       @roll-dice="rollDice"
@@ -172,11 +183,6 @@ async function onCloseContextMenu() {
     <TabletopDiceTrayComponent
       v-model:is-open="isDiceTrayOpen"
       @roll-dice="rollDice"
-    />
-    <ContextMenu
-      ref="contextMenu"
-      :model="contextMenuItems"
-      @hide="onCloseContextMenu"
     />
     <TabletopPropertiesComponent
       v-model:is-open="isPropertiesOpen"

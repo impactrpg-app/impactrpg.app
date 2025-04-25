@@ -63,13 +63,6 @@ function onChangeTool(toolName: string) {
       v-tooltip.top="'Rulebook'"
       @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
     />
-    <Button
-      variant="outlined"
-      class="rounded-button"
-      icon="pi pi-sign-out"
-      v-tooltip.top="'Leave Room'"
-      @click="() => emits('leaveRoom')"
-    />
     <Divider layout="vertical" />
     <Button
       variant="outlined"
