@@ -34,14 +34,17 @@ export class NetworkModule extends Module<any> {
     if (this.entity.position.isNetworkDirty) {
       updates.position = this.entity.position.toObject();
       hasUpdated = true;
+      this.entity.position.isNetworkDirty = false;
     }
     if (this.entity.rotation.isNetworkDirty) {
       updates.rotation = this.entity.rotation.toObject();
       hasUpdated = true;
+      this.entity.rotation.isNetworkDirty = false;
     }
     if (this.entity.scale.isNetworkDirty) {
       updates.scale = this.entity.scale.toObject();
       hasUpdated = true;
+      this.entity.scale.isNetworkDirty = false;
     }
 
     if (hasUpdated) {
