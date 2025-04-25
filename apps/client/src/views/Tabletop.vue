@@ -13,8 +13,11 @@ import * as TabletopService from "../service/tabletop";
 import * as Api from "@/service/api";
 import * as Task from "@/service/task";
 import { MenuItem } from "primevue/menuitem";
+import { RoomInfoMessage } from "@impact/shared";
+import { useRoute } from "vue-router";
 
 const toast = useToast();
+const route = useRoute();
 
 const contextMenu = ref();
 const isTabletopReady = ref(false);
@@ -69,11 +72,7 @@ const contextMenuItems: MenuItem[] = [
 ];
 
 onMounted(() => {
-  Task.runTask(async () => {
-    await TabletopService.init(document.body);
-    isTabletopReady.value = true;
-    await fetchRooms();
-  });
+  // setup listeners
   TabletopService.notificationListeners.add((message) => {
     TabletopService.play("notify.mp3");
     toast.add({
@@ -87,6 +86,16 @@ onMounted(() => {
       severity: "error",
       summary: `${code}: ${message}`,
     });
+  });
+  Task.runTask(async () => {
+    await TabletopService.init(document.body);
+    isTabletopReady.value = true;
+    await fetchRooms();
+    const autoRoomJoinId = localStorage.getItem("autoJoin");
+    if (autoRoomJoinId) {
+      TabletopService.joinRoom(autoRoomJoinId);
+      localStorage.removeItem("autoJoin");
+    }
   });
 });
 onUnmounted(() => {
@@ -161,6 +170,11 @@ async function onChangeTool(toolName: string) {
 async function onCloseContextMenu() {
   TabletopService.isContextMenuOpen.value = false;
 }
+async function updateRoom(room: TabletopService.Room) {
+  TabletopService.updateRoomInfo(
+    new RoomInfoMessage(room.name, room.rollTarget, [])
+  );
+}
 </script>
 
 <template>
@@ -174,6 +188,7 @@ async function onCloseContextMenu() {
       v-if="TabletopService.currentRoom()"
       :room="TabletopService.currentRoom()!"
       @leave-room="leaveRoomHandler"
+      @update:room="updateRoom"
     />
     <TabletopCharacterComponent
       v-model:is-open="isCharacterSheetOpen"

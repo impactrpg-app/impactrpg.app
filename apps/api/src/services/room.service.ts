@@ -28,6 +28,7 @@ export type Room = {
   users: Map<string, Socket>; // userId -> Socket
   owner: string;
   rollTarget: number;
+  name: string;
   tabletopObjects: TabletopObject[];
 };
 
@@ -138,23 +139,40 @@ export class RoomService {
     return { userId, room, error: false };
   }
 
-  private async updateRoomInfo(client: Socket) {
-    const { room, error } = this.verifyUser(client);
-    if (error) {
+  private async sendNewRoomInfo(roomId: string) {
+    const room = this.rooms.get(roomId);
+    if (!room) {
       return;
     }
-    const roomName = await this.roomModel.findById(room.id);
     const userIds = [...room.users.keys()];
     const users = await this.userService.getUsersById(userIds);
     const displayNames = users.map((user) => user.displayName);
     const message = new RoomInfoMessage(
-      roomName.name,
+      room.name,
       room.rollTarget,
       displayNames
     );
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
       socket.emit("event", message)
     );
+  }
+  async updateRoomInfo(client: Socket, roomInfo: RoomInfoMessage) {
+    const { userId, room, error } = this.verifyUser(client);
+    if (error) {
+      return;
+    }
+    if (userId !== room.owner) {
+      client.emit("event", new ErrorMessage(403, "Not the owner"));
+      return;
+    }
+    await this.roomModel.findOneAndUpdate(
+      { _id: new Types.ObjectId(room.id) },
+      { rollTarget: roomInfo.rollTarget, name: roomInfo.roomName }
+    );
+    room.rollTarget = roomInfo.rollTarget;
+    room.name = roomInfo.roomName;
+    this.rooms.set(room.id, room);
+    this.sendNewRoomInfo(room.id);
   }
   async joinRoom(client: Socket, roomId: string) {
     const userId = connectedUsers.get(client);
@@ -185,6 +203,7 @@ export class RoomService {
         owner: userId,
         tabletopObjects: query.objects,
         rollTarget: query.rollTarget,
+        name: query.name,
       });
     }
 
@@ -194,7 +213,7 @@ export class RoomService {
       roomId: roomId,
     } as JoinRoomMessage);
     await this.syncAllObjectsToClient(client);
-    await this.updateRoomInfo(client);
+    await this.sendNewRoomInfo(roomId);
   }
   async leaveRoom(client: Socket, roomId: string) {
     const { userId, room, error } = this.verifyUser(client);
@@ -211,7 +230,7 @@ export class RoomService {
       await this.saveRoom(roomId);
       this.rooms.delete(roomId);
     } else {
-      await this.updateRoomInfo(client);
+      await this.sendNewRoomInfo(roomId);
     }
   }
   async leaveAllRooms(client: Socket) {

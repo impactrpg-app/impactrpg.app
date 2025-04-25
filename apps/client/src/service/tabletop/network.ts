@@ -217,6 +217,12 @@ export function sendDiceRoll(data: DiceRollMessage) {
   }
   socket.value.emit("event", data);
 }
+export function updateRoomInfo(room: RoomInfoMessage) {
+  if (!socket.value) {
+    throw new Error("Not connected to server");
+  }
+  socket.value.emit("event", room);
+}
 
 // converters
 export function toNetworkModule<T extends Module<any>>(

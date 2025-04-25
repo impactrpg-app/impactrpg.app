@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { Room } from "@/service/tabletop";
-import { Dialog, Button, Divider } from "primevue";
-import { ref } from "vue";
+import { Dialog, Button, Divider, FloatLabel, InputText } from "primevue";
+import { computed, ref } from "vue";
+import CustomResourceComponent from "./CustomResourceComponent.vue";
 
 const showRoomSettings = ref(false);
 
@@ -11,15 +12,55 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: "leaveRoom"): void;
+  (e: "update:room", room: Room): void;
 }>();
 
 function copyRoomLink() {
   const roomLink = `${window.location.origin}/join/${props.room.id}`;
   navigator.clipboard.writeText(roomLink);
 }
+function updateSettings(updatedRoom: Partial<Room>) {
+  emits("update:room", {
+    ...props.room,
+    ...updatedRoom,
+  });
+}
+const roomName = computed({
+  get() {
+    return props.room.name;
+  },
+  set(value: string) {
+    updateSettings({ name: value });
+  },
+});
+const rollTarget = computed({
+  get() {
+    return props.room.rollTarget;
+  },
+  set(value: number) {
+    updateSettings({ rollTarget: value });
+  },
+});
 </script>
 
 <template>
+  <Dialog
+    :modal="false"
+    v-model:visible="showRoomSettings"
+    header="Room Settings"
+    position="top"
+  >
+    <div class="column gap20">
+      <FloatLabel class="field">
+        <InputText id="room-name" v-model="roomName" />
+        <label for="room-name">Room Name</label>
+      </FloatLabel>
+      <div class="column gap10">
+        <span class="label">Roll Target</span>
+        <CustomResourceComponent v-model="rollTarget" style="height: 45px" />
+      </div>
+    </div>
+  </Dialog>
   <Dialog
     :visible="true"
     :modal="false"
@@ -86,5 +127,10 @@ function copyRoomLink() {
   border-radius: 100%;
   height: 35px;
   width: 35px;
+}
+.label {
+  font-size: 12px;
+  color: var(--p-floatlabel-active-color);
+  padding-left: 10px;
 }
 </style>
