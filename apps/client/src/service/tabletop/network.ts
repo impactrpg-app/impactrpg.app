@@ -5,6 +5,7 @@ import {
   AllMessageTypes,
   BoxCollider,
   DiceRollMessage,
+  ErrorMessage,
   JoinRoomMessage,
   LeaveRoomMessage,
   MessageType,
@@ -66,43 +67,42 @@ export function init() {
     transports: ["websocket"],
   });
 
-  socket.value.on("event", (data: AllMessageTypes) => {
-    switch (data.type) {
-      case MessageType.Error:
-        for (const listener of errorListeners) {
-          listener(data.code, data.message);
-        }
-        break;
-      case MessageType.SendNotification:
-        for (const listener of notificationListeners) {
-          listener(data.message);
-        }
-        break;
-      case MessageType.JoinRoom:
-        joinRoomResponse(data);
-        break;
-      case MessageType.LeaveRoom:
-        leaveRoomResponse(data);
-        break;
-      case MessageType.AddObject:
-        addObjectResponse(data);
-        break;
-      case MessageType.RemoveObject:
-        removeObjectResponse(data);
-        break;
-      case MessageType.UpdateObject:
-        updateObjectResponse(data);
-        break;
-      case MessageType.DiceRoll:
-        diceRollResponse(data);
-        break;
-      case MessageType.RoomInfo:
-        roomInfoResponse(data);
-        break;
-      default:
-        console.error(`Unknown event: ${data}`);
+  socket.value.on(MessageType.Error, (data: ErrorMessage) => {
+    for (const listener of errorListeners) {
+      listener(data.code, data.message);
     }
   });
+
+  socket.value.on(
+    MessageType.SendNotification,
+    (data: SendNotificationMessage) => {
+      for (const listener of notificationListeners) {
+        listener(data.message);
+      }
+    }
+  );
+
+  socket.value.on(MessageType.JoinRoom, (data: JoinRoomMessage) =>
+    joinRoomResponse(data)
+  );
+  socket.value.on(MessageType.LeaveRoom, (data: LeaveRoomMessage) =>
+    leaveRoomResponse(data)
+  );
+  socket.value.on(MessageType.RoomInfo, (data: RoomInfoMessage) =>
+    roomInfoResponse(data)
+  );
+  socket.value.on(MessageType.AddObject, (data: AddObjectMessage) =>
+    addObjectResponse(data)
+  );
+  socket.value.on(MessageType.RemoveObject, (data: RemoveObjectMessage) =>
+    removeObjectResponse(data)
+  );
+  socket.value.on(MessageType.UpdateObject, (data: UpdateObjectMessage) =>
+    updateObjectResponse(data)
+  );
+  socket.value.on(MessageType.DiceRoll, (data: DiceRollMessage) =>
+    diceRollResponse(data)
+  );
 }
 
 // private
@@ -180,7 +180,7 @@ export function joinRoom(roomId: string) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.value.emit("event", new JoinRoomMessage(roomId));
+  socket.value.emit(MessageType.JoinRoom, new JoinRoomMessage(roomId));
 }
 export function leaveRoom() {
   if (!socket.value) {
@@ -189,13 +189,16 @@ export function leaveRoom() {
   if (!room.value) {
     throw new Error("Not in a room");
   }
-  socket.value.emit("event", new LeaveRoomMessage(room.value.id));
+  socket.value.emit(MessageType.LeaveRoom, new LeaveRoomMessage(room.value.id));
 }
 export function sendNotification(message: string) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.value.emit("event", new SendNotificationMessage(message));
+  socket.value.emit(
+    MessageType.SendNotification,
+    new SendNotificationMessage(message)
+  );
 }
 export function notifySelf(message: string) {
   for (const listener of notificationListeners) {
@@ -206,31 +209,31 @@ export function addObject(data: AddObjectMessage) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.value.emit("event", data);
+  socket.value.emit(MessageType.AddObject, data);
 }
 export function removeObject(data: RemoveObjectMessage) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.value.emit("event", data);
+  socket.value.emit(MessageType.RemoveObject, data);
 }
 export function updateObject(data: UpdateObjectMessage) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.value.emit("event", data);
+  socket.value.emit(MessageType.UpdateObject, data);
 }
 export function sendDiceRoll(data: DiceRollMessage) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.value.emit("event", data);
+  socket.value.emit(MessageType.DiceRoll, data);
 }
 export function updateRoomInfo(room: RoomInfoMessage) {
   if (!socket.value) {
     throw new Error("Not connected to server");
   }
-  socket.value.emit("event", room);
+  socket.value.emit(MessageType.RoomInfo, room);
 }
 
 // converters

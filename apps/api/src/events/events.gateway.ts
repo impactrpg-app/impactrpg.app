@@ -9,10 +9,16 @@ import { JwtService } from "src/services/jwt.service";
 import { connectedUsers } from "./users";
 import { RoomService } from "../services/room.service";
 import {
-  AllMessageTypes,
+  AddObjectMessage,
+  DiceRollMessage,
   ErrorMessage,
+  JoinRoomMessage,
+  LeaveRoomMessage,
   MessageType,
-  createClassObject,
+  RemoveObjectMessage,
+  RoomInfoMessage,
+  SendNotificationMessage,
+  UpdateObjectMessage,
 } from "@impact/shared";
 import { validate } from "class-validator";
 
@@ -30,49 +36,112 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly roomService: RoomService
   ) {}
 
-  @SubscribeMessage("event")
-  async handleEvent(client: Socket, payload: AllMessageTypes) {
-    console.log(`handleEvent ${payload.type} by ${client.id}`);
+  private async verifyMessagePayload<T extends object>(
+    payload: T,
+    prototype: object
+  ): Promise<string[]> {
+    const data = Object.setPrototypeOf(payload, prototype) as T;
+    const errors = await validate(data);
+    if (errors.length === 0) {
+      return [];
+    }
+    // flatten constraints and send them as a single array
+    const issues = errors.map((err) => Object.values(err.constraints)).flat();
+    return issues;
+  }
 
-    const result = await validate(createClassObject(payload));
-    if (result.length > 0) {
-      const issues = result
-        .map((err) =>
-          Object.values(err.constraints).map((constraint) => `- ${constraint}`)
-        )
-        .flat();
-      client.emit("event", new ErrorMessage(400, `\n${issues.join("\n")}`));
+  private async handleInvalidPayloads<T extends object>(
+    client: Socket,
+    payload: T,
+    prototype: object,
+    callback: () => void
+  ) {
+    const issues = await this.verifyMessagePayload(payload, prototype);
+    if (issues.length > 0) {
+      client.emit(
+        MessageType.Error,
+        new ErrorMessage(400, `\n${issues.join("\n")}`)
+      );
       return;
     }
+    callback();
+  }
 
-    switch (payload.type) {
-      case MessageType.JoinRoom:
-        this.roomService.joinRoom(client, payload.roomId);
-        break;
-      case MessageType.LeaveRoom:
-        this.roomService.leaveRoom(client, payload.roomId);
-        break;
-      case MessageType.AddObject:
-        this.roomService.addObject(client, payload.object);
-        break;
-      case MessageType.RemoveObject:
-        this.roomService.removeObject(client, payload.objectId);
-        break;
-      case MessageType.UpdateObject:
-        this.roomService.updateObject(client, payload.objectId, payload.object);
-        break;
-      case MessageType.SendNotification:
-        this.roomService.sendNotification(client, payload.message);
-        break;
-      case MessageType.DiceRoll:
-        this.roomService.diceRoll(client, payload);
-        break;
-      case MessageType.RoomInfo:
-        this.roomService.updateRoomInfo(client, payload);
-        break;
-      default:
-        console.error(`Unknown event: ${JSON.stringify(payload)}`);
-    }
+  @SubscribeMessage(MessageType.JoinRoom)
+  handleJoinRoom(client: Socket, payload: JoinRoomMessage) {
+    this.handleInvalidPayloads(client, payload, JoinRoomMessage.prototype, () =>
+      this.roomService.joinRoom(client, payload.roomId)
+    );
+  }
+
+  @SubscribeMessage(MessageType.LeaveRoom)
+  handleLeaveRoom(client: Socket, payload: LeaveRoomMessage) {
+    this.handleInvalidPayloads(
+      client,
+      payload,
+      LeaveRoomMessage.prototype,
+      () => this.roomService.leaveRoom(client, payload.roomId)
+    );
+  }
+
+  @SubscribeMessage(MessageType.AddObject)
+  handleAddObject(client: Socket, payload: AddObjectMessage) {
+    this.handleInvalidPayloads(
+      client,
+      payload,
+      AddObjectMessage.prototype,
+      () => this.roomService.addObject(client, payload.object)
+    );
+  }
+
+  @SubscribeMessage(MessageType.RemoveObject)
+  handleRemoveObject(client: Socket, payload: RemoveObjectMessage) {
+    this.handleInvalidPayloads(
+      client,
+      payload,
+      RemoveObjectMessage.prototype,
+      () => this.roomService.removeObject(client, payload.objectId)
+    );
+  }
+
+  @SubscribeMessage(MessageType.UpdateObject)
+  handleUpdateObject(client: Socket, payload: UpdateObjectMessage) {
+    this.handleInvalidPayloads(
+      client,
+      payload,
+      UpdateObjectMessage.prototype,
+      () =>
+        this.roomService.updateObject(client, payload.objectId, payload.object)
+    );
+  }
+
+  @SubscribeMessage(MessageType.SendNotification)
+  handleSendNotification(client: Socket, payload: SendNotificationMessage) {
+    this.handleInvalidPayloads(
+      client,
+      payload,
+      SendNotificationMessage.prototype,
+      () => this.roomService.sendNotification(client, payload.message)
+    );
+  }
+
+  @SubscribeMessage(MessageType.DiceRoll)
+  handleDiceRoll(client: Socket, payload: DiceRollMessage) {
+    this.handleInvalidPayloads(client, payload, DiceRollMessage.prototype, () =>
+      this.roomService.diceRoll(client, payload)
+    );
+  }
+
+  @SubscribeMessage(MessageType.RoomInfo)
+  handleRoomInfo(client: Socket, payload: RoomInfoMessage) {
+    this.handleInvalidPayloads(client, payload, RoomInfoMessage.prototype, () =>
+      this.roomService.updateRoomInfo(client, payload)
+    );
+  }
+
+  @SubscribeMessage(MessageType.Error)
+  handleError(client: Socket, payload: ErrorMessage) {
+    console.error(`Error from client ${client.id}: ${payload.message}`);
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
@@ -103,7 +172,6 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
   }
-
   handleDisconnect(client: Socket) {
     this.roomService.leaveAllRooms(client);
     connectedUsers.delete(client);

@@ -63,15 +63,12 @@ export class RoomService {
 
     const roomId = this.findUsersRoom(userId);
     if (!roomId) {
-      client.emit("event", {
-        type: MessageType.Error,
-        message: "Room not found",
-      } as ErrorMessage);
+      client.emit(MessageType.Error, new ErrorMessage(404, "Room not found"));
       return;
     }
 
     for (const object of this.rooms.get(roomId)!.tabletopObjects) {
-      client.emit("event", new AddObjectMessage(object));
+      client.emit(MessageType.AddObject, new AddObjectMessage(object));
     }
   }
 
@@ -120,20 +117,14 @@ export class RoomService {
     const roomId = this.findUsersRoom(userId);
     if (!roomId) {
       console.error("Room Id not found");
-      client.emit("event", {
-        type: MessageType.Error,
-        message: "Room not found",
-      } as ErrorMessage);
+      client.emit(MessageType.Error, new ErrorMessage(404, "Room not found"));
       return { userId, room: null, error: true };
     }
 
     const room = this.rooms.get(roomId);
     if (!room) {
       console.error("Room not found");
-      client.emit("event", {
-        type: MessageType.Error,
-        message: "Room not found",
-      } as ErrorMessage);
+      client.emit(MessageType.Error, new ErrorMessage(404, "Room not found"));
       return { userId, room, error: true };
     }
 
@@ -161,7 +152,7 @@ export class RoomService {
       displayNames
     );
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit("event", message)
+      socket.emit(MessageType.RoomInfo, message)
     );
   }
   async updateRoomInfo(client: Socket, roomInfo: RoomInfoMessage) {
@@ -170,7 +161,7 @@ export class RoomService {
       return;
     }
     if (userId !== room.owner) {
-      client.emit("event", new ErrorMessage(403, "Not the owner"));
+      client.emit(MessageType.Error, new ErrorMessage(403, "Not the owner"));
       return;
     }
     await this.roomModel.findOneAndUpdate(
@@ -196,7 +187,7 @@ export class RoomService {
     }
 
     if (!Types.ObjectId.isValid(roomId)) {
-      client.emit("event", new ErrorMessage(404, "Room not found"));
+      client.emit(MessageType.Error, new ErrorMessage(404, "Room not found"));
       return;
     }
 
@@ -208,7 +199,7 @@ export class RoomService {
     if (!this.rooms.has(roomId)) {
       const query = await this.roomModel.findById(roomId);
       if (!query) {
-        client.emit("event", new ErrorMessage(404, "Room not found"));
+        client.emit(MessageType.Error, new ErrorMessage(404, "Room not found"));
         return;
       }
       this.rooms.set(roomId, {
@@ -222,10 +213,7 @@ export class RoomService {
     }
 
     this.rooms.get(roomId)!.users.set(userId, client);
-    client.emit("event", {
-      type: MessageType.JoinRoom,
-      roomId: roomId,
-    } as JoinRoomMessage);
+    client.emit(MessageType.JoinRoom, new JoinRoomMessage(roomId));
     await this.syncAllObjectsToClient(client);
     await this.sendNewRoomInfo(roomId);
   }
@@ -236,10 +224,7 @@ export class RoomService {
     }
 
     room.users.delete(userId);
-    client.emit("event", {
-      type: MessageType.LeaveRoom,
-      roomId: roomId,
-    } as LeaveRoomMessage);
+    client.emit(MessageType.LeaveRoom, new LeaveRoomMessage(roomId));
     if (room.users.size === 0) {
       await this.saveRoom(roomId);
       this.rooms.delete(roomId);
@@ -269,7 +254,7 @@ export class RoomService {
     this.rooms.get(room.id)!.tabletopObjects.push(object);
     // todo: replace image content with url
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit("event", new AddObjectMessage(object))
+      socket.emit(MessageType.AddObject, new AddObjectMessage(object))
     );
   }
   async removeObject(client: Socket, objectId: string) {
@@ -291,20 +276,14 @@ export class RoomService {
       }
     }
     if (!object) {
-      client.emit("event", {
-        type: MessageType.Error,
-        message: "Object not found",
-      } as ErrorMessage);
+      client.emit(MessageType.Error, new ErrorMessage(404, "Object not found"));
       return;
     }
     room.tabletopObjects = room.tabletopObjects.filter(
       (object) => object.uuid !== objectId
     );
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit("event", {
-        type: MessageType.RemoveObject,
-        objectId: objectId,
-      } as RemoveObjectMessage)
+      socket.emit(MessageType.RemoveObject, new RemoveObjectMessage(objectId))
     );
   }
   async updateObject(
@@ -321,10 +300,7 @@ export class RoomService {
       (object) => object.uuid === objectId
     );
     if (objectIndex === -1) {
-      client.emit("event", {
-        type: MessageType.Error,
-        message: "Object not found",
-      } as ErrorMessage);
+      client.emit(MessageType.Error, new ErrorMessage(404, "Object not found"));
       return;
     }
 
@@ -335,26 +311,24 @@ export class RoomService {
     this.triggerForAllUsersInRoom(
       room.id,
       (userId, socket) =>
-        socket.emit("event", {
-          type: MessageType.UpdateObject,
-          objectId: objectId,
-          object: object,
-        } as UpdateObjectMessage),
+        socket.emit(
+          MessageType.UpdateObject,
+          new UpdateObjectMessage(objectId, object)
+        ),
       [userId]
     );
   }
-  async sendNotification(client: Socket, message: string, image?: string) {
+  async sendNotification(client: Socket, message: string) {
     const { room, error } = this.verifyUser(client);
     if (error) {
       return;
     }
 
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
-      socket.emit("event", {
-        type: MessageType.SendNotification,
-        message: message,
-        image: image,
-      } as SendNotificationMessage)
+      socket.emit(
+        MessageType.SendNotification,
+        new SendNotificationMessage(message)
+      )
     );
   }
   async diceRoll(client: Socket, payload: DiceRollMessage) {
@@ -366,7 +340,7 @@ export class RoomService {
     this.triggerForAllUsersInRoom(
       room.id,
       (_userId, socket) =>
-        socket.emit("event", new DiceRollMessage(payload.props)),
+        socket.emit(MessageType.DiceRoll, new DiceRollMessage(payload.props)),
       [userId]
     );
   }
