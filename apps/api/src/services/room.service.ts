@@ -171,6 +171,11 @@ export class RoomService {
     );
     room.rollTarget = roomInfo.rollTarget;
     room.name = roomInfo.roomName;
+    for (const user of room.users) {
+      if (!roomInfo.users.includes(user[0])) {
+        this.leaveRoom(user[1], room.id);
+      }
+    }
     this.rooms.set(room.id, room);
     this.sendNewRoomInfo(room.id);
   }

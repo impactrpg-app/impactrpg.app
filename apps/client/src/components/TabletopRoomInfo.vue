@@ -25,6 +25,11 @@ function updateSettings(updatedRoom: Partial<Room>) {
     ...updatedRoom,
   });
 }
+function kickUser(user: string) {
+  updateSettings({
+    users: props.room.users.filter((u) => u !== user),
+  });
+}
 const roomName = computed({
   get() {
     return props.room.name;
@@ -115,6 +120,7 @@ const rollTarget = computed({
             icon="pi pi-times"
             class="rounded-button"
             v-tooltip.bottom="'Kick Player'"
+            @click="() => kickUser(user)"
           />
         </div>
       </div>

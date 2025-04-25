@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { decode, JwtPayload } from "jsonwebtoken";
 import { ImageUploadResponse } from "@impact/shared";
 
@@ -11,6 +11,10 @@ export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 export const accessToken = ref<string | null>(
   localStorage.getItem("accessToken")
 );
+export const claims = ref<Claims | null>(null);
+watch(accessToken, () => {
+  claims.value = getUserClaims();
+});
 
 export function getUserClaims(): Claims | null {
   if (!accessToken.value) {
