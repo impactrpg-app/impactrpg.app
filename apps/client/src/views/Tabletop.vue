@@ -14,10 +14,8 @@ import * as Api from "@/service/api";
 import * as Task from "@/service/task";
 import { MenuItem } from "primevue/menuitem";
 import { RoomInfoMessage } from "@impact/shared";
-import { useRoute } from "vue-router";
 
 const toast = useToast();
-const route = useRoute();
 
 const contextMenu = ref();
 const isTabletopReady = ref(false);

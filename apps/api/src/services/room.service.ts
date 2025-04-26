@@ -173,7 +173,11 @@ export class RoomService {
     const userIds = roomInfo.users.map((user) => user.uuid);
     for (const user of room.users) {
       if (!userIds.includes(user[0])) {
-        this.leaveRoom(user[1], room.id);
+        await this.sendNotification(
+          user[1],
+          "You have been kicked from the room"
+        );
+        await this.leaveRoom(user[1], room.id);
       }
     }
     this.rooms.set(room.id, room);

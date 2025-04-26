@@ -37,6 +37,9 @@ export class TabletopObject {
   @Prop({ required: true })
   scale: Vector3;
 
+  @Prop({ required: false, default: false })
+  isLocked: boolean;
+
   @Prop({ type: mongoose.Schema.Types.Mixed, required: true })
   modules: any;
 }

@@ -84,4 +84,11 @@ export class NetworkModule extends Module<any> {
     };
     Network.updateObject(new UpdateObjectMessage(this.entity.uuid, updates));
   }
+  updateEntityLock() {
+    const updates: Partial<NetworkEntity> = {
+      uuid: this.entity.uuid,
+      isLocked: this.entity.isLocked,
+    };
+    Network.updateObject(new UpdateObjectMessage(this.entity.uuid, updates));
+  }
 }

@@ -1,4 +1,10 @@
-import { IsArray, IsEnum, IsObject, IsString } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsEnum,
+  IsObject,
+  IsString,
+} from "class-validator";
 import { Vector3, Vector4 } from "./vector";
 
 export enum NetworkModuleType {
@@ -78,6 +84,8 @@ export class NetworkEntity {
   rotation: Vector4;
   @IsObject()
   scale: Vector3;
+  @IsBoolean()
+  isLocked: boolean;
   @IsArray()
   modules: NetworkModule[];
 
@@ -86,12 +94,14 @@ export class NetworkEntity {
     position: Vector3,
     rotation: Vector4,
     scale: Vector3,
+    isLocked: boolean,
     modules: NetworkModule[]
   ) {
     this.uuid = uuid;
     this.position = position;
     this.rotation = rotation;
     this.scale = scale;
+    this.isLocked = isLocked;
     this.modules = modules;
   }
 }

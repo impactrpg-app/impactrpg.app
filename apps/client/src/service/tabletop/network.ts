@@ -335,14 +335,15 @@ export function toNetworkEntity(entity: Entity): NetworkEntity {
     .map((module) => toNetworkModule(module))
     .filter((module) => module !== null);
 
-  const data = {
-    uuid: entity.uuid,
-    position: entity.position.toObject(),
-    rotation: entity.rotation.toObject(),
-    scale: entity.scale.toObject(),
-    modules,
-  };
-  return data;
+  const networkEntity = new NetworkEntity(
+    entity.uuid,
+    entity.position.toObject(),
+    entity.rotation.toObject(),
+    entity.scale.toObject(),
+    entity.isLocked,
+    modules
+  );
+  return networkEntity;
 }
 export async function toEntity(networkEntity: NetworkEntity): Promise<Entity> {
   const entity = new Entity(networkEntity.uuid);
@@ -353,6 +354,7 @@ export async function toEntity(networkEntity: NetworkEntity): Promise<Entity> {
   entity.position = Vector3.fromObject(networkEntity.position);
   entity.rotation = Vector4.fromObject(networkEntity.rotation);
   entity.scale = Vector3.fromObject(networkEntity.scale);
+  entity.isLocked = networkEntity.isLocked;
   for (const module of networkEntity.modules) {
     const convertedModule = toModule(module);
     if (convertedModule) {

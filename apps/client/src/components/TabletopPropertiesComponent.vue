@@ -43,6 +43,11 @@ const lockObject = computed({
   set(value: boolean) {
     for (const obj of props.selectedObjects) {
       obj.isLocked = value;
+      const net =
+        obj.getModule<TabletopService.NetworkModule>("Module::Network");
+      if (net) {
+        net.updateEntityLock();
+      }
     }
   },
 });
