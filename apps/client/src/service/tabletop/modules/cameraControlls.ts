@@ -5,7 +5,7 @@ export class CameraControllsModule extends Module<any> {
   private isCameraMoveKeyDown: boolean = false;
   private previousCameraPos = Vector3.zero();
   private readonly minZoom = 0.5;
-  private readonly maxZoom = 20;
+  private readonly maxZoom = 50;
 
   clone() {
     return new CameraControllsModule();
@@ -17,7 +17,7 @@ export class CameraControllsModule extends Module<any> {
 
   onWheel(e: WheelEvent) {
     let pos = this.entity.position;
-    pos.y += e.deltaY / 500;
+    pos.y += e.deltaY / 200;
     pos.y = Math.min(this.maxZoom, Math.max(this.minZoom, pos.y));
     this.entity.position = pos;
   }
