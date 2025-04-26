@@ -34,7 +34,7 @@ async function updateCharacterImage() {
   const fileContents = await loadFromFile();
   if (fileContents === null) return;
   const formData = new FormData();
-  formData.append("image", new Blob([fileContents]));
+  formData.append("file", new Blob([fileContents]));
   const data: ImageUploadResponse = await makeRequest("/image", {
     method: "POST",
     body: formData,
