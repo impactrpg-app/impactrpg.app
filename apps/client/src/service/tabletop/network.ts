@@ -253,7 +253,7 @@ export function toNetworkModule<T extends Module<any>>(
   } else if (module instanceof LineRendererModule) {
     return {
       type: NetworkModuleType.LineRenderer,
-      points: module.getPoints(),
+      points: module.getPoints().map((point) => point.toObject()),
     };
   } else if (module instanceof BoxRendererModule) {
     return {
