@@ -35,7 +35,7 @@ export class MoveTool extends BaseTool {
   private addSelectedObject(entity: Entity, point: Vector3) {
     selectedObjects.add(entity.uuid);
     const pos = entity.position.subtract(point);
-    this._objectOffset.push(new Vector3(pos.x, 0, pos.y));
+    this._objectOffset.push(pos);
   }
 
   onMouseDown(e: MouseEvent): void {
