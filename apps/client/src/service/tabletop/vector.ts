@@ -8,7 +8,7 @@ export class Dirtyable {
   constructor() {
     this.isPhysicsDirty = true;
     this.isRenderDirty = true;
-    this.isNetworkDirty = true;
+    this.isNetworkDirty = false;
   }
 
   setDirty(boolean = true) {
