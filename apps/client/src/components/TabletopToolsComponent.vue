@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Button, Divider } from "primevue";
+import { Dialog, Button, Divider } from "primevue";
 import { ref } from "vue";
 
 const props = defineProps<{
@@ -31,86 +31,90 @@ function onChangeTool(toolName: string) {
 </script>
 
 <template>
-  <div class="tools">
-    <Button
-      :variant="!props.isCharactersOpen ? 'outlined' : undefined"
-      class="rounded-button"
-      icon="pi pi-user"
-      v-tooltip.top="'Character Sheet'"
-      @click="emits('update:isCharactersOpen', !props.isCharactersOpen)"
-    />
-    <Button
-      :variant="!props.isDiceTrayOpen ? 'outlined' : undefined"
-      class="rounded-button"
-      v-tooltip.top="'Roll Tray'"
-      @click="emits('update:isDiceTrayOpen', !props.isDiceTrayOpen)"
-    >
-      <template #icon>
-        <span class="material-symbols-outlined">casino</span>
-      </template>
-    </Button>
-    <Button
-      :variant="!props.isEncountersOpen ? 'outlined' : undefined"
-      class="rounded-button"
-      icon="pi pi-eye"
-      v-tooltip.top="'Encounters'"
-      @click="emits('update:isEncountersOpen', !props.isEncountersOpen)"
-    />
-    <Button
-      :variant="!props.isRulebookOpen ? 'outlined' : undefined"
-      class="rounded-button"
-      icon="pi pi-align-justify"
-      v-tooltip.top="'Rulebook'"
-      @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
-    />
-    <Divider layout="vertical" />
-    <Button
-      variant="outlined"
-      class="rounded-button"
-      icon="pi pi-upload"
-      v-tooltip.top="'Upload Image'"
-      @click="emits('uploadImage')"
-    />
-    <Button
-      variant="outlined"
-      class="rounded-button"
-      v-tooltip.top="'Upload Object'"
-      @click="emits('uploadObject')"
-    >
-      <template #icon>
-        <span class="material-symbols-outlined">deployed_code</span>
-      </template>
-    </Button>
-    <Divider layout="vertical" />
-    <template v-for="tool in props.tools" :key="tool.name">
+  <Dialog
+    :visible="true"
+    :modal="false"
+    :draggable="false"
+    :closable="false"
+    :resizable="false"
+    :show-header="false"
+    position="bottom"
+    class="tools-dialog"
+  >
+    <div class="row gap10 tools">
       <Button
-        :variant="selectedTool !== tool.name ? 'outlined' : undefined"
-        :aria-label="tool.name"
+        :variant="!props.isCharactersOpen ? 'outlined' : undefined"
         class="rounded-button"
-        :icon="tool.icon"
-        v-tooltip.top="tool.name"
-        @click="onChangeTool(tool.name)"
+        icon="pi pi-user"
+        v-tooltip.top="'Character Sheet'"
+        @click="emits('update:isCharactersOpen', !props.isCharactersOpen)"
       />
-    </template>
-  </div>
+      <Button
+        :variant="!props.isDiceTrayOpen ? 'outlined' : undefined"
+        class="rounded-button"
+        v-tooltip.top="'Roll Tray'"
+        @click="emits('update:isDiceTrayOpen', !props.isDiceTrayOpen)"
+      >
+        <template #icon>
+          <span class="material-symbols-outlined">casino</span>
+        </template>
+      </Button>
+      <Button
+        :variant="!props.isEncountersOpen ? 'outlined' : undefined"
+        class="rounded-button"
+        icon="pi pi-eye"
+        v-tooltip.top="'Encounters'"
+        @click="emits('update:isEncountersOpen', !props.isEncountersOpen)"
+      />
+      <Button
+        :variant="!props.isRulebookOpen ? 'outlined' : undefined"
+        class="rounded-button"
+        icon="pi pi-align-justify"
+        v-tooltip.top="'Rulebook'"
+        @click="emits('update:isRulebookOpen', !props.isRulebookOpen)"
+      />
+      <Divider layout="vertical" />
+      <Button
+        variant="outlined"
+        class="rounded-button"
+        icon="pi pi-upload"
+        v-tooltip.top="'Upload Image'"
+        @click="emits('uploadImage')"
+      />
+      <Button
+        variant="outlined"
+        class="rounded-button"
+        v-tooltip.top="'Upload Object'"
+        @click="emits('uploadObject')"
+      >
+        <template #icon>
+          <span class="material-symbols-outlined">deployed_code</span>
+        </template>
+      </Button>
+      <Divider layout="vertical" />
+      <template v-for="tool in props.tools" :key="tool.name">
+        <Button
+          :variant="selectedTool !== tool.name ? 'outlined' : undefined"
+          :aria-label="tool.name"
+          class="rounded-button"
+          :icon="tool.icon"
+          v-tooltip.top="tool.name"
+          @click="onChangeTool(tool.name)"
+        />
+      </template>
+    </div>
+  </Dialog>
 </template>
 
 <style lang="css" scoped>
 .tools {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  z-index: 5000;
-  padding: 10px 15px;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
-  border-radius: 50px;
-  border: 0;
+  position: relative;
+  top: 12px;
+
+  .p-divider {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
 
   .rounded-button {
     border-radius: 50%;
@@ -119,6 +123,16 @@ function onChangeTool(toolName: string) {
   .search-input {
     border-radius: 20px;
     min-width: 400px;
+  }
+}
+</style>
+<style lang="css">
+.tools-dialog {
+  border-radius: 40px !important;
+
+  div {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
   }
 }
 </style>
