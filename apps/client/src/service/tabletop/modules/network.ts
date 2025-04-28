@@ -33,18 +33,18 @@ export class NetworkModule extends Module<any> {
     let updates: Partial<NetworkEntity> = {};
     if (this.entity.position.isNetworkDirty) {
       updates.position = this.entity.position.toObject();
-      hasUpdated = true;
       this.entity.position.isNetworkDirty = false;
+      hasUpdated = true;
     }
     if (this.entity.rotation.isNetworkDirty) {
       updates.rotation = this.entity.rotation.toObject();
-      hasUpdated = true;
       this.entity.rotation.isNetworkDirty = false;
+      hasUpdated = true;
     }
     if (this.entity.scale.isNetworkDirty) {
       updates.scale = this.entity.scale.toObject();
-      hasUpdated = true;
       this.entity.scale.isNetworkDirty = false;
+      hasUpdated = true;
     }
 
     if (hasUpdated) {
@@ -52,8 +52,10 @@ export class NetworkModule extends Module<any> {
         this.entity.uuid,
         updates
       );
-      this._lastUpdate = updateObjectMessage;
-      if (Date.now() - this._lastUpdateTimestamp < 100) return;
+      if (Date.now() - this._lastUpdateTimestamp < 100) {
+        this._lastUpdate = updateObjectMessage;
+        return;
+      }
       Network.updateObject(updateObjectMessage);
       this._lastUpdateTimestamp = Date.now();
     } else if (this._lastUpdate !== null) {
