@@ -42,6 +42,14 @@ export class MoveTool extends BaseTool {
     if (e.button === 0) {
       this._isDragging = true;
       // Left mouse button down
+      for (const uuid of selectedObjects.values()) {
+        const entity = scene.get(uuid);
+        if (!entity) continue;
+        const body =
+          entity.getModule<Physics.BaseBodyModule>("Module::Physics");
+        if (body) body.setActive(false);
+      }
+
       const result = this.getClickedObject(e);
       if (!this._isShiftDown) {
         selectedObjects.clear();
@@ -70,6 +78,13 @@ export class MoveTool extends BaseTool {
   }
   onMouseUp(e: MouseEvent): void {
     if (e.button === 0) {
+      for (const uuid of selectedObjects.values()) {
+        const entity = scene.get(uuid);
+        if (!entity) continue;
+        const body =
+          entity.getModule<Physics.BaseBodyModule>("Module::Physics");
+        if (body) body.setActive(true);
+      }
       this._isDragging = false;
     }
   }
@@ -81,7 +96,6 @@ export class MoveTool extends BaseTool {
       const offset = this._objectOffset[i]!;
       if (!entity) continue;
       const body = entity.getModule<Physics.BaseBodyModule>("Module::Physics");
-      if (body) body.setActive(!this._isDragging);
       if (this._isDragging === false) continue;
       const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
       const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
