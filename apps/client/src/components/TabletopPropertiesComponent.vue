@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import CustomResourceComponent from "./CustomResourceComponent.vue";
 import * as TabletopService from "@/service/tabletop";
-import { Button, Dialog, ToggleSwitch } from "primevue";
-import { Vector3, Vector4 } from "@/service/tabletop/vector";
+import { Dialog, ToggleSwitch } from "primevue";
+import { Vector3 } from "@/service/tabletop/vector";
 import { computed } from "vue";
 
 const props = defineProps<{
@@ -17,7 +17,9 @@ const rotation = computed({
   get() {
     return 0;
   },
-  set(val: number) {},
+  set(val: number) {
+    console.error("Rotation not implemented");
+  },
 });
 const scale = computed({
   get() {
@@ -51,18 +53,6 @@ const lockObject = computed({
     }
   },
 });
-
-function deleteSelectedObjects() {
-  for (const obj of props.selectedObjects) {
-    const net = obj.getModule<TabletopService.NetworkModule>("Module::Network");
-    if (net) {
-      net.despawn();
-    } else {
-      obj.destroy();
-    }
-  }
-  emits("update:isOpen", false);
-}
 </script>
 
 <template>
@@ -85,14 +75,6 @@ function deleteSelectedObjects() {
       <label>
         <span>Lock Object</span>
         <ToggleSwitch v-model="lockObject" input-id="lock-object" />
-      </label>
-      <label>
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          @click="deleteSelectedObjects"
-          variant="danger"
-        />
       </label>
     </div>
   </Dialog>

@@ -27,7 +27,7 @@ import {
   ImageRendererModule,
   ObjectRenderer,
 } from "./renderer";
-import { LineRendererModule } from "./renderer/modules/LineRenderer";
+import { LineRendererModule } from "./renderer/modules/lineRenderer";
 import * as Physics from "./physics";
 import * as Network from "./modules/network";
 import { createDefaultScene } from "./defaultScene";

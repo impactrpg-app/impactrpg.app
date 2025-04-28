@@ -95,6 +95,7 @@ export class MoveTool extends BaseTool {
             .add(offset)
             .add(new Vector3(0, 0.1, 0));
         }
+        entity.position.isNetworkDirty = true;
       }
     }
   }

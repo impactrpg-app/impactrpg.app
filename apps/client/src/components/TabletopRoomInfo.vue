@@ -55,6 +55,25 @@ const rollTarget = computed({
     updateSettings({ rollTarget: value });
   },
 });
+
+function clearDrawings() {
+  for (const obj of TabletopService.scene.values()) {
+    const lineRenderer =
+      obj.getModule<TabletopService.LineRendererModule>("Module::Renderer");
+    if (
+      lineRenderer &&
+      lineRenderer instanceof TabletopService.LineRendererModule
+    ) {
+      const net =
+        obj.getModule<TabletopService.NetworkModule>("Module::Network");
+      if (net) {
+        net.despawn();
+      } else {
+        obj.destroy();
+      }
+    }
+  }
+}
 </script>
 
 <template>
@@ -73,6 +92,13 @@ const rollTarget = computed({
         <span class="label">Roll Target</span>
         <CustomResourceComponent v-model="rollTarget" style="height: 45px" />
       </div>
+      <Button
+        label="Clear Drawings"
+        icon="pi pi-trash"
+        class="p-button-danger"
+        @click="clearDrawings"
+        v-tooltip.bottom="'Clear Drawings'"
+      />
     </div>
   </Dialog>
   <Dialog

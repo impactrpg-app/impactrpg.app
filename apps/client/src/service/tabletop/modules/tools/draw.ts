@@ -2,7 +2,7 @@ import * as Rapier from "@dimforge/rapier3d";
 import * as Physics from "../../physics";
 import { Vector3 } from "../../vector";
 import { BaseTool } from "./base";
-import { LineRendererModule } from "../../renderer/modules/LineRenderer";
+import { LineRendererModule } from "../../renderer/modules/lineRenderer";
 import { Entity } from "../../scene";
 import { NetworkModule } from "../network";
 import { toNetworkEntity, updateObject } from "../../network";
@@ -25,6 +25,7 @@ export class DrawTool extends BaseTool {
     return new DrawTool();
   }
   onMouseDown(e: MouseEvent): void {
+    if (e.button !== 0) return;
     const ray = this._camera?.getRayFromScreenPoint(e.clientX, e.clientY);
     if (!ray) return;
     const hit = Physics.CastRay(ray.origin, ray.direction, 100);
@@ -45,6 +46,7 @@ export class DrawTool extends BaseTool {
     this._entity.addModule(new NetworkModule());
   }
   onMouseUp(e: MouseEvent): void {
+    if (e.button !== 0) return;
     if (this.points.length <= 2) {
       this._entity?.destroy();
     } else {
