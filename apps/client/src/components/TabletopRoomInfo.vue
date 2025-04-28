@@ -128,6 +128,7 @@ function clearDrawings() {
           class="rounded-button"
           @click="() => (showRoomSettings = true)"
           v-tooltip.bottom="'Room Settings'"
+          v-if="myUserId === room.owner"
         />
         <Button
           variant="outlined"
