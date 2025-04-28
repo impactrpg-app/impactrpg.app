@@ -8,6 +8,7 @@ import CharacterStatsComponent from "./character-sheet/CharacterStatsComponent.v
 import CharacterSkillAndGearComponent from "./character-sheet/CharacterSkillAndGearComponent.vue";
 import { makeRequest } from "../service/api";
 import { CharacterDto, CharacterListDto } from "@impact/shared";
+import { runTask } from "@/service/task";
 
 const props = defineProps<{
   isOpen: boolean;
@@ -37,52 +38,60 @@ async function fetchCharacters() {
 }
 
 async function saveCharacter() {
-  if (!selectedCharacter.value) return;
-  const data = await makeRequest<CharacterDto>(
-    `/character/${selectedCharacterId.value}`,
-    {
-      method: "PUT",
-      body: JSON.stringify(selectedCharacter.value),
+  runTask(async () => {
+    if (!selectedCharacter.value) return;
+    const data = await makeRequest<CharacterDto>(
+      `/character/${selectedCharacterId.value}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(selectedCharacter.value),
+      }
+    );
+    if (!data) {
+      toast.add({
+        severity: "error",
+        summary: "Failed to save character",
+      });
     }
-  );
-  if (!data) {
-    toast.add({
-      severity: "error",
-      summary: "Failed to save character",
-    });
-  }
+  });
 }
 
 async function selectCharacter(characterId: string) {
-  selectedCharacter.value = await makeRequest<CharacterDto>(
-    `/character/${characterId}`
-  );
-  selectedCharacterId.value = characterId;
+  runTask(async () => {
+    selectedCharacter.value = await makeRequest<CharacterDto>(
+      `/character/${characterId}`
+    );
+    selectedCharacterId.value = characterId;
+  });
 }
 async function deSelectCharacter() {
-  await saveCharacter();
-  await fetchCharacters();
   selectedCharacterId.value = null;
   selectedCharacter.value = null;
+  runTask(async () => {
+    await saveCharacter();
+    await fetchCharacters();
+  });
 }
 async function createCharacter(character: CharacterDto) {
-  if (!character.info.name) {
-    character.info.name = "New Character";
-  }
-  const data = await makeRequest<CharacterListDto>("/character", {
-    method: "POST",
-    body: JSON.stringify(character),
-  });
+  runTask(async () => {
+    if (!character.info.name) {
+      character.info.name = "New Character";
+    }
+    const data = await makeRequest<CharacterListDto>("/character", {
+      method: "POST",
+      body: JSON.stringify(character),
+    });
 
-  characters.value = [
-    ...characters.value,
-    {
-      id: data.id,
-      name: data.name,
-      image: data.image,
-    },
-  ];
-  selectCharacter(data.id);
+    characters.value = [
+      ...characters.value,
+      {
+        id: data.id,
+        name: data.name,
+        image: data.image,
+      },
+    ];
+    selectCharacter(data.id);
+  });
 }
 async function deleteCharacter(characterId: string) {
   confirm.require({
@@ -96,17 +105,20 @@ async function deleteCharacter(characterId: string) {
     acceptIcon: "pi pi-trash",
     rejectIcon: "pi pi-times",
     header: "Delete Character",
-    accept: async () => {
-      const data = await makeRequest<CharacterListDto>(
-        `/character/${characterId}`,
-        {
-          method: "DELETE",
+    accept: () =>
+      runTask(async () => {
+        const data = await makeRequest<CharacterListDto>(
+          `/character/${characterId}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (data) {
+          characters.value = characters.value.filter(
+            (c) => c.id !== characterId
+          );
         }
-      );
-      if (data) {
-        characters.value = characters.value.filter((c) => c.id !== characterId);
-      }
-    },
+      }),
   });
 }
 </script>
