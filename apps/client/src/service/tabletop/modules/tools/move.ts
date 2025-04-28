@@ -37,19 +37,19 @@ export class MoveTool extends BaseTool {
     const pos = entity.position.subtract(point);
     this._objectOffset.push(pos);
   }
+  private setPhysicsForSelectedObjects(value: boolean) {
+    for (const uuid of selectedObjects.values()) {
+      const entity = scene.get(uuid);
+      if (!entity) continue;
+      const body = entity.getModule<Physics.BaseBodyModule>("Module::Physics");
+      if (body) body.setActive(value);
+    }
+  }
 
   onMouseDown(e: MouseEvent): void {
     if (e.button === 0) {
       this._isDragging = true;
       // Left mouse button down
-      for (const uuid of selectedObjects.values()) {
-        const entity = scene.get(uuid);
-        if (!entity) continue;
-        const body =
-          entity.getModule<Physics.BaseBodyModule>("Module::Physics");
-        if (body) body.setActive(false);
-      }
-
       const result = this.getClickedObject(e);
       if (!this._isShiftDown) {
         selectedObjects.clear();
@@ -61,6 +61,7 @@ export class MoveTool extends BaseTool {
         }
         this._isDragging = true;
       }
+      this.setPhysicsForSelectedObjects(false);
     } else if (e.button === 2) {
       // Right mouse button down
       const result = this.getClickedObject(e, true);
@@ -78,13 +79,7 @@ export class MoveTool extends BaseTool {
   }
   onMouseUp(e: MouseEvent): void {
     if (e.button === 0) {
-      for (const uuid of selectedObjects.values()) {
-        const entity = scene.get(uuid);
-        if (!entity) continue;
-        const body =
-          entity.getModule<Physics.BaseBodyModule>("Module::Physics");
-        if (body) body.setActive(true);
-      }
+      this.setPhysicsForSelectedObjects(true);
       this._isDragging = false;
     }
   }
