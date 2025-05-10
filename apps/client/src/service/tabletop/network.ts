@@ -63,8 +63,14 @@ const socket = ref<Socket | null>(null);
 export function init() {
   socket.value = io(API_URL, {
     auth: getSocketHeaders(),
-    withCredentials: true,
     transports: ["websocket"],
+    reconnectionDelayMax: 500,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 500,
+    withCredentials: true,
+    reconnection: true,
+    autoConnect: true,
+    timeout: 3000,
   });
 
   socket.value.on(MessageType.Error, (data: ErrorMessage) => {
