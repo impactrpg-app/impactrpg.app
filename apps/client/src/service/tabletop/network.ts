@@ -2,7 +2,6 @@ import { io, Socket } from "socket.io-client";
 import { API_URL, getSocketHeaders } from "../api";
 import {
   AddObjectMessage,
-  AllMessageTypes,
   BoxCollider,
   DiceRollMessage,
   ErrorMessage,
@@ -71,6 +70,13 @@ export function init() {
     reconnection: true,
     autoConnect: true,
     timeout: 3000,
+  });
+  socket.value.on("disconnect", (reason, description) => {
+    room.value = null;
+    notifySelf("Disconnected from server");
+    console.warn(
+      `Disconnected from server: ${reason} ${description}. Reconnecting...`
+    );
   });
 
   socket.value.on(MessageType.Error, (data: ErrorMessage) => {
