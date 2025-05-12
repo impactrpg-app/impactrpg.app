@@ -77,6 +77,14 @@ export function init() {
     console.warn(
       `Disconnected from server: ${reason} ${description}. Reconnecting...`
     );
+    if (
+      reason === "transport close" ||
+      reason === "transport error" ||
+      reason === "ping timeout" ||
+      reason === "parse error"
+    ) {
+      socket.value?.connect();
+    }
   });
 
   socket.value.on(MessageType.Error, (data: ErrorMessage) => {
