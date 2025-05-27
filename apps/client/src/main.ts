@@ -10,6 +10,7 @@ import {
   ToastService,
   Tooltip,
 } from "primevue";
+import "./version";
 
 const app = createApp(App);
 

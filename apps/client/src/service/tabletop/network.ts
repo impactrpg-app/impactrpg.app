@@ -168,6 +168,9 @@ function updateObjectResponse(data: UpdateObjectMessage) {
     entity.scale = Vector3.fromObject(data.object.scale);
     entity.scale.isNetworkDirty = false;
   }
+  if (data.object.isLocked !== undefined)  {
+    entity.isLocked = data.object.isLocked;
+  }
   if (data.object.modules) {
     for (const module of data.object.modules) {
       const convertedModule = toModule(module);

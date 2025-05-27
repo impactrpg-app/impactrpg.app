@@ -9,7 +9,7 @@ export const config = {
   enableSSL: process.env.ENABLE_SSL === "true",
   storage: {
     host: process.env.STORAGE_HOST ?? "",
-    region: process.env.STORAGE_REGION ?? "",
+    region: process.env.STORAGE_REGION ?? "eu-west-1",
     bucket: process.env.STORAGE_BUCKET ?? "",
     key: process.env.STORAGE_KEY ?? "",
     secret: process.env.STORAGE_SECRET ?? "",

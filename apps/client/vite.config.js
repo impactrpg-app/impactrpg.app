@@ -4,6 +4,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 import vue from "@vitejs/plugin-vue";
+import * as Uuid from "uuid";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -28,6 +29,14 @@ export default defineConfig({
     watch: {
       usePolling: true,
       interval: 1000,
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        entryFileNames: `${Uuid.v7()}.js`,
+        chunkFileNames: `${Uuid.v7()}.js`,
+      },
     },
   },
 });
