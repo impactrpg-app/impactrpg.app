@@ -68,8 +68,7 @@ export class RoomController {
         _id: new mongoose.Types.ObjectId(id),
         owner: new mongoose.Types.ObjectId(req.user.id),
       },
-      { name: body.name },
-      { new: true }
+      { name: body.name }
     );
     if (!room) {
       throw new NotFoundException("Room not found");
