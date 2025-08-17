@@ -3,17 +3,19 @@ import { BaseTool } from "./base";
 import { Entity, isContextMenuOpen, scene, selectedObjects } from "../../scene";
 import { Vector3 } from "../../vector";
 
+const MIN_MOUSE_MOVE_PER_PIXEL = 5;
+
 export class MoveTool extends BaseTool {
   public name = "Move (Q)";
   public icon = "pi pi-arrows-alt";
   private _isShiftDown = false;
   private _isDragging = false;
   private _objectOffset: Vector3[] = [];
+  private _previousMouseMove: MouseEvent | null = null;
 
   async init() {
     await super.init();
   }
-
   clone(): MoveTool {
     return new MoveTool();
   }
@@ -85,6 +87,17 @@ export class MoveTool extends BaseTool {
   }
   onMouseMove(e: MouseEvent) {
     if (!this._camera) return;
+
+    const mouseMoveDiffX = e.clientX - (this._previousMouseMove?.clientX ?? 0);
+    const mouseMoveDiffY = e.clientY - (this._previousMouseMove?.clientY ?? 0);
+    const mouseMoveDiff = Math.sqrt(
+      mouseMoveDiffX * mouseMoveDiffX + mouseMoveDiffY * mouseMoveDiffY
+    );
+    if (mouseMoveDiff < MIN_MOUSE_MOVE_PER_PIXEL) return;
+
+    const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
+    const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
+
     const uuids = [...selectedObjects.values()];
     for (let i = 0; i < uuids.length; i++) {
       const entity = scene.get(uuids[i]!);
@@ -92,8 +105,6 @@ export class MoveTool extends BaseTool {
       if (!entity) continue;
       const body = entity.getModule<Physics.BaseBodyModule>("Module::Physics");
       if (this._isDragging === false) continue;
-      const ray = this._camera.getRayFromScreenPoint(e.clientX, e.clientY);
-      const rayResult = Physics.CastRay(ray.origin, ray.direction, 100);
       if (rayResult) {
         if (body instanceof Physics.DynamicBodyModule) {
           entity.position = rayResult.point
@@ -107,6 +118,7 @@ export class MoveTool extends BaseTool {
         entity.position.isNetworkDirty = true;
       }
     }
+    this._previousMouseMove = e;
   }
   onKeyDown(e: KeyboardEvent): void {
     if (e.key === "Shift") {
