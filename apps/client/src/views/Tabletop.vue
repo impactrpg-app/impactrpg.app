@@ -170,7 +170,7 @@ async function onCloseContextMenu() {
 }
 async function updateRoom(room: TabletopService.Room) {
   TabletopService.updateRoomInfo(
-    new RoomInfoMessage("", room.name, room.rollTarget, room.users)
+    new RoomInfoMessage("", room.name, room.users)
   );
 }
 </script>

@@ -47,14 +47,6 @@ const roomName = computed({
     updateSettings({ name: value });
   },
 });
-const rollTarget = computed({
-  get() {
-    return props.room.rollTarget;
-  },
-  set(value: number) {
-    updateSettings({ rollTarget: value });
-  },
-});
 
 function clearDrawings() {
   for (const obj of TabletopService.scene.values()) {
@@ -88,10 +80,6 @@ function clearDrawings() {
         <InputText id="room-name" v-model="roomName" />
         <label for="room-name">Room Name</label>
       </FloatLabel>
-      <div class="column gap10">
-        <span class="label">Roll Target</span>
-        <CustomResourceComponent v-model="rollTarget" style="height: 45px" />
-      </div>
       <Button
         label="Clear Drawings"
         icon="pi pi-trash"

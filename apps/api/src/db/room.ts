@@ -57,13 +57,6 @@ export class Room {
   owner: mongoose.Schema.Types.ObjectId;
 
   @Prop({
-    required: false,
-    default: 2,
-    type: Number,
-  })
-  rollTarget: number;
-
-  @Prop({
     required: true,
     type: [TabletopObject],
   })

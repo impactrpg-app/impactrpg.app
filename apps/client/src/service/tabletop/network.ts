@@ -42,14 +42,12 @@ export class Room {
   name: string;
   owner: string | null;
   users: NetworkUser[];
-  rollTarget: number;
 
   constructor(id: string) {
     this.id = id;
     this.name = "New Room";
     this.owner = null;
     this.users = [];
-    this.rollTarget = 2;
   }
 }
 
@@ -139,7 +137,6 @@ function leaveRoomResponse(data: LeaveRoomMessage) {
 function roomInfoResponse(data: RoomInfoMessage) {
   if (!room.value) return;
   room.value.users = data.users;
-  room.value.rollTarget = data.rollTarget;
   room.value.name = data.roomName;
   room.value.owner = data.ownerUserId;
 }
@@ -168,7 +165,7 @@ function updateObjectResponse(data: UpdateObjectMessage) {
     entity.scale = Vector3.fromObject(data.object.scale);
     entity.scale.isNetworkDirty = false;
   }
-  if (data.object.isLocked !== undefined)  {
+  if (data.object.isLocked !== undefined) {
     entity.isLocked = data.object.isLocked;
   }
   if (data.object.modules) {

@@ -139,19 +139,11 @@ export class RoomInfoMessage {
   roomName: string;
   @IsArray()
   users: NetworkUser[];
-  @IsNumber()
-  rollTarget: number;
 
-  constructor(
-    ownerUserId: string,
-    roomName: string,
-    rollTarget: number,
-    users: NetworkUser[]
-  ) {
+  constructor(ownerUserId: string, roomName: string, users: NetworkUser[]) {
     this.type = MessageType.RoomInfo;
     this.ownerUserId = ownerUserId;
     this.roomName = roomName;
-    this.rollTarget = rollTarget;
     this.users = users;
   }
 }

@@ -28,7 +28,6 @@ export type Room = {
   id: string;
   users: Map<string, Socket>; // userId -> Socket
   owner: string;
-  rollTarget: number;
   name: string;
   tabletopObjects: TabletopObject[];
 };
@@ -145,12 +144,7 @@ export class RoomService {
           uuid: user._id.toString(),
         }) as NetworkUser
     );
-    const message = new RoomInfoMessage(
-      room.owner,
-      room.name,
-      room.rollTarget,
-      displayNames
-    );
+    const message = new RoomInfoMessage(room.owner, room.name, displayNames);
     this.triggerForAllUsersInRoom(room.id, (_userId, socket) =>
       socket.emit(MessageType.RoomInfo, message)
     );
@@ -166,9 +160,8 @@ export class RoomService {
     }
     await this.roomModel.findOneAndUpdate(
       { _id: new Types.ObjectId(room.id) },
-      { rollTarget: roomInfo.rollTarget, name: roomInfo.roomName }
+      { name: roomInfo.roomName }
     );
-    room.rollTarget = roomInfo.rollTarget;
     room.name = roomInfo.roomName;
     const userIds = roomInfo.users.map((user) => user.uuid);
     for (const user of room.users) {
@@ -211,7 +204,6 @@ export class RoomService {
         users: new Map([[userId, client]]),
         owner: userId,
         tabletopObjects: query.objects,
-        rollTarget: query.rollTarget,
         name: query.name,
       });
     }
